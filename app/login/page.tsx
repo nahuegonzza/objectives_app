@@ -18,9 +18,9 @@ export default function LoginPage() {
     setError('');
 
     const supabase = createBrowserSupabaseClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
+    const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
     });
 
     if (error) {
