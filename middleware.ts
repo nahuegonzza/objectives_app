@@ -1,20 +1,26 @@
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next();
+
+  const supabase = createMiddlewareClient({ req, res });
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   const protectedRoutes = ['/', '/goals', '/analytics', '/calendar', '/history', '/settings'];
-  const pathname = request.nextUrl.pathname;
+  const pathname = req.nextUrl.pathname;
 
-  const isProtected = protectedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
-  const hasSessionCookie = Boolean(request.cookies.get('sb-access-token'));
+  const isProtected = protectedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
 
-  if (isProtected && !hasSessionCookie) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (isProtected && !session) {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  return NextResponse.next();
+  return res;
 }
-
-export const config = {
-  matcher: ['/', '/goals/:path*', '/analytics/:path*', '/calendar/:path*', '/history/:path*', '/settings/:path*'],
-};
