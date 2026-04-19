@@ -2,8 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@lib/auth';
+import { getServerSupabaseSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
 import { moduleDefinitions } from '@modules';
@@ -82,7 +81,7 @@ async function getModuleEntriesForRange(start: Date, end: Date, userId: string) 
 }
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const { session } = await getServerSupabaseSession();
 
   if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

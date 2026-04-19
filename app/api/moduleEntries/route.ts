@@ -2,8 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@lib/auth';
+import { getServerSupabaseSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 
 function normalizeDateToStartOfDay(dateString: string) {
@@ -27,7 +26,7 @@ function normalizeDateToStartOfDay(dateString: string) {
 }
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const { session } = await getServerSupabaseSession();
 
   if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -78,7 +77,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const { session } = await getServerSupabaseSession();
 
   if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

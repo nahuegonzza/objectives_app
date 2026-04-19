@@ -2,8 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@lib/auth';
+import { getServerSupabaseSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
 import { moduleDefinitions } from '@modules';
@@ -25,7 +24,7 @@ function normalizeGoalType(type: string): GoalType {
 }
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const { session } = await getServerSupabaseSession();
 
   if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -4,8 +4,7 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import type { GoalEntryPayload } from '@types';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@lib/auth';
+import { getServerSupabaseSession } from '@lib/supabase-server';
 
 function normalizeDateToStartOfDay(dateString: string) {
   if (!dateString || typeof dateString !== 'string') {
@@ -34,7 +33,7 @@ function normalizeGoalType(type: string) {
 }
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
+  const { session } = await getServerSupabaseSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -76,7 +75,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const { session } = await getServerSupabaseSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
