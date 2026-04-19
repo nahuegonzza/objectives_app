@@ -2,7 +2,7 @@ import { withAuth } from 'next-auth/middleware';
 
 export default withAuth(
   function middleware(req) {
-    // Add any additional middleware logic here if needed
+    // Additional middleware logic can be added here later
   },
   {
     callbacks: {
@@ -12,5 +12,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/goals/:path*', '/analytics/:path*', '/calendar/:path*', '/history/:path*', '/settings/:path*'],
+  matcher: ['/', '/goals/:path*', '/analytics/:path*', '/calendar/:path*', '/history/:path*', '/settings/:path*'],
 };
