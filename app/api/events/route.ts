@@ -7,13 +7,13 @@ import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 
 export async function GET(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = user.id;
 
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get('limit') ?? 10);
@@ -55,9 +55,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

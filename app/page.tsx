@@ -2,9 +2,9 @@ import { redirect } from 'next/navigation';
 import { ensurePrismaUserForSession, getServerSupabaseSession } from '@lib/supabase-server';
 
 export default async function Home() {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session?.user?.id) {
+  if (!user?.id) {
     redirect('/login');
   }
 

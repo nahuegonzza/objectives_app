@@ -5,8 +5,10 @@ import { prisma } from '@lib/prisma';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
-  console.warn('Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY');
+if (!supabaseUrl || !supabaseKey) {
+  console.warn(
+    'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
+  );
 }
 
 export function createServerSupabaseClient(cookieStore = cookies()) {
@@ -24,22 +26,32 @@ export function createServerSupabaseClient(cookieStore = cookies()) {
   });
 }
 
-export async function getServerSupabaseSession() {
+/**
+ * 🔐 Obtener usuario autenticado (FORMA CORRECTA)
+ */
+export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error) {
     throw error;
   }
 
   return {
-    session: data?.session ?? null,
+    user,
     supabase,
   };
 }
 
+/**
+ * 👤 Sincroniza usuario con Prisma
+ */
 export async function ensurePrismaUserForSession() {
-    const { user } = await getServerSupabaseUser();
+  const { user } = await getServerSupabaseUser();
 
   if (!user?.id || !user.email) {
     return null;
@@ -59,7 +71,10 @@ export async function ensurePrismaUserForSession() {
   });
 }
 
+/**
+ * 🆔 Obtener ID del usuario autenticado
+ */
 export async function getSupabaseUserId() {
-  const { session } = await getServerSupabaseSession();
-  return session?.user?.id ?? null;
+  const { user } = await getServerSupabaseUser();
+  return user?.id ?? null;
 }

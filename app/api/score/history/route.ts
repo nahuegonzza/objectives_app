@@ -81,9 +81,9 @@ async function getModuleEntriesForRange(start: Date, end: Date, userId: string) 
 }
 
 export async function GET(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

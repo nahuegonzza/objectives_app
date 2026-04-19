@@ -26,9 +26,9 @@ function normalizeDateToStartOfDay(dateString: string) {
 }
 
 export async function GET(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -77,9 +77,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

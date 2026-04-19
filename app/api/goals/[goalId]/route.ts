@@ -7,8 +7,8 @@ import type { GoalPayload } from '@types';
 import { getServerSupabaseSession } from '@lib/supabase-server';
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
-  const { session } = await getServerSupabaseSession();
-  if (!session?.user?.id) {
+  const { user } = await getServerSupabaseUser();
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -56,8 +56,8 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
 }
 
 export async function DELETE(request: Request, { params }: { params: { goalId: string } }) {
-  const { session } = await getServerSupabaseSession();
-  if (!session?.user?.id) {
+  const { user } = await getServerSupabaseUser();
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

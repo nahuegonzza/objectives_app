@@ -7,9 +7,9 @@ import { prisma } from '@lib/prisma';
 import type { Rule } from '@types';
 
 export async function GET() {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -29,9 +29,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

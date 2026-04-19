@@ -7,9 +7,9 @@ import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 
 export async function GET() {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -48,9 +48,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const { session } = await getServerSupabaseSession();
+  const { user } = await getServerSupabaseUser();
 
-  if (!session || !session.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
