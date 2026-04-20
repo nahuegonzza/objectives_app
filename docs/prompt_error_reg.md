@@ -1,4 +1,4 @@
-Quiero que hagas un análisis profundo del sistema actual (Next.js + Prisma + PostgreSQL + NextAuth) enfocado en detectar y corregir un error en producción.
+Quiero que hagas un análisis profundo del sistema actual (Next.js + Prisma + PostgreSQL + Supabase) enfocado en detectar y corregir un error en producción.
 
 ⚠️ CONTEXTO IMPORTANTE:
 
@@ -67,8 +67,8 @@ Buscar específicamente:
 Verificar uso correcto de:
 
 * DATABASE_URL
-* NEXTAUTH_SECRET
-* NEXTAUTH_URL
+* NEXT_PUBLIC_SUPABASE_URL
+* NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 Asegurar que:
 

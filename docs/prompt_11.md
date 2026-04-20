@@ -26,7 +26,7 @@ Convertir la app en un sistema multiusuario donde:
 
 Implementar usando:
 
-* NextAuth (Auth.js)
+* Supabase Auth
 * Prisma Adapter
 
 ## FUNCIONALIDAD:

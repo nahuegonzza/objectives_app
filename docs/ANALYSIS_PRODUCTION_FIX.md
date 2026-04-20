@@ -233,12 +233,12 @@ En Vercel dashboard → Settings → Environment Variables:
 
 ```
 DATABASE_URL = postgresql://user:pass@host:5432/objetives_app
-NEXTAUTH_SECRET = <generar con: openssl rand -base64 32>
-NEXTAUTH_URL = https://tu-domain.vercel.app
+NEXT_PUBLIC_SUPABASE_URL = https://tu-domain.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY = sb_anon_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 NODE_ENV = production
 ```
 
-### Paso 2: Generar NEXTAUTH_SECRET seguro
+### Paso 2: Generar claves de Supabase
 
 ```bash
 # En tu terminal local
@@ -412,8 +412,8 @@ vercel env list
 
 # Esperado:
 DATABASE_URL = ••••••••
-NEXTAUTH_SECRET = ••••••••
-NEXTAUTH_URL = https://tu-domain.vercel.app
+NEXT_PUBLIC_SUPABASE_URL = ••••••••
+NEXT_PUBLIC_SUPABASE_ANON_KEY = ••••••••
 ```
 
 2. **Ver logs en tiempo real:**

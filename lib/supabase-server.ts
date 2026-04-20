@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@lib/prisma';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export function createServerSupabaseClient(cookieStore = cookies()) {
   return createServerClient(supabaseUrl, supabaseKey, {

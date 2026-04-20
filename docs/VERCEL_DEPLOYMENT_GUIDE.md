@@ -32,15 +32,16 @@ El endpoint `/api/register` retornaba **500 Internal Server Error** en producci�
 
 ## 🚀 PASO A PASO: Desplegar en Vercel
 
-### Paso 1: Generar NEXTAUTH_SECRET
+### Paso 1: Configurar las variables de Supabase
 
-```bash
-# Opción A: Con OpenSSL (recomendado)
-openssl rand -base64 32
+En Vercel dashboard → Settings → Environment Variables, agrega estas variables:
 
-# Copiar output, ejemplo:
-# abc123XYZ+/=...
-```
+| Variable | Valor | Ejemplo |
+|----------|-------|---------|
+| `DATABASE_URL` | Tu PostgreSQL connection string | `postgresql://user:pass@db.internal.vercel.app:5432/objetives_app` |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL de tu proyecto Supabase | `https://xxxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key de Supabase | `sb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| `NODE_ENV` | `production` | `production` |
 
 ### Paso 2: Ir a Vercel Dashboard
 
@@ -55,14 +56,14 @@ Agregar o actualizar estas variables (sin comillas):
 | Variable | Valor | Ejemplo |
 |----------|-------|---------|
 | `DATABASE_URL` | Tu PostgreSQL connection string | `postgresql://user:pass@db.internal.vercel.app:5432/objetives_app` |
-| `NEXTAUTH_SECRET` | Output del paso 1 | `abc123XYZ+/=...` |
-| `NEXTAUTH_URL` | Tu dominio en producción | `https://objectives-app.vercel.app` |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL de tu proyecto Supabase | `https://xxxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key de Supabase | `sb_anon_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX` |
 | `NODE_ENV` | `production` | `production` |
 
 ⚠️ **IMPORTANTE:**
 - Sin comillas en Vercel dashboard
 - `DATABASE_URL` debe ser PostgreSQL en producción
-- `NEXTAUTH_URL` debe incluir `https://`
+- `NEXT_PUBLIC_SUPABASE_URL` debe incluir `https://`
 
 ### Paso 4: Verificar Prisma Schema
 

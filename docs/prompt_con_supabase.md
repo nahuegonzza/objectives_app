@@ -14,7 +14,7 @@ Code:
 File: .env.local
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://oknknckrwgnuwmrqrxnf.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_SN421nbSolPCWKpjE7Wjaw_RDIKsKU_
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_anon_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
 File: page.tsx
@@ -44,7 +44,7 @@ File: utils/supabase/server.ts
 2import { cookies } from "next/headers";
 3
 4const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-5const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+5const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 6
 7export const createClient = (cookieStore: Awaited<ReturnType<typeof cookies>>) => {
 8  return createServerClient(
@@ -75,7 +75,7 @@ File: utils/supabase/client.ts
 1import { createBrowserClient } from "@supabase/ssr";
 2
 3const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-4const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+4const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 5
 6export const createClient = () =>
 7  createBrowserClient(
@@ -90,7 +90,7 @@ File: utils/supabase/middleware.ts
 2import { type NextRequest, NextResponse } from "next/server";
 3
 4const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-5const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+5const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 6
 7export const createClient = (request: NextRequest) => {
 8  // Create an unmodified response

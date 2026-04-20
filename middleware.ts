@@ -10,12 +10,10 @@ let res = NextResponse.next()
       cookies: {
         get: (key) => req.cookies.get(key)?.value,
         set: (key, value, options) => {
-          req.cookies.set({ name: key, value, ...options })
-          res.cookies.set({ name: key, value, ...options })
+          res.cookies.set({ name: key, value, ...options });
         },
-        remove: (key, options) => {
-          req.cookies.set({ name: key, value: '', ...options })
-          res.cookies.set({ name: key, value: '', ...options })
+        remove: (key) => {
+          res.cookies.set({ name: key, value: '', maxAge: 0 });
         },
       },
     }
