@@ -14,37 +14,24 @@ function normalizeGoalType(type: string) {
 
 export async function GET() {
   try {
-    const { user, isServiceRole } = await getServerSupabaseUser();
+    const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
 
-    if (isServiceRole) {
-      // En modo service role, usar usuario por defecto para desarrollo
-      const defaultUserId = process.env.DEFAULT_USER_ID;
-      if (!defaultUserId) {
-        return NextResponse.json({ error: 'Service role mode requires DEFAULT_USER_ID' }, { status: 500 });
-      }
-
-      const goals = await withRetry(() =>
-        prisma.goal.findMany({
-          where: { userId: defaultUserId },
-          orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
-        })
-      );
-
-      const normalized = goals.map((goal) => ({
-        ...goal,
-        type: normalizeGoalType(goal.type)
-      }));
-
-      return NextResponse.json(normalized);
+    let userId: string | undefined;
+    if (user?.id) {
+      userId = user.id;
+    } else if (isServiceRole && serviceRoleAvailable) {
+      userId = process.env.DEFAULT_USER_ID;
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const goals = await withRetry(() =>
       prisma.goal.findMany({
-        where: { userId: user.id },
+        where: { userId: userId },
         orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
       })
     );

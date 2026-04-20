@@ -5,7 +5,6 @@ import { prisma } from '@lib/prisma';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
 export function createServerSupabaseClient(cookieStore = cookies()) {
   return createServerClient(supabaseUrl, supabaseKey, {
@@ -23,6 +22,9 @@ export function createServerSupabaseClient(cookieStore = cookies()) {
 }
 
 export function createServiceRoleSupabaseClient() {
+  // Read from env inside function to ensure latest values
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+  
   if (!supabaseServiceRoleKey) {
     throw new Error('Missing Supabase service role key. Set SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY in the environment.');
   }
@@ -38,16 +40,18 @@ export function createServiceRoleSupabaseClient() {
 // ✅ NUEVA función basada en getUser() con fallback mejorado
 export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
-      console.log('User session not found, checking for service role fallback');
+      console.log('✅ User session not found, checking for service role fallback');
+      console.log('Service role key available:', !!supabaseServiceRoleKey);
       
       // Fallback: usar service role si está disponible
       if (supabaseServiceRoleKey) {
-        console.log('Service role key found, enabling fallback mode');
+        console.log('✅ Service role key found, enabling fallback mode');
         return {
           user: null,
           supabase: createServiceRoleSupabaseClient(),
@@ -57,6 +61,7 @@ export async function getServerSupabaseUser() {
       }
 
       // No hay usuario ni service role
+      console.log('❌ No user session and no service role key available');
       return {
         user: null,
         supabase: null,
@@ -65,6 +70,7 @@ export async function getServerSupabaseUser() {
       };
     }
 
+    console.log('✅ User authenticated:', user.id);
     return {
       user,
       supabase,
@@ -72,11 +78,11 @@ export async function getServerSupabaseUser() {
       serviceRoleAvailable: supabaseServiceRoleKey ? true : false
     };
   } catch (error) {
-    console.log('Auth error:', error);
+    console.log('⚠️ Auth error:', error);
     
     // En caso de error, intentar service role si está disponible
     if (supabaseServiceRoleKey) {
-      console.log('Falling back to service role after auth error');
+      console.log('✅ Falling back to service role after auth error');
       return {
         user: null,
         supabase: createServiceRoleSupabaseClient(),
@@ -86,6 +92,7 @@ export async function getServerSupabaseUser() {
     }
 
     // Error sin fallback disponible
+    console.log('❌ Auth error and no service role key available');
     return {
       user: null,
       supabase: null,
