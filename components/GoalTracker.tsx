@@ -224,6 +224,8 @@ export default function GoalTracker() {
         });
         setMessage('✓ Registrado');
         setMessageType('success');
+        // Forzar recarga completa para asegurar actualización del score
+        await loadData();
         await loadScoreHistory();
       } else {
         setMessage('Error al guardar');
