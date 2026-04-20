@@ -7,7 +7,12 @@ export const metadata: Metadata = {
   title: 'Objetives App',
   description: 'Motor de hábitos, eventos y score diario con módulos extendibles.',
   icons: {
-    icon: '/favicon.ico'
+    icon: '/favicon.ico',
+    shortcut: '/favicon-32x32.png',
+    apple: '/apple-touch-icon.png',
+    other: [
+      { rel: 'manifest', url: '/site.webmanifest' }
+    ]
   }
 };
 
