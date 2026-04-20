@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@lib/prisma';
+import { prisma, withRetry } from '@lib/prisma';
 import type { GoalPayload } from '@types';
 import { getServerSupabaseUser } from '@lib/supabase-server';
 
@@ -19,10 +19,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const goals = await prisma.goal.findMany({
-      where: { userId: user.id },
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
-    });
+    const goals = await withRetry(() =>
+      prisma.goal.findMany({
+        where: { userId: user.id },
+        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
+      })
+    );
 
     const normalized = goals.map((goal) => ({
       ...goal,
@@ -46,55 +48,63 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as GoalPayload;
     const activatedAt = payload.activatedAt ? new Date(payload.activatedAt) : new Date();
 
-    const existingGoal = await prisma.goal.findFirst({
-      where: {
-        userId: user.id,
-        title: payload.title
-      }
-    });
+    const existingGoal = await withRetry(() =>
+      prisma.goal.findFirst({
+        where: {
+          userId: user.id,
+          title: payload.title
+        }
+      })
+    );
 
     if (existingGoal) {
-      const updatedGoal = await prisma.goal.update({
-        where: { id: existingGoal.id },
-        data: {
-          description: payload.description,
-          type: payload.type,
-          icon: payload.icon ?? 'star',
-          color: payload.color ?? 'slate',
-          order: payload.order ?? existingGoal.order,
-          pointsIfTrue: payload.pointsIfTrue,
-          pointsIfFalse: payload.pointsIfFalse,
-          pointsPerUnit: payload.pointsPerUnit,
-          isActive: true,
-          activatedAt,
-          deactivatedAt: null
-        }
-      });
+      const updatedGoal = await withRetry(() =>
+        prisma.goal.update({
+          where: { id: existingGoal.id },
+          data: {
+            description: payload.description,
+            type: payload.type,
+            icon: payload.icon ?? 'star',
+            color: payload.color ?? 'slate',
+            order: payload.order ?? existingGoal.order,
+            pointsIfTrue: payload.pointsIfTrue,
+            pointsIfFalse: payload.pointsIfFalse,
+            pointsPerUnit: payload.pointsPerUnit,
+            isActive: true,
+            activatedAt,
+            deactivatedAt: null
+          }
+        })
+      );
 
       return NextResponse.json(updatedGoal, { status: 200 });
     }
 
-    const lastGoal = await prisma.goal.findFirst({
-      where: { userId: user.id },
-      orderBy: { order: 'desc' }
-    });
+    const lastGoal = await withRetry(() =>
+      prisma.goal.findFirst({
+        where: { userId: user.id },
+        orderBy: { order: 'desc' }
+      })
+    );
 
-    const goal = await prisma.goal.create({
-      data: {
-        userId: user.id,
-        title: payload.title,
-        description: payload.description,
-        type: payload.type,
-        icon: payload.icon ?? 'star',
-        color: payload.color ?? 'slate',
-        order: payload.order ?? ((lastGoal?.order ?? -1) + 1),
-        pointsIfTrue: payload.pointsIfTrue,
-        pointsIfFalse: payload.pointsIfFalse,
-        pointsPerUnit: payload.pointsPerUnit,
-        isActive: true,
-        activatedAt
-      }
-    });
+    const goal = await withRetry(() =>
+      prisma.goal.create({
+        data: {
+          userId: user.id,
+          title: payload.title,
+          description: payload.description,
+          type: payload.type,
+          icon: payload.icon ?? 'star',
+          color: payload.color ?? 'slate',
+          order: payload.order ?? ((lastGoal?.order ?? -1) + 1),
+          pointsIfTrue: payload.pointsIfTrue,
+          pointsIfFalse: payload.pointsIfFalse,
+          pointsPerUnit: payload.pointsPerUnit,
+          isActive: true,
+          activatedAt
+        }
+      })
+    );
 
     return NextResponse.json(goal, { status: 201 });
   } catch (error) {
