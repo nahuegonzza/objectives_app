@@ -18,9 +18,10 @@ function buildEntryPayload(goal: Goal, value: boolean | number | null, date: str
 
 function getLocalDateStringFromEntry(dateString: string) {
   if (!dateString.includes('T')) {
-    return formatLocalDate(parseLocalDate(dateString));
+    return dateString;
   }
-  return formatLocalDate(new Date(dateString));
+  // Extraer YYYY-MM-DD directamente de la cadena ISO para evitar problemas de zona horaria
+  return dateString.split('T')[0];
 }
 
 export default function GoalTracker() {
