@@ -10,8 +10,19 @@ import { parseModuleConfig } from '@lib/modules';
 import type { GoalEntryWithGoal, ActiveModule } from '@types';
 
 function normalizeDateToStartOfDay(dateString: string) {
-  const date = new Date(dateString);
-  date.setHours(0, 0, 0, 0);
+  if (!dateString || typeof dateString !== 'string') {
+    throw new Error('Invalid date string provided');
+  }
+  const parts = dateString.split('-');
+  if (parts.length !== 3) {
+    throw new Error('Date string must be in YYYY-MM-DD format');
+  }
+  const [year, month, day] = parts.map(Number);
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    throw new Error('Invalid date components');
+  }
+  // Create date at start of day in UTC to avoid timezone issues
+  const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   return date;
 }
 
