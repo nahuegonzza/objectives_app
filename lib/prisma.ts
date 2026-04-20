@@ -9,9 +9,19 @@ function normalizeDatabaseUrl(url?: string) {
     return url;
   }
 
-  const trimmedUrl = url.trim();
+  let trimmedUrl = url.trim();
 
-  if (/supabase\.co/.test(trimmedUrl) && !/[?&]sslmode=/.test(trimmedUrl)) {
+  if (
+    (trimmedUrl.startsWith('"') && trimmedUrl.endsWith('"')) ||
+    (trimmedUrl.startsWith("'") && trimmedUrl.endsWith("'"))
+  ) {
+    trimmedUrl = trimmedUrl.slice(1, -1).trim();
+  }
+
+  // Remove accidental trailing semicolon or whitespace
+  trimmedUrl = trimmedUrl.replace(/;$/, '').trim();
+
+  if (/(supabase\.co|pooler\.supabase\.com)/.test(trimmedUrl) && !/[?&]sslmode=/.test(trimmedUrl)) {
     return trimmedUrl.includes('?') ? `${trimmedUrl}&sslmode=require` : `${trimmedUrl}?sslmode=require`;
   }
 
