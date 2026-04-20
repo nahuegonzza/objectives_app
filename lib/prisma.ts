@@ -23,13 +23,14 @@ export function normalizeDatabaseUrl(url?: string) {
   // Remove accidental trailing semicolon or whitespace
   trimmedUrl = trimmedUrl.replace(/;$/, '').trim();
 
-  // Ensure SSL and pgbouncer for pooler connections
-  if (/pooler\.supabase\.com/.test(trimmedUrl)) {
-    const params = new URLSearchParams();
-    params.set('sslmode', 'require');
-    params.set('pgbouncer', 'true');
-    const separator = trimmedUrl.includes('?') ? '&' : '?';
-    return `${trimmedUrl}${separator}${params.toString()}`;
+  // Ensure SSL for pooler connections (port 6543 or pooler.supabase.com)
+  if (/pooler\.supabase\.com|:6543/.test(trimmedUrl)) {
+    // Already has sslmode, don't duplicate
+    if (!/[?&]sslmode=/.test(trimmedUrl)) {
+      const separator = trimmedUrl.includes('?') ? '&' : '?';
+      return `${trimmedUrl}${separator}sslmode=require`;
+    }
+    return trimmedUrl;
   }
 
   // Regular Supabase direct connection
