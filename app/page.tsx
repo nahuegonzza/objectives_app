@@ -8,7 +8,11 @@ export default async function Home() {
     redirect('/login');
   }
 
-  await ensurePrismaUserForSession();
+  try {
+    await ensurePrismaUserForSession();
+  } catch (error) {
+    console.error('Prisma sync failed', error);
+  }
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">

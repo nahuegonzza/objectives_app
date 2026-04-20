@@ -4,7 +4,7 @@ const globalForPrisma = global as typeof globalThis & {
   prisma?: PrismaClient;
 };
 
-function normalizeDatabaseUrl(url?: string) {
+export function normalizeDatabaseUrl(url?: string) {
   if (!url) {
     return url;
   }
