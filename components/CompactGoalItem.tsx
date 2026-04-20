@@ -15,7 +15,6 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
   const colors = getBackgroundColors(goal.color);
   const icon = getGoalIcon(goal.icon);
   const currentValue = goal.type === 'BOOLEAN' ? entry?.valueBoolean ?? false : entry?.valueFloat ?? 0;
-  console.log('🎯 Goal:', goal.title, 'entry:', entry, 'currentValue:', currentValue);
   const [inputValue, setInputValue] = useState<string>(Number(currentValue).toFixed(1));
   const [isFocused, setIsFocused] = useState(false);
 

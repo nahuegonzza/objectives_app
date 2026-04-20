@@ -18,11 +18,8 @@ function normalizeDateToStartOfDay(dateString: string) {
   if (isNaN(year) || isNaN(month) || isNaN(day)) {
     throw new Error('Invalid date components');
   }
-  const date = new Date(year, month - 1, day); // local date
-  if (isNaN(date.getTime())) {
-    throw new Error('Invalid date created');
-  }
-  date.setHours(0, 0, 0, 0);
+  // Create date at start of day in UTC to avoid timezone issues
+  const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   return date;
 }
 
@@ -57,7 +54,8 @@ export async function GET(request: Request) {
     try {
       const date = normalizeDateToStartOfDay(dateParam);
       const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
+      endOfDay.setUTCDate(endOfDay.getUTCDate() + 1); // Next day at start
+      endOfDay.setUTCMilliseconds(-1); // End of the day
       whereClause.date = { gte: date, lte: endOfDay };
     } catch (error) {
       console.error('Error parsing date parameter:', dateParam, error);

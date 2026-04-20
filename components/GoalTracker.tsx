@@ -55,7 +55,6 @@ export default function GoalTracker() {
 
   async function loadData() {
     setLoading(true);
-    console.log('🔄 Loading data for date:', today);
     try {
       const [goalsRes, entriesRes, eventsRes, moduleEntriesRes] = await Promise.all([
         fetch('/api/goals'),
@@ -127,9 +126,6 @@ export default function GoalTracker() {
       const eventsData = JSON.parse(eventsText);
       const moduleEntriesData = JSON.parse(moduleEntriesText);
 
-      console.log('📊 Loaded entries:', entriesData);
-      console.log('🎯 Loaded goals:', goalsData);
-
       const activeGoals = goalsData.filter((goal: Goal) => isGoalActiveOnDate(goal, today));
       setGoals(activeGoals.sort((a: Goal, b: Goal) => (a.order ?? 0) - (b.order ?? 0)));
       setEntries(entriesData);
@@ -181,7 +177,6 @@ export default function GoalTracker() {
   }
 
   async function handleSaveEntry(goal: Goal, value: boolean | number) {
-    console.log('💾 Saving entry for goal:', goal.title, 'value:', value, 'type:', goal.type);
     setSavingGoalId(goal.id);
     setMessage('');
     setEntries((prevEntries) => {
@@ -199,7 +194,6 @@ export default function GoalTracker() {
         valueFloat: goal.type === 'NUMERIC' ? Number(value) : prevEntries[existingIndex]?.valueFloat ?? null
       } as GoalEntryWithGoal;
 
-      console.log('🔄 Optimistic update:', updatedEntry);
       if (existingIndex !== -1) {
         return prevEntries.map((entry, index) => index === existingIndex ? updatedEntry : entry);
       }
@@ -209,7 +203,6 @@ export default function GoalTracker() {
 
     try {
       const payload = buildEntryPayload(goal, value, today);
-      console.log('📤 Sending payload:', payload);
       const res = await fetch('/api/goalEntries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,7 +211,6 @@ export default function GoalTracker() {
 
       if (res.ok) {
         const updatedEntry = await res.json();
-        console.log('✅ Server response:', updatedEntry);
         setEntries((prevEntries) => {
           const existingIndex = prevEntries.findIndex((entry) =>
             entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === today
@@ -236,13 +228,11 @@ export default function GoalTracker() {
         await loadData();
         await loadScoreHistory();
       } else {
-        console.error('❌ Save failed:', res.status, await res.text());
         setMessage('Error al guardar');
         setMessageType('error');
         await loadData();
       }
     } catch (error) {
-      console.error('❌ Save error:', error);
       setMessage('Error de conexión');
       setMessageType('error');
       await loadData();
@@ -271,7 +261,6 @@ export default function GoalTracker() {
 
   useEffect(() => {
     const currentScore = calculateDailyScore(currentEntries, currentEvents, currentModuleEntries, activeModules);
-    console.log('📈 Calculated daily score:', currentScore, 'from entries:', currentEntries);
     setDailyScore(currentScore);
   }, [currentEntries, currentEvents, currentModuleEntries, activeModules]);
 
