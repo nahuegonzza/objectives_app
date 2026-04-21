@@ -380,9 +380,9 @@ const allDates = useMemo(() => {
       </div>
 
       {/* Chart */}
-      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Tendencia</h3>
-        <div className="h-96 w-full">
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-6">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 px-6">Tendencia</h3>
+        <div className="h-96 w-full px-6">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             <polyline
               fill="none"
