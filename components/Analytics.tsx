@@ -380,10 +380,10 @@ const allDates = useMemo(() => {
       </div>
 
       {/* Chart */}
-      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-6">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 px-6">Tendencia</h3>
-        <div className="h-96 w-full px-6">
-          <svg viewBox="0 0 100 100" className="w-full h-full">
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 px-6">Tendencia</h3>
+        <div className="h-64 w-full">
+          <svg viewBox="0 0 140 100" className="w-full h-full">
             <polyline
               fill="none"
               stroke="rgb(34, 197, 94)"
@@ -397,11 +397,11 @@ const allDates = useMemo(() => {
 
                   const dateMs = parseLocalDate(item.date).getTime();
 
-                  // 👉 X con padding 10% (10 → 90)
+                  // 👉 X ocupa todo el ancho disponible (5 → 135)
                   const x =
                     totalMs === 0
-                      ? 50
-                      : 10 + ((dateMs - start.getTime()) / totalMs) * 80;
+                      ? 70
+                      : 5 + ((dateMs - start.getTime()) / totalMs) * 130;
 
                   const range = maxPoints - minPoints || 1;
                   const points = item.hasData ? item.points : 0;
@@ -423,11 +423,11 @@ const allDates = useMemo(() => {
               const totalMs = end.getTime() - start.getTime();
               const dateMs = parseLocalDate(score.date).getTime();
 
-              // 👉 X con padding 10%
+              // 👉 X ocupa todo el ancho disponible (5 → 135)
               const x =
                 totalMs === 0
-                  ? 50
-                  : 10 + ((dateMs - start.getTime()) / totalMs) * 80;
+                  ? 70
+                  : 5 + ((dateMs - start.getTime()) / totalMs) * 130;
 
               const range = maxPoints - minPoints || 1;
 
