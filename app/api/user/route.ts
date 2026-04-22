@@ -57,6 +57,8 @@ export async function PATCH(request: Request) {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
+        firstName: firstName || null,
+        lastName: lastName || null,
         name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null
       }
     });

@@ -22,7 +22,7 @@ export default async function Home() {
         <Navigation />
 
         <header className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Inicio</h1>
           <p className="mt-2 text-slate-600 dark:text-slate-400">
             Bienvenido, {user?.email}!
           </p>

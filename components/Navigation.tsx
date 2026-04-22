@@ -26,7 +26,7 @@ export default function Navigation() {
       fetch('/api/user')
         .then(res => res.json())
         .then(data => {
-          const displayName = data.name || data.firstName || data.email;
+          const displayName = data.firstName || data.email;
           setUserName(displayName);
         })
         .catch(() => setUserName(session.user.email || 'Usuario'));

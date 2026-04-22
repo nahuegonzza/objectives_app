@@ -47,9 +47,19 @@ export default function SettingsPage() {
         if (!res.ok) throw new Error('Error loading user');
         const data = await res.json();
         setUser(data);
+        
+        // Parse name into firstName and lastName if they are not set
+        let firstName = data.firstName || '';
+        let lastName = data.lastName || '';
+        if (!firstName && !lastName && data.name) {
+          const parts = data.name.trim().split(' ');
+          firstName = parts[0] || '';
+          lastName = parts.slice(1).join(' ') || '';
+        }
+        
         setProfileForm({
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
+          firstName,
+          lastName,
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
