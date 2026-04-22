@@ -47,17 +47,22 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   };
 
   const calculatePoints = (hours: number) => {
+    // Si ambos horarios son iguales (no hay registro), 0 puntos
+    if (bedtime === waketime) return 0;
+    
+    // Si no hay horas registradas (campos vacíos), 0 puntos
+    if (hours === 0) return 0;
+
     const idealHours = (config.idealHours as number) || 8;
     const maxPoints = (config.maxPoints as number) || 2;
     const penaltyMode = (config.penaltyMode as string) || 'automatic';
     const penaltyPerHour = (config.penaltyPerHour as number) || 1;
 
-    if (hours === 0) return 0; // Si no hay horas registradas, 0 puntos directamente
-
     const diff = Math.abs(hours - idealHours);
     const penalty = penaltyMode === 'automatic' ? diff : penaltyPerHour * diff;
 
-    return Math.max(0, maxPoints - penalty); // Ensure score doesn't go negative
+    // Permitir puntos negativos
+    return maxPoints - penalty;
   };
 
   useEffect(() => {

@@ -25,7 +25,14 @@ export const sleepModule: ModuleDefinition = {
 
     const data = JSON.parse(todayEntry.data);
     const hours = Number(data.hours || 0);
-    if (hours === 0) return 0; // Si no hay horas registradas, 0 puntos directamente
+    const bedtime = data.bedtime || '';
+    const waketime = data.waketime || '';
+
+    // Si ambos horarios son iguales (no hay registro), 0 puntos
+    if (bedtime === waketime) return 0;
+    
+    // Si no hay horas registradas, 0 puntos directamente
+    if (hours === 0) return 0;
 
     const idealHours = (config.idealHours as number) || 8;
     const maxPoints = (config.maxPoints as number) || 2;
@@ -35,7 +42,8 @@ export const sleepModule: ModuleDefinition = {
     const diff = Math.abs(hours - idealHours);
     const penalty = penaltyMode === 'automatic' ? diff : penaltyPerHour * diff;
 
-    return Math.max(0, maxPoints - penalty); // Ensure score doesn't go negative
+    // Permitir puntos negativos
+    return maxPoints - penalty;
   },
   Component: SleepDashboard,
   HistoryComponent: SleepHistory,
