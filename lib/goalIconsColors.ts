@@ -15,19 +15,31 @@ export const GOAL_ICONS = {
   trophy: '🏆',
   gift: '🎁',
 
-  // SALUD Y BIENESTAR
+  // SALUD / FITNESS
   runner: '🏃',
+  gym: '🏋️',
   muscle: '💪',
-  apple: '🍎',
-  water: '💧',
-  meditation: '🧘',
-  sleep: '😴',
-  bed: '🛏️',
   bicycle: '🚴',
   stretch: '🧎',
+  meditation: '🧘',
+  water: '💧',
+  apple: '🍎',
+  healthy_food: '🥗',
   pill: '💊',
 
-  // PRODUCTIVIDAD / ESTUDIO / TRABAJO
+  // DESCANSO / HÁBITOS
+  sleep: '😴',
+  bed: '🛏️',
+  alarm: '⏰',
+  hourglass: '⏳',
+  cigarette: '🚬',
+  alcohol: '🍺',
+  junk_food: '🍔',
+  coffee: '☕',
+  no_phone: '📵',
+  puzzle: '🧩',
+
+  // ESTUDIO / PRODUCTIVIDAD / TRABAJO
   book: '📚',
   book_read: '📖',
   pen: '✏️',
@@ -35,39 +47,28 @@ export const GOAL_ICONS = {
   code: '💻',
   chart_up: '📈',
   briefcase: '💼',
-  alarm: '⏰',
-  hourglass: '⏳',
-  puzzle: '🧩',
+  money: '💰',
+  shopping: '🛒',
+  cleaning: '🧹',
 
-  // SOCIAL / RELACIONES
+  // SOCIAL / VIDA PERSONAL
   handshake: '🤝',
   people: '👥',
   family: '👨‍👩‍👧‍👦',
   speech: '💬',
-  microphone: '🎤',
-  heart_hands: '🫶',
-  party: '🎉',
   phone: '📱',
   home: '🏠',
+  party: '🎉',
+  travel: '✈️',
+  mountain: '⛰️',
   camera: '📷',
 
-  // HÁBITOS / LIFESTYLE / FINANZAS
-  money: '💰',
-  shopping: '🛒',
-  cup: '☕',
+  // CREATIVIDAD / HOBBIES
   music: '🎵',
+  microphone: '🎤',
   game: '🎮',
-  travel: '✈️',
-  cigarette: '🚬',
-  sun: '☀️',
-  moon: '🌙',
-  leaf: '🍃',
-
-  // NATURALEZA / AVENTURA
-  tree: '🌳',
-  mountain: '⛰️',
-  globe: '🌍',
-  compass: '🧭',
+  camera_art: '📸',
+  art: '🎨',
 } as const;
 
 export const GOAL_COLORS = {
