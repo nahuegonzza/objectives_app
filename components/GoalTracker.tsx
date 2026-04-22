@@ -349,15 +349,6 @@ export default function GoalTracker() {
               />
             ))}
           </div>
-        ) : goals.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-slate-500 dark:text-slate-400">
-              No hay objetivos. Crea algunos en{' '}
-              <a href="/goals" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
-                Objetivos
-              </a>
-            </p>
-          </div>
         ) : (
           <div className="space-y-4">
             {activeModules.length > 0 && (
@@ -383,42 +374,55 @@ export default function GoalTracker() {
               </div>
             )}
 
-            {booleanGoals.length > 0 && (
-              <div>
-                <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
-                  Hábitos
+            {goals.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-slate-500 dark:text-slate-400">
+                  No hay objetivos. Crea algunos en{' '}
+                  <a href="/goals" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                    Objetivos
+                  </a>
                 </p>
-                <div className="space-y-2">
-                  {booleanGoals.map((goal) => (
-                    <CompactGoalItem
-                      key={goal.id}
-                      goal={goal}
-                      entry={goalEntriesMap.get(goal.id)}
-                      isLoading={savingGoalId === goal.id}
-                      onChange={handleSaveEntry}
-                    />
-                  ))}
-                </div>
               </div>
-            )}
+            ) : (
+              <>
+                {booleanGoals.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                      Hábitos
+                    </p>
+                    <div className="space-y-2">
+                      {booleanGoals.map((goal) => (
+                        <CompactGoalItem
+                          key={goal.id}
+                          goal={goal}
+                          entry={goalEntriesMap.get(goal.id)}
+                          isLoading={savingGoalId === goal.id}
+                          onChange={handleSaveEntry}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {numericGoals.length > 0 && (
-              <div>
-                <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
-                  Métricas
-                </p>
-                <div className="space-y-2">
-                  {numericGoals.map((goal) => (
-                    <CompactGoalItem
-                      key={goal.id}
-                      goal={goal}
-                      entry={goalEntriesMap.get(goal.id)}
-                      isLoading={savingGoalId === goal.id}
-                      onChange={handleSaveEntry}
-                    />
-                  ))}
-                </div>
-              </div>
+                {numericGoals.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                      Métricas
+                    </p>
+                    <div className="space-y-2">
+                      {numericGoals.map((goal) => (
+                        <CompactGoalItem
+                          key={goal.id}
+                          goal={goal}
+                          entry={goalEntriesMap.get(goal.id)}
+                          isLoading={savingGoalId === goal.id}
+                          onChange={handleSaveEntry}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
