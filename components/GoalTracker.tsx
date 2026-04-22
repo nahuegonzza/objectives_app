@@ -375,6 +375,7 @@ export default function GoalTracker() {
                         config={module.config}
                         module={module}
                         onUpdate={() => loadModuleEntries()}
+                        date={today}
                       />
                     );
                   })}

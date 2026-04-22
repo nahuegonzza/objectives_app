@@ -12,7 +12,7 @@ export const waterModule: ModuleDefinition = {
     pointsPerGlass: 0.5
   },
   ConfigComponent: WaterConfig,
-  DashboardComponent: WaterDashboard,
+  Component: WaterDashboard,
   calculateScore: (entries, config) => {
     const totalGlasses = entries.reduce((sum, entry) => {
       const data = JSON.parse(entry.data);

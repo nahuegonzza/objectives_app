@@ -7,9 +7,10 @@ interface SleepDashboardProps {
   config: Record<string, unknown>;
   module: any; // ModuleState
   onUpdate?: (data: any) => void;
+  isEditing?: boolean;
 }
 
-export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, onUpdate }) => {
+export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, onUpdate, isEditing = false }) => {
   const [bedtime, setBedtime] = useState('');
   const [waketime, setWaketime] = useState('');
   const [loading, setLoading] = useState(true);
@@ -64,11 +65,11 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
     const pts = calculatePoints(hours);
     setPoints(pts);
 
-    // Auto-save when both times are set
-    if (bedtime && waketime) {
+    // Auto-save when both times are set and in editing mode
+    if (bedtime && waketime && isEditing) {
       saveEntry(hours);
     }
-  }, [bedtime, waketime, config]);
+  }, [bedtime, waketime, config, isEditing]);
 
   const saveEntry = async (hours: number) => {
     try {
@@ -114,7 +115,12 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             type="time"
             value={bedtime}
             onChange={(e) => setBedtime(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+            disabled={!isEditing}
+            className={`rounded-lg border px-3 py-2 text-sm shadow-sm outline-none transition focus:ring-2 ${
+              isEditing
+                ? 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+                : 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
+            }`}
           />
         </label>
         <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
@@ -123,7 +129,12 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             type="time"
             value={waketime}
             onChange={(e) => setWaketime(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+            disabled={!isEditing}
+            className={`rounded-lg border px-3 py-2 text-sm shadow-sm outline-none transition focus:ring-2 ${
+              isEditing
+                ? 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+                : 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
+            }`}
           />
         </label>
       </div>

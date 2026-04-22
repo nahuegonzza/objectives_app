@@ -61,6 +61,8 @@ export default function CalendarExplorer() {
   const [viewDate, setViewDate] = useState(parseLocalDate(today));
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [dayEdits, setDayEdits] = useState<Record<string, { valueBoolean?: boolean; valueFloat?: number }>>({});
+  const [modulesCollapsed, setModulesCollapsed] = useState(false);
+  const [goalsCollapsed, setGoalsCollapsed] = useState(false);
 
   const isEditingDay = editingGoalId === selectedDate;
 
@@ -486,32 +488,52 @@ export default function CalendarExplorer() {
 
               {activeModules.length > 0 && (
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">Módulos</p>
-                  <div className="space-y-2">
-                    {activeModules.map((module) => {
-                      const Component = module.definition?.Component;
-                      if (!Component) return null;
-                      return (
-                        <Component
-                          key={module.slug}
-                          config={module.config}
-                          module={module}
-                        />
-                      );
-                    })}
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setModulesCollapsed(!modulesCollapsed)}
+                      className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                    >
+                      <span className={`transform transition-transform ${modulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                      Módulos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={buildInitialDayEdits}
+                      className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm font-semibold transition"
+                    >
+                      ✏️ Editar día
+                    </button>
                   </div>
+                  {!modulesCollapsed && (
+                    <div className="space-y-2">
+                      {activeModules.map((module) => {
+                        const Component = module.definition?.Component;
+                        if (!Component) return null;
+                        return (
+                          <Component
+                            key={module.slug}
+                            config={module.config}
+                            module={module}
+                            isEditing={isEditingDay}
+                            date={selectedDate}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
               <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
                 <div className="mb-4 flex items-center justify-between gap-4">
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Objetivos</p>
                   <button
                     type="button"
-                    onClick={buildInitialDayEdits}
-                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm font-semibold transition"
+                    onClick={() => setGoalsCollapsed(!goalsCollapsed)}
+                    className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                   >
-                    ✏️ Editar día
+                    <span className={`transform transition-transform ${goalsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    Objetivos
                   </button>
                 </div>
                 {isEditingDay && (
@@ -532,92 +554,94 @@ export default function CalendarExplorer() {
                     </button>
                   </div>
                 )}
-                <div className="space-y-2">
-                  {visibleGoals.map((goal) => {
-                    const entry = entriesByGoalId.get(goal.id);
-                    const colors = getBackgroundColors(goal.color);
-                    const editValues = dayEdits[goal.id];
-                    const hasEdit = isEditingDay && Boolean(editValues);
-                    return (
-                      <div 
-                        key={goal.id} 
-                        className="flex flex-col gap-3 rounded-xl border px-4 py-3 transition-all [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]"
-                        style={{
-                          '--bg-light': colors.light,
-                          '--border-light': colors.lightBorder,
-                          '--bg-dark': colors.dark,
-                          '--border-dark': colors.darkBorder,
-                        } as React.CSSProperties & Record<string, string>}
-                      >
-                        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
-                          <span className="text-xl flex-shrink-0">{getGoalIcon(goal.icon)}</span>
-                          <div className="min-w-0">
-                            <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
-                              {goal.title}
-                            </h3>
-                            <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
-                              {entry ? (
-                                goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
-                              ) : (
-                                'No registrado'
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        {isEditingDay ? (
-                          <div className="space-y-2">
-                            {goal.type === 'BOOLEAN' ? (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
-                                  className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                >
-                                  Sí
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
-                                  className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                >
-                                  No
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  step="1"
-                                  value={editValues?.valueFloat ?? ''}
-                                  onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
-                                  onWheel={(event) => {
-                                    event.preventDefault();
-                                    const current = Number(editValues?.valueFloat ?? 0);
-                                    const next = current + (event.deltaY < 0 ? 1 : -1);
-                                    handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
-                                  }}
-                                  className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
-                                />
-                                <span className="text-sm text-slate-600 dark:text-slate-300">unidades</span>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between gap-2">
-                            <div />
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <span className="text-xs font-semibold text-slate-900 dark:text-white">
-                                {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
-                              </span>
-                              <span className="inline-flex h-2 w-2 rounded-full bg-current" />
+                {!goalsCollapsed && (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {visibleGoals.map((goal) => {
+                      const entry = entriesByGoalId.get(goal.id);
+                      const colors = getBackgroundColors(goal.color);
+                      const editValues = dayEdits[goal.id];
+                      const hasEdit = isEditingDay && Boolean(editValues);
+                      return (
+                        <div 
+                          key={goal.id} 
+                          className="flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]"
+                          style={{
+                            '--bg-light': colors.light,
+                            '--border-light': colors.lightBorder,
+                            '--bg-dark': colors.dark,
+                            '--border-dark': colors.darkBorder,
+                          } as React.CSSProperties & Record<string, string>}
+                        >
+                          <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                            <span className="text-lg flex-shrink-0">{getGoalIcon(goal.icon)}</span>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
+                                {goal.title}
+                              </h3>
+                              <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
+                                {entry ? (
+                                  goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
+                                ) : (
+                                  'No registrado'
+                                )}
+                              </p>
                             </div>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                          {isEditingDay ? (
+                            <div className="space-y-2">
+                              {goal.type === 'BOOLEAN' ? (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
+                                    className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
+                                  >
+                                    Sí
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
+                                    className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    value={editValues?.valueFloat ?? ''}
+                                    onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
+                                    onWheel={(event) => {
+                                      event.preventDefault();
+                                      const current = Number(editValues?.valueFloat ?? 0);
+                                      const next = current + (event.deltaY < 0 ? 1 : -1);
+                                      handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
+                                    }}
+                                    className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                  />
+                                  <span className="text-sm text-slate-600 dark:text-slate-300">unidades</span>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between gap-2">
+                              <div />
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-xs font-semibold text-slate-900 dark:text-white">
+                                  {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
+                                </span>
+                                <span className="inline-flex h-2 w-2 rounded-full bg-current" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}

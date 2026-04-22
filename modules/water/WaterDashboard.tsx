@@ -6,15 +6,18 @@ import type { ActiveModule } from '@lib/modules';
 
 interface WaterDashboardProps {
   module: ActiveModule;
-  date: string;
+  date?: string;
+  isEditing?: boolean;
 }
 
-export default function WaterDashboard({ module, date }: WaterDashboardProps) {
+export default function WaterDashboard({ module, date, isEditing }: WaterDashboardProps) {
   const [entries, setEntries] = useState<ModuleEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadEntries();
+    if (date) {
+      loadEntries();
+    }
   }, [date]);
 
   async function loadEntries() {
