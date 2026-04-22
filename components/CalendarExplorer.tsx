@@ -486,9 +486,19 @@ export default function CalendarExplorer() {
                 </div>
               </div>
 
-              <div className="flex justify-right mb-4">
+              <div className="flex justify-end mb-4 gap-2">
+                {!isEditingDay && (
+                  <button
+                    type="button"
+                    onClick={buildInitialDayEdits}
+                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
+                  >
+                    ✏️ Editar día
+                  </button>
+                )}
+
                 {isEditingDay && (
-                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                  <>
                     <button
                       type="button"
                       onClick={handleSaveAllDayEntries}
@@ -503,17 +513,7 @@ export default function CalendarExplorer() {
                     >
                       ✕ Cancelar
                     </button>
-                  </div>
-                )}
-                
-                {!isEditingDay && (
-                  <button
-                    type="button"
-                    onClick={buildInitialDayEdits}
-                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
-                  >
-                    ✏️ Editar día
-                  </button>
+                  </>
                 )}
               </div>
 
