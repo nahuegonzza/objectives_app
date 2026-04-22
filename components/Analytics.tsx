@@ -83,6 +83,7 @@ export default function Analytics() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState(getLocalDateString());
   const [viewMode, setViewMode] = useState<'overview' | 'goal'>('overview');
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, content: '' });
 
   useEffect(() => {
     if (selectedRange === 'week') {
@@ -466,9 +467,9 @@ export default function Analytics() {
                   cy={y}
                   r="2"
                   fill="rgb(11, 128, 54)"
-                >
-                  <title>{tooltipLines.join('\n')}</title>
-                </circle>
+                  onMouseEnter={(e) => setTooltip({ visible: true, x: e.clientX, y: e.clientY, content: tooltipLines.join('\n') })}
+                  onMouseLeave={() => setTooltip({ visible: false, x: 0, y: 0, content: '' })}
+                />
               );
             })}
           </svg>
@@ -511,6 +512,23 @@ export default function Analytics() {
           </table>
         </div>
       </div>
+
+      {tooltip.visible && (
+        <div
+          className="fixed z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3 text-sm text-slate-900 dark:text-white pointer-events-none"
+          style={{
+            top: tooltip.y - 10,
+            left: tooltip.x,
+            transform: 'translateX(-50%)',
+          }}
+        >
+          {tooltip.content.split('\n').map((line, index) => (
+            <p key={index} className="whitespace-nowrap">
+              {line}
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
