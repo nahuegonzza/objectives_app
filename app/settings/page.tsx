@@ -336,23 +336,25 @@ export default function SettingsPage() {
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Cuenta</h2>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                router.push('/login');
-              }}
-              className="rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-semibold transition"
-            >
-              Cerrar Sesión
-            </button>
-            <button
-              type="button"
-              onClick={handleExportData}
-              disabled={exportLoading}
-              className="rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 text-sm font-semibold transition"
-            >
-              {exportLoading ? 'Exportando...' : 'Exportar Datos JSON'}
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  router.push('/login');
+                }}
+                className="w-full rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-semibold transition"
+              >
+                Cerrar Sesión
+              </button>
+              <button
+                type="button"
+                onClick={handleExportData}
+                disabled={exportLoading}
+                className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 text-sm font-semibold transition"
+              >
+                {exportLoading ? 'Exportando...' : 'Exportar Datos JSON'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
