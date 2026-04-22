@@ -382,7 +382,7 @@ const allDates = useMemo(() => {
       {/* Chart */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-4 px-6">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Tendencia</h3>
-        <div className="h-64 w-full -mx-6">
+        <div className="h-64 w-full -mx-6 flex justify-center items-center">
           <svg viewBox="0 0 280 100" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
             <polyline
               fill="none"
@@ -435,6 +435,30 @@ const allDates = useMemo(() => {
               const y =
                 90 - ((score.points - minPoints) / range) * 80;
 
+              // Get entries for this day
+              const dayEntries = filteredEntries.filter(entry => getLocalDateStringFromEntry(entry.date) === score.date);
+              const dayModuleEntries = filteredModuleEntries.filter((e) => e.date.slice(0, 10) === score.date);
+              let modulePoints = 0;
+              for (const module of activeModules) {
+                if (module.definition?.calculateScore) {
+                  const moduleDayEntries = dayModuleEntries.filter((e) => e.moduleId === module.id);
+                  modulePoints += module.definition.calculateScore(moduleDayEntries, module.config);
+                }
+              }
+
+              const tooltipLines = [
+                `Fecha: ${score.displayDate}`,
+                ...dayEntries.map(entry => {
+                  const points = getEntryPoints(entry);
+                  if (entry.goal.type === 'BOOLEAN') {
+                    return `${entry.goal.title}: ${entry.valueBoolean ? 'Cumplido' : 'No cumplido'} (${points} pts)`;
+                  } else {
+                    return `${entry.goal.title}: ${entry.valueFloat} (${points} pts)`;
+                  }
+                }),
+                ...(modulePoints > 0 ? [`Módulos: ${modulePoints.toFixed(1)} pts`] : [])
+              ];
+
               return (
                 <circle
                   key={index}
@@ -442,7 +466,9 @@ const allDates = useMemo(() => {
                   cy={y}
                   r="1.5"
                   fill="rgb(11, 128, 54)"
-                />
+                >
+                  <title>{tooltipLines.join('\n')}</title>
+                </circle>
               );
             })}
           </svg>
