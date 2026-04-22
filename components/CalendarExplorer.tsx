@@ -486,6 +486,35 @@ export default function CalendarExplorer() {
                 </div>
               </div>
 
+              {isEditingDay && (
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveAllDayEntries}
+                    className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold transition"
+                  >
+                    💾 Guardar día
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelDayEdit}
+                    className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                  >
+                    ✕ Cancelar
+                  </button>
+                </div>
+              )}
+
+              <div className="flex justify-center mb-4">
+                <button
+                  type="button"
+                  onClick={buildInitialDayEdits}
+                  className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
+                >
+                  ✏️ Editar día
+                </button>
+              </div>
+
               {activeModules.length > 0 && (
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
                   <div className="mb-4 flex items-center justify-between gap-4">
@@ -496,13 +525,6 @@ export default function CalendarExplorer() {
                     >
                       <span className={`transform transition-transform ${modulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
                       Módulos
-                    </button>
-                    <button
-                      type="button"
-                      onClick={buildInitialDayEdits}
-                      className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm font-semibold transition"
-                    >
-                      ✏️ Editar día
                     </button>
                   </div>
                   {!modulesCollapsed && (
@@ -536,24 +558,6 @@ export default function CalendarExplorer() {
                     Objetivos
                   </button>
                 </div>
-                {isEditingDay && (
-                  <div className="mb-4 flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleSaveAllDayEntries}
-                      className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm font-semibold transition"
-                    >
-                      💾 Guardar día
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCancelDayEdit}
-                      className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                    >
-                      ✕ Cancelar
-                    </button>
-                  </div>
-                )}
                 {!goalsCollapsed && (
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {visibleGoals.map((goal) => {

@@ -132,7 +132,7 @@ export const ICON_OPTIONS = Object.entries(GOAL_ICONS).map(([key, emoji]) => ({
 
 export const COLOR_OPTIONS = [
   // ⚪ Neutros (de blanco a negro)
-  { key: 'white', label: 'Blanco', bgColor: '#ffffff', borderColor: '#e5e5e5' },
+  { key: 'white', label: 'White', bgColor: '#ffffff', borderColor: '#e5e5e5' },
   { key: 'gray-light', label: 'Light Gray', bgColor: '#e5e5e5', borderColor: '#d1d5db' },
   { key: 'gray', label: 'Gray', bgColor: '#9ca3af', borderColor: '#6b7280' },
   { key: 'slate', label: 'Slate', bgColor: '#64748b', borderColor: '#475569' },
