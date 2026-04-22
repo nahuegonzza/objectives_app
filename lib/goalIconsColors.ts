@@ -3,65 +3,71 @@
  */
 
 export const GOAL_ICONS = {
+  // GENERALES
   star: '⭐',
-  book: '📚',
-  runner: '🏃',
-  muscle: '💪',
-  moon: '🌙',
-
-  sun: '☀️',
-  water: '💧',
-  apple: '🍎',
-  meditation: '🧘',
-  code: '💻',
-
-  heart: '❤️',
-  brain: '🧠',
-  flame: '🔥',
-  rocket: '🚀',
   target: '🎯',
-
-  book_read: '📖',
-  music: '🎵',
-  camera: '📷',
-  pen: '✏️',
-  cup: '☕',
-
-  trophy: '🏆',
-  medal: '🥇',
-  chart_up: '📈',
+  rocket: '🚀',
+  flame: '🔥',
+  heart: '❤️',
   checklist: '📋',
   calendar: '📅',
+  idea: '💡',
+  trophy: '🏆',
+  gift: '🎁',
 
+  // SALUD Y BIENESTAR
+  runner: '🏃',
+  muscle: '💪',
+  apple: '🍎',
+  water: '💧',
+  meditation: '🧘',
+  sleep: '😴',
+  bed: '🛏️',
+  bicycle: '🚴',
+  stretch: '🧎',
+  pill: '💊',
+
+  // PRODUCTIVIDAD / ESTUDIO / TRABAJO
+  book: '📚',
+  book_read: '📖',
+  pen: '✏️',
+  brain: '🧠',
+  code: '💻',
+  chart_up: '📈',
+  briefcase: '💼',
   alarm: '⏰',
   hourglass: '⏳',
-  focus: '🎯',
-  idea: '💡',
   puzzle: '🧩',
 
+  // SOCIAL / RELACIONES
   handshake: '🤝',
   people: '👥',
   family: '👨‍👩‍👧‍👦',
   speech: '💬',
   microphone: '🎤',
+  heart_hands: '🫶',
+  party: '🎉',
+  phone: '📱',
+  home: '🏠',
+  camera: '📷',
 
+  // HÁBITOS / LIFESTYLE / FINANZAS
+  money: '💰',
+  shopping: '🛒',
+  cup: '☕',
+  music: '🎵',
+  game: '🎮',
+  travel: '✈️',
+  cigarette: '🚬',
+  sun: '☀️',
+  moon: '🌙',
   leaf: '🍃',
+
+  // NATURALEZA / AVENTURA
   tree: '🌳',
   mountain: '⛰️',
   globe: '🌍',
   compass: '🧭',
-
-  sleep: '😴',
-  hospital: '🏥',
-  pill: '💊',
-  stretch: '🧎',
-  bicycle: '🚴',
-
-  money: '💰',
-  bank: '🏦',
-  briefcase: '💼',
-  shopping: '🛒',
-  gift: '🎁'
 } as const;
 
 export const GOAL_COLORS = {
