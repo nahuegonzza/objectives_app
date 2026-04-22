@@ -452,9 +452,9 @@ export default function Analytics() {
                 ...dayEntries.map(entry => {
                   const points = getEntryPoints(entry);
                   if (entry.goal.type === 'BOOLEAN') {
-                    return `${entry.goal.title}: ${entry.valueBoolean ? 'Cumplido' : 'No cumplido'} (${points} pts)`;
+                    return `${entry.goal.icon || '🎯'} ${entry.goal.title}: ${entry.valueBoolean ? 'Cumplido' : 'No cumplido'} (${points} pts)`;
                   } else {
-                    return `${entry.goal.title}: ${entry.valueFloat} (${points} pts)`;
+                    return `${entry.goal.icon || '🎯'} ${entry.goal.title}: ${entry.valueFloat} (${points} pts)`;
                   }
                 }),
                 ...(modulePoints > 0 ? [`Módulos: ${modulePoints.toFixed(1)} pts`] : [])
