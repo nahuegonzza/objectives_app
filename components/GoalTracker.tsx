@@ -365,6 +365,7 @@ export default function GoalTracker() {
                         key={module.slug}
                         config={module.config}
                         module={module}
+                        isEditing={true}
                         onUpdate={() => loadModuleEntries()}
                         date={today}
                       />

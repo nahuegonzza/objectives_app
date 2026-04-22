@@ -556,7 +556,7 @@ export default function CalendarExplorer() {
                     onClick={() => setGoalsCollapsed(!goalsCollapsed)}
                     className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                   >
-                    <span className={`transform transition-transform ${goalsCollapsed ? 'rotate-270' : ''}`}>▼</span>
+                    <span className={`transform transition-transform ${goalsCollapsed ? 'rotate-270' : ''}`}>▶</span>
                     Objetivos
                   </button>
                 </div>
