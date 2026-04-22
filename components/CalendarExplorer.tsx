@@ -486,33 +486,35 @@ export default function CalendarExplorer() {
                 </div>
               </div>
 
-              {isEditingDay && (
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <div className="flex justify-right mb-4">
+                {isEditingDay && (
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveAllDayEntries}
+                      className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold transition"
+                    >
+                      💾 Guardar día
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelDayEdit}
+                      className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                    >
+                      ✕ Cancelar
+                    </button>
+                  </div>
+                )}
+                
+                {!isEditingDay && (
                   <button
                     type="button"
-                    onClick={handleSaveAllDayEntries}
-                    className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-semibold transition"
+                    onClick={buildInitialDayEdits}
+                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
                   >
-                    💾 Guardar día
+                    ✏️ Editar día
                   </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelDayEdit}
-                    className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                  >
-                    ✕ Cancelar
-                  </button>
-                </div>
-              )}
-
-              <div className="flex justify-center mb-4">
-                <button
-                  type="button"
-                  onClick={buildInitialDayEdits}
-                  className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
-                >
-                  ✏️ Editar día
-                </button>
+                )}
               </div>
 
               {activeModules.length > 0 && (
