@@ -348,7 +348,7 @@ const allDates = useMemo(() => {
             onChange={(e) => setSelectedGoalId(e.target.value)}
             className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
           >
-            <option value="all">Todos los objetivos</option>
+            <option value="all">-</option>
             {availableGoals.map((goal) => (
               <option key={goal.id} value={goal.id}>{goal.title}</option>
             ))}
@@ -464,7 +464,7 @@ const allDates = useMemo(() => {
                   key={index}
                   cx={x}
                   cy={y}
-                  r="1.5"
+                  r="3"
                   fill="rgb(11, 128, 54)"
                 >
                   <title>{tooltipLines.join('\n')}</title>
