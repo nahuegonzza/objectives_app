@@ -8,42 +8,102 @@ export const GOAL_ICONS = {
   runner: '🏃',
   muscle: '💪',
   moon: '🌙',
+
   sun: '☀️',
   water: '💧',
   apple: '🍎',
   meditation: '🧘',
   code: '💻',
+
   heart: '❤️',
   brain: '🧠',
   flame: '🔥',
   rocket: '🚀',
   target: '🎯',
+
   book_read: '📖',
   music: '🎵',
   camera: '📷',
   pen: '✏️',
-  cup: '☕'
+  cup: '☕',
+
+  trophy: '🏆',
+  medal: '🥇',
+  chart_up: '📈',
+  checklist: '📋',
+  calendar: '📅',
+
+  alarm: '⏰',
+  hourglass: '⏳',
+  focus: '🎯',
+  idea: '💡',
+  puzzle: '🧩',
+
+  handshake: '🤝',
+  people: '👥',
+  family: '👨‍👩‍👧‍👦',
+  speech: '💬',
+  microphone: '🎤',
+
+  leaf: '🍃',
+  tree: '🌳',
+  mountain: '⛰️',
+  globe: '🌍',
+  compass: '🧭',
+
+  sleep: '😴',
+  hospital: '🏥',
+  pill: '💊',
+  stretch: '🧎',
+  bicycle: '🚴',
+
+  money: '💰',
+  bank: '🏦',
+  briefcase: '💼',
+  shopping: '🛒',
+  gift: '🎁'
 } as const;
 
 export const GOAL_COLORS = {
+  // ⚪ Neutros (de blanco a negro)
+  white: { bg: 'bg-white', border: 'border-gray-200', text: 'text-gray-900', tag: 'bg-gray-100 text-gray-700', dark: 'dark:bg-black dark:border-gray-700 dark:text-white' },
+  'gray-light': { bg: 'bg-gray-100', border: 'border-gray-300', text: 'text-gray-900', tag: 'bg-gray-200 text-gray-700', dark: 'dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100' },
+  gray: { bg: 'bg-gray-400', border: 'border-gray-500', text: 'text-gray-900', tag: 'bg-gray-300 text-gray-700', dark: 'dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100' },
   slate: { bg: 'bg-slate-50', border: 'border-slate-200', text: 'text-slate-900', tag: 'bg-slate-100 text-slate-700', dark: 'dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100' },
+  'gray-dark': { bg: 'bg-gray-600', border: 'border-gray-700', text: 'text-white', tag: 'bg-gray-500 text-gray-100', dark: 'dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100' },
+  black: { bg: 'bg-black', border: 'border-gray-800', text: 'text-white', tag: 'bg-gray-800 text-gray-200', dark: 'dark:bg-black dark:border-gray-700 dark:text-white' },
+
+  // 🔥 Cálidos (rojo → naranja → amarillo)
+  coral: { bg: 'bg-[#ff6b6b]', border: 'border-[#ffa5a5]', text: 'text-white', tag: 'bg-[#ffd1d1] text-[#7a1f1f]', dark: 'dark:bg-[#7a1f1f] dark:border-[#ff6b6b] dark:text-white' },
   red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900', tag: 'bg-red-100 text-red-700', dark: 'dark:bg-red-950 dark:border-red-800 dark:text-red-100' },
+  rose: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-900', tag: 'bg-rose-100 text-rose-700', dark: 'dark:bg-rose-950 dark:border-rose-800 dark:text-rose-100' },
+  burgundy: { bg: 'bg-[#800020]', border: 'border-[#b0032f]', text: 'text-white', tag: 'bg-[#a0002a] text-white', dark: 'dark:bg-[#2a000a] dark:border-[#800020] dark:text-white' },
+
   orange: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-900', tag: 'bg-orange-100 text-orange-700', dark: 'dark:bg-orange-950 dark:border-orange-800 dark:text-orange-100' },
   amber: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-900', tag: 'bg-amber-100 text-amber-700', dark: 'dark:bg-amber-950 dark:border-amber-800 dark:text-amber-100' },
   yellow: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-900', tag: 'bg-yellow-100 text-yellow-700', dark: 'dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-100' },
+
+  // 🌿 Verdes
+  olive: { bg: 'bg-[#6b8e23]', border: 'border-[#556b2f]', text: 'text-white', tag: 'bg-[#a3b86c] text-[#2e3b12]', dark: 'dark:bg-[#2e3b12] dark:border-[#6b8e23] dark:text-white' },
   lime: { bg: 'bg-lime-50', border: 'border-lime-200', text: 'text-lime-900', tag: 'bg-lime-100 text-lime-700', dark: 'dark:bg-lime-950 dark:border-lime-800 dark:text-lime-100' },
   green: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-900', tag: 'bg-green-100 text-green-700', dark: 'dark:bg-green-950 dark:border-green-800 dark:text-green-100' },
   emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900', tag: 'bg-emerald-100 text-emerald-700', dark: 'dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-100' },
+  mint: { bg: 'bg-[#06d6a0]', border: 'border-[#00b377]', text: 'text-black', tag: 'bg-[#5eead4] text-[#134e4a]', dark: 'dark:bg-[#134e4a] dark:border-[#06d6a0] dark:text-white' },
+
+  // 🌊 Fríos (verde-azulado → azul)
   teal: { bg: 'bg-teal-50', border: 'border-teal-200', text: 'text-teal-900', tag: 'bg-teal-100 text-teal-700', dark: 'dark:bg-teal-950 dark:border-teal-800 dark:text-teal-100' },
   cyan: { bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-900', tag: 'bg-cyan-100 text-cyan-700', dark: 'dark:bg-cyan-950 dark:border-cyan-800 dark:text-cyan-100' },
   sky: { bg: 'bg-sky-50', border: 'border-sky-200', text: 'text-sky-900', tag: 'bg-sky-100 text-sky-700', dark: 'dark:bg-sky-950 dark:border-sky-800 dark:text-sky-100' },
   blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', tag: 'bg-blue-100 text-blue-700', dark: 'dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100' },
   indigo: { bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-900', tag: 'bg-indigo-100 text-indigo-700', dark: 'dark:bg-indigo-950 dark:border-indigo-800 dark:text-indigo-100' },
+  navy: { bg: 'bg-[#001f3f]', border: 'border-[#003d66]', text: 'text-white', tag: 'bg-[#003d66] text-white', dark: 'dark:bg-black dark:border-[#001f3f] dark:text-white' },
+
+  // 🟣 Púrpuras → rosas
   violet: { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-900', tag: 'bg-violet-100 text-violet-700', dark: 'dark:bg-violet-950 dark:border-violet-800 dark:text-violet-100' },
   purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-900', tag: 'bg-purple-100 text-purple-700', dark: 'dark:bg-purple-950 dark:border-purple-800 dark:text-purple-100' },
+  magenta: { bg: 'bg-[#d946ef]', border: 'border-[#f0abfc]', text: 'text-white', tag: 'bg-[#f5d0fe] text-[#701a75]', dark: 'dark:bg-[#701a75] dark:border-[#d946ef] dark:text-white' },
   fuchsia: { bg: 'bg-fuchsia-50', border: 'border-fuchsia-200', text: 'text-fuchsia-900', tag: 'bg-fuchsia-100 text-fuchsia-700', dark: 'dark:bg-fuchsia-950 dark:border-fuchsia-800 dark:text-fuchsia-100' },
   pink: { bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-900', tag: 'bg-pink-100 text-pink-700', dark: 'dark:bg-pink-950 dark:border-pink-800 dark:text-pink-100' },
-  rose: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-900', tag: 'bg-rose-100 text-rose-700', dark: 'dark:bg-rose-950 dark:border-rose-800 dark:text-rose-100' },
 } as const;
 
 export type GoalIconKey = keyof typeof GOAL_ICONS;
