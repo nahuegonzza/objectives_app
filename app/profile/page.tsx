@@ -95,7 +95,7 @@ export default function ProfilePage() {
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <img src="/navbar_icons/racha.gif" alt="Racha" className="w-8 h-8 rounded-full" />
+                    <img src="/navbar_icons/streak_off.png" alt="Racha" className="w-8 h-8 rounded-full" />
                     <span className="font-medium text-slate-900 dark:text-white">Racha Compartida</span>
                   </div>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">12 días</span>
