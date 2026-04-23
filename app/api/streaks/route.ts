@@ -91,7 +91,7 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const dateParam = url.searchParams.get('date');
-  const referenceDate = normalizeDateToStartOfDay(dateParam ?? new Date().toISOString());
+  const referenceDate = normalizeDateToStartOfDay(dateParam ?? formatDate(new Date()));
   const referenceDateKey = formatDate(referenceDate);
 
   try {
@@ -116,7 +116,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const dateParam = typeof body?.date === 'string' ? body.date : new Date().toISOString();
+  const dateParam = typeof body?.date === 'string' ? body.date : formatDate(new Date());
   let entryDate: Date;
 
   try {
