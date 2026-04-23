@@ -287,15 +287,15 @@ export default function GoalTracker() {
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg">
+        <div>
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+            Registro diario
+          </p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {today}
+          </h2>
+        </div>
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              Registro diario
-            </p>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {today}
-            </h2>
-          </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full">
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Hoy</p>
