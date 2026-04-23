@@ -106,11 +106,11 @@ export default function ProfilePage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400">Puntuación Total</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{streakInfo.currentStreak}</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{streakInfo.currentStreak}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Racha Actual</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{streakInfo.longestStreak}</p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{streakInfo.longestStreak}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Mejor Racha</p>
                 </div>
               </div>
@@ -134,7 +134,6 @@ export default function ProfilePage() {
             {/* Racha diaria */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Racha diaria</h2>
-              <p className="text-slate-500 dark:text-slate-400">La racha solo se cumple cuando se registra un ítem desde Inicio.</p>
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <div className="flex items-center space-x-3">
@@ -151,16 +150,19 @@ export default function ProfilePage() {
                   </div>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">{streakInfo.currentStreak} días</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={'/navbar_icons/streak_on.gif'}
-                    alt={'Racha cumplida'}
-                    className="w-10 h-10 rounded-full"
-                  />                  
-                  <div>
+
+                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={'/navbar_icons/streak_on.gif'}
+                      alt={'Racha cumplida'}
+                      className="w-10 h-10 rounded-full"
+                    />                
+                    <div>
                     <p className="font-medium text-slate-900 dark:text-white">
                       Mejor racha registrada: {streakInfo.longestStreak} días
                     </p>
+                    </div>
                   </div>
                 </div>
               </div>
