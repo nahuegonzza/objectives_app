@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Navigation from '@components/Navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
@@ -26,12 +27,12 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <Navigation />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Perfil</h1>
-          <button className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-            Ajustes
-          </button>
+          <Link href="/settings" className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className="w-6 h-6" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
