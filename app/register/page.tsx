@@ -20,6 +20,9 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [status, setStatus] = useState('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [loading, setLoading] = useState(false);
@@ -29,6 +32,13 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setStatus('');
+
+    if (!firstName.trim() || !lastName.trim() || !birthDate) {
+      setStatus('Nombre, apellido y fecha de nacimiento son obligatorios');
+      setStatusType('error');
+      setLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setStatus('Las contraseñas no coinciden');
@@ -41,6 +51,13 @@ export default function RegisterPage() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
+      options: {
+        data: {
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          birth_date: birthDate,
+        },
+      },
     });
 
     if (error) {
@@ -67,6 +84,52 @@ export default function RegisterPage() {
           <p className="mt-2 text-slate-400">Regístrate para comenzar</p>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-2">
+                Nombre
+              </label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                required
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Nombre"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-slate-300 mb-2">
+                Apellido
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Apellido"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="birthDate" className="block text-sm font-medium text-slate-300 mb-2">
+              Fecha de nacimiento
+            </label>
+            <input
+              id="birthDate"
+              name="birthDate"
+              type="date"
+              required
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+            />
+          </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
               Email

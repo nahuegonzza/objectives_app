@@ -110,16 +110,29 @@ export async function ensurePrismaUserForSession() {
     return null;
   }
 
+  const metadata = user.user_metadata as Record<string, any> | undefined;
+  const firstName = metadata?.first_name ?? metadata?.firstName ?? null;
+  const lastName = metadata?.last_name ?? metadata?.lastName ?? null;
+  const birthDateValue = metadata?.birth_date ?? metadata?.birthDate ?? null;
+  const birthDate = birthDateValue ? new Date(birthDateValue) : null;
+  const name = metadata?.full_name ?? [firstName, lastName].filter(Boolean).join(' ') || null;
+
   return prisma.user.upsert({
     where: { id: user.id },
     update: {
       email: user.email,
-      name: (user.user_metadata as any)?.full_name ?? null,
+      firstName,
+      lastName,
+      birthDate,
+      name,
     },
     create: {
       id: user.id,
       email: user.email,
-      name: (user.user_metadata as any)?.full_name ?? null,
+      firstName,
+      lastName,
+      birthDate,
+      name,
     },
   });
 }

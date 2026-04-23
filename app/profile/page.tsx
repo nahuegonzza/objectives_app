@@ -12,6 +12,18 @@ export default function ProfilePage() {
   const supabase = createBrowserSupabaseClient();
   const [userData, setUserData] = useState<any>(null);
   const [stats, setStats] = useState<any>({ goalsCompleted: 0, totalScore: 0, streak: 0 });
+
+  const calculateAge = (birthDate?: string | null) => {
+    if (!birthDate) return null;
+    const date = new Date(birthDate);
+    if (isNaN(date.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - date.getFullYear();
+    const monthDiff = today.getMonth() - date.getMonth();
+    const dayDiff = today.getDate() - date.getDate();
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
+    return age;
+  };
   const [streakInfo, setStreakInfo] = useState({ currentStreak: 0, longestStreak: 0, todayFulfilled: false, today: getLocalDateString() });
 
   useEffect(() => {
@@ -62,10 +74,21 @@ export default function ProfilePage() {
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Información Personal</h2>
               <div className="space-y-2">
                 <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Nombre:</span> {userData?.firstName + " " + userData?.lastName || 'Cargando...'}
+                  <span className="font-medium">Nombre:</span> {userData?.firstName || userData?.name ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}`.trim() : 'Cargando...'}
                 </p>
                 <p className="text-slate-600 dark:text-slate-400">
                   <span className="font-medium">Email:</span> {userData?.email || ''}
+                </p>
+                <p className="text-slate-600 dark:text-slate-400">
+                  <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES') : 'No registrada'}
+                </p>
+                {calculateAge(userData?.birthDate) !== null && (
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <span className="font-medium">Edad:</span> {calculateAge(userData?.birthDate)} años
+                  </p>
+                )}
+                <p className="text-slate-600 dark:text-slate-400">
+                  <span className="font-medium">Miembro desde:</span> {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES') : 'No disponible'}
                 </p>
               </div>
             </div>
@@ -128,7 +151,7 @@ export default function ProfilePage() {
                   </div>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">{streakInfo.currentStreak} días</span>
                 </div>
-                <div className="rounded-2xl bg-slate-50 dark:bg-slate-800 p-3 text-sm text-slate-600 dark:text-slate-300">
+                <div className="flex items-center space-x-3">
                   <img
                     src={'/navbar_icons/streak_on.gif'}
                     alt={'Racha cumplida'}

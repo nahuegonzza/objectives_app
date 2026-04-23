@@ -21,6 +21,7 @@ export default function SettingsPage() {
   const [profileForm, setProfileForm] = useState({
     firstName: '',
     lastName: '',
+    birthDate: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -58,9 +59,14 @@ export default function SettingsPage() {
           lastName = parts.slice(1).join(' ') || '';
         }
         
+        const birthDate = data.birthDate
+          ? new Date(data.birthDate).toISOString().slice(0, 10)
+          : (data.user_metadata?.birth_date || data.user_metadata?.birthDate || '');
+
         setProfileForm({
           firstName,
           lastName,
+          birthDate,
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
@@ -146,7 +152,8 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firstName: profileForm.firstName,
-          lastName: profileForm.lastName
+          lastName: profileForm.lastName,
+          birthDate: profileForm.birthDate
         })
       });
       if (!res.ok) {
@@ -260,6 +267,15 @@ export default function SettingsPage() {
                         onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })}
                         className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                         placeholder="Tu apellido"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Fecha de nacimiento</label>
+                      <input
+                        type="date"
+                        value={profileForm.birthDate}
+                        onChange={(e) => setProfileForm({ ...profileForm, birthDate: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>

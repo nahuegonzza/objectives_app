@@ -52,15 +52,27 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { firstName, lastName } = body;
+    const { firstName, lastName, birthDate } = body;
+
+    const data: any = {
+      firstName: firstName || null,
+      lastName: lastName || null,
+      name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null,
+    };
+
+    if (birthDate) {
+      const date = new Date(birthDate);
+      if (isNaN(date.getTime())) {
+        return NextResponse.json({ error: 'Invalid birthDate' }, { status: 400 });
+      }
+      data.birthDate = date;
+    } else if (birthDate === '') {
+      data.birthDate = null;
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        firstName: firstName || null,
-        lastName: lastName || null,
-        name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null
-      }
+      data,
     });
 
     return NextResponse.json(updatedUser);
