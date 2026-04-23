@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Navigation from '@components/Navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
@@ -62,9 +61,6 @@ export default function ProfilePage() {
             <h1 className="text-4xl font-bold tracking-tight">Perfil</h1>
             <p className="mt-2 text-slate-600 dark:text-slate-400">Un vistazo a tu perfil social y estadísticas.</p>
           </div>
-          <Link href="/settings" className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-            <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className="w-6 h-6" />
-          </Link>
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">

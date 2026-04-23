@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Navigation from '@components/Navigation';
 import ThemeToggle from '@components/ThemeToggle';
 import ModuleTile from '@components/ModuleTile';
@@ -208,16 +207,11 @@ export default function SettingsPage() {
       <div className="mx-auto max-w-4xl">
         <Navigation />
 
-        <header className="flex justify-between items-center mb-8">
+        <header className="mb-8">
           <div>
             <h1 className="text-4xl font-bold tracking-tight">Configuración</h1>
             <p className="mt-2 text-slate-600 dark:text-slate-400">Personaliza tu experiencia</p>
           </div>
-          <Link href="/profile" className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </Link>
         </header>
 
         <div className="space-y-6">
