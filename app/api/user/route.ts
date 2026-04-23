@@ -74,13 +74,18 @@ export async function PATCH(request: Request) {
       data.birthDate = null;
     }
 
+    const email = user?.email;
+    if (user && !email) {
+      return NextResponse.json({ error: 'User email is required' }, { status: 400 });
+    }
+
     const updatedUser = user
       ? await prisma.user.upsert({
           where: { id: userId },
           update: data,
           create: {
             id: userId,
-            email: user.email,
+            email,
             firstName: data.firstName,
             lastName: data.lastName,
             name: data.name,
