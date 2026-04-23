@@ -32,13 +32,20 @@ export default function Navigation() {
     }
   }, [session]);
 
+  const isActivePath = (href: string) => {
+    if (href === '/profile') {
+      return pathname === '/profile' || pathname === '/settings';
+    }
+    return pathname === href;
+  };
+
   const getIconClasses = (href: string) => {
-    const isActive = pathname === href;
+    const isActive = isActivePath(href);
     return isActive ? 'w-6 h-6 brightness-110' : 'w-6 h-6';
   };
 
   const getLinkClasses = (href: string) => {
-    const isActive = pathname === href;
+    const isActive = isActivePath(href);
     return isActive
       ? 'rounded-xl border-2 border-emerald-600 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200'
       : 'rounded-xl border border-slate-300 bg-white px-2 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800';
@@ -87,9 +94,9 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 title={item.label}
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath(item.href) ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
               >
-                <img src={item.icon} alt={item.label} className={`${pathname === item.href ? 'w-7 h-7' : 'w-6 h-6'}`} />
+                <img src={item.icon} alt={item.label} className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
           </div>
@@ -110,9 +117,9 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 title={item.label}
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${pathname === item.href ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath(item.href) ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 scale-105' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-transform duration-200`}
               >
-                <img src={item.icon} alt={item.label} className={`${pathname === item.href ? 'w-7 h-7' : 'w-6 h-6'}`} />
+                <img src={item.icon} alt={item.label} className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
           </div>

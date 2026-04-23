@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { DragEvent } from 'react';
 import type { Goal } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/goalIconsColors';
 import GoalForm from '@components/GoalForm';
@@ -17,6 +18,8 @@ export default function GoalManager() {
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
   const [showInactive, setShowInactive] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [draggedGoalId, setDraggedGoalId] = useState<string | null>(null);
+  const [dragOverGoalId, setDragOverGoalId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
 
@@ -147,55 +150,103 @@ export default function GoalManager() {
     }
   }
 
-  async function moveGoal(goalId: string, direction: 'up' | 'down') {
-    const currentGoal = goals.find((goal) => goal.id === goalId);
-    if (!currentGoal || typeof currentGoal.order !== 'number') return;
-    const currentOrder = currentGoal.order;
+  const activeGoals = goals.filter((goal) => goal.isActive !== false);
 
-    const nextGoal = goals
-      .filter((goal) => goal.id !== goalId)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-      .find((goal) =>
-        direction === 'up'
-          ? (goal.order ?? 0) < currentOrder
-          : (goal.order ?? 0) > currentOrder
+  async function persistOrderedGoals(orderedGoals: Goal[]) {
+    try {
+      const responses = await Promise.all(
+        orderedGoals.map((goal, index) =>
+          fetch(`/api/goals/${goal.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: index + 1 })
+          })
+        )
       );
 
-    if (!nextGoal) return;
-
-    try {
-      const updateResponse = await fetch(`/api/goals/${goalId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order: nextGoal.order })
-      });
-      if (!updateResponse.ok) {
-        const body = await updateResponse.json().catch(() => null);
-        throw new Error(body?.error || `HTTP error! status: ${updateResponse.status}`);
-      }
-
-      const swapResponse = await fetch(`/api/goals/${nextGoal.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order: currentGoal.order })
-      });
-      if (!swapResponse.ok) {
-        const body = await swapResponse.json().catch(() => null);
-        throw new Error(body?.error || `HTTP error! status: ${swapResponse.status}`);
+      for (const response of responses) {
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          throw new Error(body?.error || `HTTP error! status: ${response.status}`);
+        }
       }
 
       setStatusMessage('Orden de objetivos actualizado');
       setStatusType('success');
     } catch (error) {
-      console.error('Error moving goal:', error);
-      setStatusMessage(error instanceof Error ? `Error al mover objetivo: ${error.message}` : 'Error al mover objetivo');
+      console.error('Error updating goal order:', error);
+      setStatusMessage(error instanceof Error ? `Error actualizando orden: ${error.message}` : 'Error actualizando orden');
       setStatusType('error');
     } finally {
+      setDraggedGoalId(null);
+      setDragOverGoalId(null);
       loadGoals();
     }
   }
 
-  const sortedGoals = [...goals].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  function getOrderedActiveGoals() {
+    return [...activeGoals].sort((a, b) => {
+      const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+      const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+  }
+
+  function handleDragStart(event: DragEvent<HTMLDivElement>, goalId: string) {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', goalId);
+    setDraggedGoalId(goalId);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLDivElement>, goalId: string) {
+    event.preventDefault();
+    if (goalId !== dragOverGoalId) {
+      setDragOverGoalId(goalId);
+    }
+  }
+
+  function handleDragLeave(goalId: string) {
+    if (dragOverGoalId === goalId) {
+      setDragOverGoalId(null);
+    }
+  }
+
+  async function handleDrop(event: DragEvent<HTMLDivElement>, goalId: string) {
+    event.preventDefault();
+    const draggedId = event.dataTransfer.getData('text/plain');
+    if (!draggedId || draggedId === goalId) {
+      setDraggedGoalId(null);
+      setDragOverGoalId(null);
+      return;
+    }
+
+    const orderedGoals = getOrderedActiveGoals();
+    const draggedIndex = orderedGoals.findIndex((goal) => goal.id === draggedId);
+    const targetIndex = orderedGoals.findIndex((goal) => goal.id === goalId);
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedGoalId(null);
+      setDragOverGoalId(null);
+      return;
+    }
+
+    const nextGoals = [...orderedGoals];
+    const [movedGoal] = nextGoals.splice(draggedIndex, 1);
+    const insertIndex = draggedIndex < targetIndex ? targetIndex - 1 : targetIndex;
+    nextGoals.splice(insertIndex, 0, movedGoal);
+
+    await persistOrderedGoals(nextGoals);
+  }
+
+  function handleDragEnd() {
+    setDraggedGoalId(null);
+    setDragOverGoalId(null);
+  }
+
+  const sortedGoals = [...goals].sort((a, b) => {
+    const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+    const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
+  });
 
   return (
     <div className="space-y-6">
@@ -208,6 +259,11 @@ export default function GoalManager() {
             {statusMessage && (
               <p className={`mt-2 text-sm font-medium ${statusType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
                 {statusMessage}
+              </p>
+            )}
+            {!showInactive && (
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Arrastra los objetivos usando el handle para cambiar su orden.
               </p>
             )}
           </div>
@@ -263,13 +319,22 @@ export default function GoalManager() {
             }).map((goal) => {
               const icon = getGoalIcon(goal.icon);
               const isEditing = editingGoalId === goal.id;
-
+              const isActiveGoal = goal.isActive !== false;
+              const isDragging = draggedGoalId === goal.id;
+              const isDragOver = dragOverGoalId === goal.id;
               const colorOption = getColorOption(goal.color);
 
               return (
                 <div 
-                  key={goal.id} 
-                  className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all"
+                  key={goal.id}
+                  draggable={!showInactive && isActiveGoal && !isEditing}
+                  onDragStart={(event) => !showInactive && isActiveGoal && !isEditing && handleDragStart(event, goal.id)}
+                  onDragOver={(event) => !showInactive && isActiveGoal && !isEditing && handleDragOver(event, goal.id)}
+                  onDragEnter={(event) => !showInactive && isActiveGoal && !isEditing && handleDragOver(event, goal.id)}
+                  onDragLeave={() => !showInactive && isActiveGoal && !isEditing && handleDragLeave(goal.id)}
+                  onDrop={(event) => !showInactive && isActiveGoal && !isEditing && handleDrop(event, goal.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all ${isDragging ? 'opacity-80 border-emerald-400 shadow-lg' : ''} ${isDragOver ? 'border-emerald-300 bg-emerald-50/50' : ''}`}
                 >
                   {isEditing ? (
                     <div className="space-y-4">
@@ -548,17 +613,22 @@ export default function GoalManager() {
                   ) : (
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="relative">
-                          <span className="text-3xl">{icon}</span>
-                          <div 
-                            className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
-                            style={{
-                              backgroundColor: colorOption?.bgColor || '#9ca3af',
-                            }}
-                            title={goal.color}
-                          />
+                      {!showInactive && isActiveGoal && (
+                        <div className="flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                          <span className="text-lg">⋮⋮</span>
                         </div>
-                        <div className="min-w-0">
+                      )}
+                      <div className="relative">
+                        <span className="text-3xl">{icon}</span>
+                        <div 
+                          className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
+                          style={{
+                            backgroundColor: colorOption?.bgColor || '#9ca3af',
+                          }}
+                          title={goal.color}
+                        />
+                      </div>
+                      <div className="min-w-0">
                           <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
                           <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -594,22 +664,6 @@ export default function GoalManager() {
                               className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
                             >
                               ⊘
-                            </button>
-                            <button
-                              title="Mover arriba"
-                              type="button"
-                              onClick={() => moveGoal(goal.id, 'up')}
-                              className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                            >
-                              ↑
-                            </button>
-                            <button
-                              title="Mover abajo"
-                              type="button"
-                              onClick={() => moveGoal(goal.id, 'down')}
-                              className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                            >
-                              ↓
                             </button>
                           </>
                         ) : (
