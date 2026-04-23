@@ -20,6 +20,7 @@ export default function Navigation() {
   const supabase = createBrowserSupabaseClient();
   const [userName, setUserName] = useState<string>('');
   const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(0);
 
   useEffect(() => {
     if (session?.user) {
@@ -45,6 +46,7 @@ export default function Navigation() {
       }
       const data = await res.json();
       setTodayStreakFulfilled(Boolean(data.todayFulfilled));
+      setCurrentStreak(Number(data.currentStreak ?? 0));
     } catch (error) {
       console.error('Error loading streak info:', error);
     }
@@ -83,16 +85,24 @@ export default function Navigation() {
   return (
     <>
       <nav className="hidden sm:block mb-4 rounded-xl border border-slate-200 bg-white px-2 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <div className="flex items-center justify-center w-8 h-8">
-              <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-full h-full object-contain" />
+        <div className="relative flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <img
+              src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
+              alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
+              className="w-10 h-10 rounded-full"
+            />
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {currentStreak} día{currentStreak === 1 ? '' : 's'}
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Goalyx{userName ? ` - ${userName}` : ''}</p>
-              <h2 className="text-xs font-semibold text-slate-900 dark:text-white">Sistema de seguimiento</h2>
-            </div>
-          </Link>
+          </div>
+
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Link href="/" className="flex items-center justify-center">
+              <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-10 h-10 object-contain" />
+            </Link>
+          </div>
+
           <div className="flex flex-wrap items-center gap-1">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href as any} className={getLinkClasses(item.href)} title={item.label}>
@@ -104,18 +114,23 @@ export default function Navigation() {
       </nav>
 
       <nav className="sm:hidden fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between py-3 px-4">
-          <div className="flex items-center justify-center">
-            <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-12 h-12" />
-          </div>
+        <div className="relative mx-auto flex max-w-5xl items-center justify-between py-3 px-4">
           <div className="flex items-center gap-2">
             <img
               src={todayStreakFulfilled ? '/navbar_icons/streak_on.gif' : '/navbar_icons/streak_off.png'}
               alt={todayStreakFulfilled ? 'Racha cumplida hoy' : 'Racha incompleta hoy'}
               className="w-10 h-10 rounded-full"
             />
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">Racha</span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {currentStreak}
+            </span>
           </div>
+
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-12 h-12" />
+          </div>
+
+          <div className="w-12" aria-hidden="true" />
         </div>
       </nav>
 
