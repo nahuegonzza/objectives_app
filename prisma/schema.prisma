@@ -48,6 +48,8 @@ model Goal {
   deactivatedAt DateTime?
   activatedAt   DateTime      @default(now())
   createdAt     DateTime      @default(now())
+  // Días de la semana: array de 0-6 (0=domingo, 6=sábado). Si está vacío = todos los días
+  weekDays      Int[]         @default([])
   entries       GoalEntry[]
   events        Event[]
 }

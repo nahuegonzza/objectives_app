@@ -322,8 +322,9 @@ export default function GoalTracker() {
     setDailyScore(currentScore);
   }, [currentEntries, currentEvents, currentModuleEntries, activeModules]);
 
-  // Filtrar solo objetivos activos (tratando isActive como true si no está definido)
-  const activeGoals = goals.filter((g) => g.isActive !== false);
+  // Filtrar solo objetivos activos Y que correspondan al día de hoy
+  // Usa isGoalActiveOnDate de goalHelpers.ts para mantener consistencia
+  const activeGoals = goals.filter((g) => g.isActive !== false && isGoalActiveOnDate(g, today));
   const booleanGoals = activeGoals.filter((g) => g.type === 'BOOLEAN');
   const numericGoals = activeGoals.filter((g) => g.type === 'NUMERIC');
   const showStreakCard = false;

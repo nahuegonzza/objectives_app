@@ -22,8 +22,19 @@ const initialState: GoalFormData = {
   color: 'white',
   pointsIfTrue: 1,
   pointsIfFalse: 0,
-  pointsPerUnit: 1
+  pointsPerUnit: 1,
+  weekDays: []
 };
+
+const WEEK_DAYS = [
+  { index: 0, label: 'D', full: 'Domingo' },
+  { index: 1, label: 'L', full: 'Lunes' },
+  { index: 2, label: 'M', full: 'Martes' },
+  { index: 3, label: 'X', full: 'Miércoles' },
+  { index: 4, label: 'J', full: 'Jueves' },
+  { index: 5, label: 'V', full: 'Viernes' },
+  { index: 6, label: 'S', full: 'Sábado' }
+];
 
 export default function GoalForm({ onSuccess }: GoalFormProps) {
   const [form, setForm] = useState<GoalFormData>(initialState);
@@ -33,6 +44,14 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showRgbPicker, setShowRgbPicker] = useState(false);
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
+
+  function toggleWeekDay(dayIndex: number) {
+    const current = form.weekDays || [];
+    const newDays = current.includes(dayIndex)
+      ? current.filter(d => d !== dayIndex)
+      : [...current, dayIndex];
+    setForm({ ...form, weekDays: newDays });
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -309,6 +328,38 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Días de la semana */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Días de la semana {form.weekDays && form.weekDays.length > 0 ? `(seleccionados: ${form.weekDays.length})` : '(vacío = todos los días)'}
+        </label>
+        <div className="flex gap-2 justify-center">
+          {WEEK_DAYS.map((day) => {
+            const isSelected = (form.weekDays || []).includes(day.index);
+            return (
+              <button
+                key={day.index}
+                type="button"
+                onClick={() => toggleWeekDay(day.index)}
+                className={`w-10 h-10 rounded-full text-sm font-semibold transition-all ${
+                  isSelected
+                    ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-600'
+                }`}
+                title={day.full}
+              >
+                {day.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-xs text-center text-slate-500 dark:text-slate-400">
+          {form.weekDays && form.weekDays.length > 0
+            ? `Este objetivo aparecerá solo los días: ${form.weekDays.map(d => WEEK_DAYS.find(wd => wd.index === d)?.full).join(', ')}`
+            : 'Este objetivo aparecerá todos los días'}
+        </p>
       </div>
 
       <button

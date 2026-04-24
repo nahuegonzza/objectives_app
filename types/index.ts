@@ -31,6 +31,7 @@ export interface Goal {
   activatedAt: string;
   createdAt: string;
   scheduledDays?: string | null;
+  weekDays?: number[];
 }
 
 export interface GoalPayload {
@@ -46,6 +47,7 @@ export interface GoalPayload {
   isActive?: boolean;
   deactivatedAt?: string | null;
   activatedAt?: string;
+  weekDays?: number[];
 }
 
 export interface GoalEntryPayload {

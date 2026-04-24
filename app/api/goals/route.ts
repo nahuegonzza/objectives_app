@@ -98,7 +98,8 @@ export async function POST(request: Request) {
             pointsPerUnit: payload.pointsPerUnit,
             isActive: true,
             activatedAt,
-            deactivatedAt: null
+            deactivatedAt: null,
+            weekDays: payload.weekDays ?? []
           }
         })
       );
@@ -127,7 +128,8 @@ export async function POST(request: Request) {
           pointsIfFalse: payload.pointsIfFalse,
           pointsPerUnit: payload.pointsPerUnit,
           isActive: true,
-          activatedAt
+          activatedAt,
+          weekDays: payload.weekDays ?? []
         }
       })
     );

@@ -40,7 +40,8 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
       order: payload.order,
       pointsIfTrue: payload.pointsIfTrue,
       pointsIfFalse: payload.pointsIfFalse,
-      pointsPerUnit: payload.pointsPerUnit
+      pointsPerUnit: payload.pointsPerUnit,
+      weekDays: payload.weekDays ?? []
     };
 
     if (typeof payload.isActive === 'boolean') {

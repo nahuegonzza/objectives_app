@@ -61,7 +61,8 @@ export default function GoalManager() {
       pointsIfTrue: editForm.pointsIfTrue,
       pointsIfFalse: editForm.pointsIfFalse,
       pointsPerUnit: editForm.pointsPerUnit,
-      activatedAt: editForm.activatedAt
+      activatedAt: editForm.activatedAt,
+      weekDays: editForm.weekDays ?? []
     };
 
     try {
@@ -634,6 +635,52 @@ export default function GoalManager() {
                               />
                             </div>
                           )}
+                        </div>
+
+                        {/* Días de la semana en edición */}
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(vacío = todos los días)'}
+                          </label>
+                          <div className="flex gap-2 justify-center">
+                            {[
+                              { index: 0, label: 'D', full: 'Domingo' },
+                              { index: 1, label: 'L', full: 'Lunes' },
+                              { index: 2, label: 'M', full: 'Martes' },
+                              { index: 3, label: 'X', full: 'Miércoles' },
+                              { index: 4, label: 'J', full: 'Jueves' },
+                              { index: 5, label: 'V', full: 'Viernes' },
+                              { index: 6, label: 'S', full: 'Sábado' }
+                            ].map((day) => {
+                              const currentDays = (editForm.weekDays as number[]) || [];
+                              const isSelected = currentDays.includes(day.index);
+                              return (
+                                <button
+                                  key={day.index}
+                                  type="button"
+                                  onClick={() => {
+                                    const newDays = isSelected
+                                      ? currentDays.filter(d => d !== day.index)
+                                      : [...currentDays, day.index];
+                                    setEditForm({ ...editForm, weekDays: newDays });
+                                  }}
+                                  className={`w-10 h-10 rounded-full text-sm font-semibold transition-all ${
+                                    isSelected
+                                      ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
+                                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-600'
+                                  }`}
+                                  title={day.full}
+                                >
+                                  {day.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <p className="mt-2 text-xs text-center text-slate-500 dark:text-slate-400">
+                            {(editForm.weekDays as number[])?.length > 0
+                              ? `Este objetivo aparecerá solo los días: ${(editForm.weekDays as number[]).map(d => ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d]).join(', ')}`
+                              : 'Este objetivo aparecerá todos los días'}
+                          </p>
                         </div>
 
                         <div className="grid gap-2 sm:grid-cols-2">
