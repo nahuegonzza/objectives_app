@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
   const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>({ goalsCompleted: 0, totalScore: 0, streak: 0 });
 
   const calculateAge = (birthDate?: string | null) => {
@@ -25,20 +26,55 @@ export default function ProfilePage() {
   };
 
   const getDisplayName = (user: any) => {
-    if (!user) return 'Cargando...';
+    if (loading) return 'Cargando...';
+    if (!user) return 'Usuario';
+    
+    // Try to build full name from firstName and lastName
     const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
     if (fullName) return fullName;
-    return user.name || session?.user?.email || 'Usuario';
+    
+    // Fallback to name field
+    if (user.name) return user.name;
+    
+    // Final fallback to email
+    return session?.user?.email || 'Usuario';
   };
 
   const [streakInfo, setStreakInfo] = useState({ currentStreak: 0, longestStreak: 0, todayFulfilled: false, today: getLocalDateString() });
 
   useEffect(() => {
     if (session?.user) {
+      setLoading(true);
+      
+      // Load user data with better error handling
       fetch('/api/user')
-        .then(res => res.json())
-        .then(data => setUserData(data))
-        .catch(() => setUserData({ firstName: 'Usuario', lastName: '', email: session.user.email }));
+        .then(async (res) => {
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(`HTTP ${res.status}: ${errorData.error || res.statusText}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          setUserData(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error loading user data:', error);
+          // Fallback: use session data
+          if (session?.user) {
+            setUserData({
+              id: session.user.id,
+              email: session.user.email,
+              name: session.user.user_metadata?.full_name || null,
+              firstName: session.user.user_metadata?.first_name || session.user.user_metadata?.firstName || null,
+              lastName: session.user.user_metadata?.last_name || session.user.user_metadata?.lastName || null,
+              birthDate: null,
+              createdAt: session.user.created_at
+            });
+          }
+          setLoading(false);
+        });
 
       // Placeholder stats
       setStats({ goalsCompleted: 42, totalScore: 1250, streak: 7 });
@@ -76,25 +112,31 @@ export default function ProfilePage() {
             {/* Información del Usuario */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Información Personal</h2>
-              <div className="space-y-2">
-                <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Nombre:</span> {getDisplayName(userData)}
-                </p>
-                <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Email:</span> {userData?.email || session?.user?.email || 'No disponible'}
-                </p>
-                <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES') : 'No registrada'}
-                </p>
-                {calculateAge(userData?.birthDate) !== null && (
+              {loading ? (
+                <div className="space-y-2">
+                  <p className="text-slate-600 dark:text-slate-400">Cargando información del perfil...</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
                   <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Edad:</span> {calculateAge(userData?.birthDate)} años
+                    <span className="font-medium">Nombre:</span> {getDisplayName(userData)}
                   </p>
-                )}
-                <p className="text-slate-600 dark:text-slate-400">
-                  <span className="font-medium">Miembro desde:</span> {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES') : 'No disponible'}
-                </p>
-              </div>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <span className="font-medium">Email:</span> {userData?.email || session?.user?.email || 'No disponible'}
+                  </p>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES') : 'No registrada'}
+                  </p>
+                  {calculateAge(userData?.birthDate) !== null && (
+                    <p className="text-slate-600 dark:text-slate-400">
+                      <span className="font-medium">Edad:</span> {calculateAge(userData?.birthDate)} años
+                    </p>
+                  )}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <span className="font-medium">Miembro desde:</span> {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES') : 'No disponible'}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Estadísticas */}
