@@ -11,7 +11,7 @@ import type { Module } from '@types';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { session } = useSupabaseSession();
+  const { session, loading: sessionLoading } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,8 @@ export default function SettingsPage() {
   const [profileType, setProfileType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
+    if (sessionLoading) return;
+
     async function loadModules() {
       try {
         const res = await fetch('/api/modules');
@@ -51,7 +53,7 @@ export default function SettingsPage() {
         }
         const data = await res.json();
         setUser(data);
-        
+
         // Parse name into firstName and lastName if they are not set
         let firstName = data.firstName || '';
         let lastName = data.lastName || '';
@@ -60,7 +62,7 @@ export default function SettingsPage() {
           firstName = firstName || parts[0] || '';
           lastName = lastName || parts.slice(1).join(' ') || '';
         }
-        
+
         const birthDate = data.birthDate
           ? new Date(data.birthDate).toISOString().slice(0, 10)
           : '';
@@ -86,11 +88,11 @@ export default function SettingsPage() {
             birthDate: null
           };
           setUser(fallbackUser);
-          
+
           const firstName = fallbackUser.firstName || '';
           const lastName = fallbackUser.lastName || '';
           const birthDate = '';
-          
+
           setProfileForm({
             firstName,
             lastName,
@@ -107,7 +109,7 @@ export default function SettingsPage() {
 
     loadModules();
     loadUser();
-  }, []);
+  }, [sessionLoading, session]);
 
   const [exportLoading, setExportLoading] = useState(false);
 
