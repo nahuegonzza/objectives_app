@@ -422,7 +422,7 @@ export default function GoalManager() {
                             <button
                               type="button"
                               onClick={() => setShowIconPicker(!showIconPicker)}
-                              className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                             >
                               {getGoalIcon(editForm.icon ?? 'star')}
                             </button>
@@ -436,7 +436,7 @@ export default function GoalManager() {
                                       setEditForm({ ...editForm, icon: opt.key });
                                       setShowIconPicker(false);
                                     }}
-                                    className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
+                                    className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
                                     title={opt.label}
                                   >
                                     {opt.emoji}
@@ -781,7 +781,7 @@ export default function GoalManager() {
                               <button
                                 type="button"
                                 onClick={() => setShowIconPicker(!showIconPicker)}
-                                className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 {getGoalIcon(editForm.icon ?? 'star')}
                               </button>
@@ -795,7 +795,7 @@ export default function GoalManager() {
                                         setEditForm({ ...editForm, icon: opt.key });
                                         setShowIconPicker(false);
                                       }}
-                                      className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                                      className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
                                       title={opt.label}
                                     >
                                       {opt.emoji}
@@ -1143,7 +1143,7 @@ export default function GoalManager() {
                               <button
                                 type="button"
                                 onClick={() => setShowIconPicker(!showIconPicker)}
-                                className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-fit min-w-\[60px\] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 {getGoalIcon(editForm.icon ?? 'star')}
                               </button>
@@ -1157,7 +1157,7 @@ export default function GoalManager() {
                                         setEditForm({ ...editForm, icon: opt.key });
                                         setShowIconPicker(false);
                                       }}
-                                      className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                                      className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
                                       title={opt.label}
                                     >
                                       {opt.emoji}
