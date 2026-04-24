@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Goal" ADD COLUMN "isActive" BOOLEAN NOT NULL DEFAULT 1;
-ALTER TABLE "Goal" ADD COLUMN "deactivatedAt" DATETIME;

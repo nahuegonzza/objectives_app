@@ -1,17 +1,17 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+const dbUrl = process.env.DATABASE_URL || process.env.DIRECT_DATABASE_URL;
+if (!dbUrl) {
+  throw new Error('Missing DATABASE_URL environment variable');
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env.DATABASE_URL ?? process.env.DIRECT_DATABASE_URL,
+    url: dbUrl,
   },
 });
-
-// Validate SSL is configured
-if (process.env.DATABASE_URL && !/[?&]sslmode=/.test(process.env.DATABASE_URL)) {
-  console.warn('[Prisma Config] Warning: DATABASE_URL may not have sslmode=require configured');
-}
