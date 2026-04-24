@@ -54,6 +54,7 @@ export default function SettingsPage() {
           throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
         }
         const data = await res.json();
+        console.log('📥 Datos cargados desde API:', data);
         setUser(data);
 
         // Parse name into firstName and lastName if they are not set
@@ -69,7 +70,7 @@ export default function SettingsPage() {
           ? new Date(data.birthDate).toISOString().slice(0, 10)
           : '';
 
-        setProfileForm({
+        const initialFormData = {
           firstName,
           lastName,
           username: data.username || '',
@@ -77,9 +78,12 @@ export default function SettingsPage() {
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
-        });
+        };
+
+        console.log('📝 Datos iniciales del formulario:', initialFormData);
+        setProfileForm(initialFormData);
       } catch (error) {
-        console.error('Error loading user:', error);
+        console.error('❌ Error loading user:', error);
         // Fallback: try to get basic info from session
         if (session?.user) {
           const fallbackUser = {
@@ -90,13 +94,14 @@ export default function SettingsPage() {
             lastName: session.user.user_metadata?.last_name || session.user.user_metadata?.lastName || null,
             birthDate: null
           };
+          console.log('🔄 Usando datos de fallback:', fallbackUser);
           setUser(fallbackUser);
 
           const firstName = fallbackUser.firstName || '';
           const lastName = fallbackUser.lastName || '';
           const birthDate = '';
 
-          setProfileForm({
+          const fallbackFormData = {
             firstName,
             lastName,
             username: '',
@@ -104,7 +109,10 @@ export default function SettingsPage() {
             currentPassword: '',
             newPassword: '',
             confirmPassword: ''
-          });
+          };
+
+          console.log('📝 Datos de fallback del formulario:', fallbackFormData);
+          setProfileForm(fallbackFormData);
         }
       } finally {
         setUserLoading(false);
