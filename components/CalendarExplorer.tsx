@@ -169,6 +169,8 @@ export default function CalendarExplorer() {
       return orderA - orderB;
     });
   };
+
+  const buildInitialDayEdits = () => {
     const edits: Record<string, { valueBoolean?: boolean; valueFloat?: number }> = {};
     visibleGoals.forEach((goal) => {
       const entry = entriesByGoalId.get(goal.id);
