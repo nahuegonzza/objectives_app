@@ -45,7 +45,10 @@ export default function SettingsPage() {
     async function loadUser() {
       try {
         const res = await fetch('/api/user');
-        if (!res.ok) throw new Error('Error loading user');
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
+        }
         const data = await res.json();
         setUser(data);
         
@@ -60,7 +63,7 @@ export default function SettingsPage() {
         
         const birthDate = data.birthDate
           ? new Date(data.birthDate).toISOString().slice(0, 10)
-          : (data.user_metadata?.birth_date || data.user_metadata?.birthDate || '');
+          : '';
 
         setProfileForm({
           firstName,
@@ -72,6 +75,31 @@ export default function SettingsPage() {
         });
       } catch (error) {
         console.error('Error loading user:', error);
+        // Fallback: try to get basic info from session
+        if (session?.user) {
+          const fallbackUser = {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || null,
+            firstName: session.user.user_metadata?.first_name || session.user.user_metadata?.firstName || null,
+            lastName: session.user.user_metadata?.last_name || session.user.user_metadata?.lastName || null,
+            birthDate: null
+          };
+          setUser(fallbackUser);
+          
+          const firstName = fallbackUser.firstName || '';
+          const lastName = fallbackUser.lastName || '';
+          const birthDate = '';
+          
+          setProfileForm({
+            firstName,
+            lastName,
+            birthDate,
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          });
+        }
       } finally {
         setUserLoading(false);
       }
@@ -150,20 +178,40 @@ export default function SettingsPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName: profileForm.firstName,
-          lastName: profileForm.lastName,
-          birthDate: profileForm.birthDate
+          firstName: profileForm.firstName.trim(),
+          lastName: profileForm.lastName.trim(),
+          birthDate: profileForm.birthDate || null
         })
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error || 'Error updating profile');
+        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
       }
       setProfileStatus('Perfil actualizado correctamente');
       setProfileType('success');
       // Reload user
       const updatedUser = await res.json();
       setUser(updatedUser);
+      
+      // Update profile form with the response data
+      let firstName = updatedUser.firstName || '';
+      let lastName = updatedUser.lastName || '';
+      if ((!firstName || !lastName) && updatedUser.name) {
+        const parts = updatedUser.name.trim().split(' ');
+        firstName = firstName || parts[0] || '';
+        lastName = lastName || parts.slice(1).join(' ') || '';
+      }
+      
+      const birthDate = updatedUser.birthDate
+        ? new Date(updatedUser.birthDate).toISOString().slice(0, 10)
+        : '';
+      
+      setProfileForm(prev => ({
+        ...prev,
+        firstName,
+        lastName,
+        birthDate
+      }));
     } catch (error) {
       console.error('Error updating profile:', error);
       setProfileStatus(error instanceof Error ? error.message : 'Error updating profile');

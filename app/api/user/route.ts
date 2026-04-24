@@ -34,6 +34,33 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // If user has incomplete data, try to enrich from Supabase metadata
+    if (user && (!dbUser.firstName || !dbUser.lastName || !dbUser.birthDate)) {
+      const metadata = user.user_metadata as Record<string, any> | undefined;
+      const enrichedUser = {
+        ...dbUser,
+        firstName: dbUser.firstName || (metadata?.first_name ?? metadata?.firstName) || null,
+        lastName: dbUser.lastName || (metadata?.last_name ?? metadata?.lastName) || null,
+        birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null),
+        name: dbUser.name || (([dbUser.firstName || (metadata?.first_name ?? metadata?.firstName), dbUser.lastName || (metadata?.last_name ?? metadata?.lastName)].filter(Boolean).join(' ')) || null)
+      };
+
+      // Update the database with enriched data
+      if (enrichedUser.firstName !== dbUser.firstName || enrichedUser.lastName !== dbUser.lastName || enrichedUser.birthDate !== dbUser.birthDate) {
+        await prisma.user.update({
+          where: { id: dbUser.id },
+          data: {
+            firstName: enrichedUser.firstName,
+            lastName: enrichedUser.lastName,
+            birthDate: enrichedUser.birthDate,
+            name: enrichedUser.name
+          }
+        });
+      }
+
+      return NextResponse.json(enrichedUser);
+    }
+
     return NextResponse.json(dbUser);
   } catch (error) {
     console.error('Error fetching user:', error);
