@@ -89,9 +89,9 @@ export async function PATCH(request: Request) {
     const { firstName, lastName, birthDate, username } = body;
 
     const data: any = {
-      firstName: firstName || null,
-      lastName: lastName || null,
-      name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null,
+      firstName: firstName?.trim() || null,
+      lastName: lastName?.trim() || null,
+      name: firstName?.trim() && lastName?.trim() ? `${firstName.trim()} ${lastName.trim()}` : firstName?.trim() || lastName?.trim() || null,
     };
 
     // Handle username update

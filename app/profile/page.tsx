@@ -15,7 +15,8 @@ export default function ProfilePage() {
 
   const calculateAge = (birthDate?: string | null) => {
     if (!birthDate) return null;
-    const date = new Date(birthDate);
+    // Create date at noon to avoid timezone issues
+    const date = new Date(birthDate + 'T12:00:00');
     if (isNaN(date.getTime())) return null;
     const today = new Date();
     let age = today.getFullYear() - date.getFullYear();
@@ -128,7 +129,7 @@ export default function ProfilePage() {
                     <span className="font-medium">Usuario:</span> {userData?.username || 'No establecido'}
                   </p>
                   <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES') : 'No registrada'}
+                    <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toISOString().slice(0, 10).split('-').reverse().join('/') : 'No registrada'}
                   </p>
                   {calculateAge(userData?.birthDate) !== null && (
                     <p className="text-slate-600 dark:text-slate-400">
