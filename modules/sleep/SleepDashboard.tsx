@@ -113,7 +113,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2">
         <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
           <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</span>
           <input
@@ -121,7 +121,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             value={bedtime}
             onChange={(e) => setBedtime(e.target.value)}
             disabled={!isEditing}
-            className={`rounded-lg border px-3 py-2 text-sm shadow-sm outline-none transition focus:ring-2 ${
+            className={`w-full rounded-lg border px-3 py-3 text-base shadow-sm outline-none transition focus:ring-2 ${
               isEditing
                 ? 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
                 : 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
@@ -135,7 +135,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             value={waketime}
             onChange={(e) => setWaketime(e.target.value)}
             disabled={!isEditing}
-            className={`rounded-lg border px-3 py-2 text-sm shadow-sm outline-none transition focus:ring-2 ${
+            className={`w-full rounded-lg border px-3 py-3 text-base shadow-sm outline-none transition focus:ring-2 ${
               isEditing
                 ? 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
                 : 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'

@@ -111,7 +111,7 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
           <button
             type="button"
             onClick={() => setShowIconPicker(!showIconPicker)}
-            className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
           >
             {getGoalIcon(form.icon ?? 'star')}
           </button>
@@ -125,7 +125,7 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
                     setForm({ ...form, icon: opt.key });
                     setShowIconPicker(false);
                   }}
-                  className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
+                  className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
                   title={opt.label}
                 >
                   {opt.emoji}

@@ -645,6 +645,18 @@ export default function CalendarExplorer() {
                                     </div>
                                   ) : (
                                     <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const current = Number(editValues?.valueFloat ?? 0);
+                                          const next = Math.max(0, current - 1);
+                                          handleEntryChange(goal.id, { valueFloat: next });
+                                        }}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        title="Disminuir"
+                                      >
+                                        −
+                                      </button>
                                       <input
                                         type="number"
                                         min="0"
@@ -657,8 +669,21 @@ export default function CalendarExplorer() {
                                           const next = current + (event.deltaY < 0 ? 1 : -1);
                                           handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
                                         }}
-                                        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                        className="flex h-8 w-16 items-center justify-center rounded-lg border border-slate-300 bg-white text-center text-sm font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                        placeholder="0"
                                       />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const current = Number(editValues?.valueFloat ?? 0);
+                                          const next = current + 1;
+                                          handleEntryChange(goal.id, { valueFloat: next });
+                                        }}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        title="Aumentar"
+                                      >
+                                        +
+                                      </button>
                                       <span className="text-sm text-slate-600 dark:text-slate-300">unidades</span>
                                     </div>
                                   )}
@@ -737,6 +762,18 @@ export default function CalendarExplorer() {
                                     </div>
                                   ) : (
                                     <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const current = Number(editValues?.valueFloat ?? 0);
+                                          const next = Math.max(0, current - 1);
+                                          handleEntryChange(goal.id, { valueFloat: next });
+                                        }}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        title="Disminuir"
+                                      >
+                                        −
+                                      </button>
                                       <input
                                         type="number"
                                         min="0"
@@ -749,8 +786,21 @@ export default function CalendarExplorer() {
                                           const next = current + (event.deltaY < 0 ? 1 : -1);
                                           handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
                                         }}
-                                        className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                        className="flex h-8 w-16 items-center justify-center rounded-lg border border-slate-300 bg-white text-center text-sm font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                        placeholder="0"
                                       />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const current = Number(editValues?.valueFloat ?? 0);
+                                          const next = current + 1;
+                                          handleEntryChange(goal.id, { valueFloat: next });
+                                        }}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        title="Aumentar"
+                                      >
+                                        +
+                                      </button>
                                       <span className="text-sm text-slate-600 dark:text-slate-300">unidades</span>
                                     </div>
                                   )}

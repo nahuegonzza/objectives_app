@@ -345,13 +345,13 @@ export default function GoalManager() {
             <button
               type="button"
               onClick={() => setShowInactive(!showInactive)}
-              className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
                 showInactive
                   ? 'bg-slate-600 text-white hover:bg-slate-700'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
               }`}
             >
-              {showInactive ? '← Ver Activos' : 'Ver Desactivados →'}
+              <span>{showInactive ? '← Ver Activos' : 'Ver Desactivados →'}</span>
             </button>
           </div>
         </div>
@@ -422,12 +422,12 @@ export default function GoalManager() {
                             <button
                               type="button"
                               onClick={() => setShowIconPicker(!showIconPicker)}
-                              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                             >
                               {getGoalIcon(editForm.icon ?? 'star')}
                             </button>
                             {showIconPicker && (
-                              <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-5 gap-2 z-10">
+                              <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-2 grid grid-cols-6 gap-1 z-10 max-h-48 overflow-y-auto">
                                 {ICON_OPTIONS.map((opt) => (
                                   <button
                                     key={opt.key}
@@ -436,7 +436,7 @@ export default function GoalManager() {
                                       setEditForm({ ...editForm, icon: opt.key });
                                       setShowIconPicker(false);
                                     }}
-                                    className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                                    className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition"
                                     title={opt.label}
                                   >
                                     {opt.emoji}
@@ -781,12 +781,12 @@ export default function GoalManager() {
                               <button
                                 type="button"
                                 onClick={() => setShowIconPicker(!showIconPicker)}
-                                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 {getGoalIcon(editForm.icon ?? 'star')}
                               </button>
                               {showIconPicker && (
-                                <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-5 gap-2 z-10">
+                                <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-2 grid grid-cols-6 gap-1 z-10 max-h-48 overflow-y-auto">
                                   {ICON_OPTIONS.map((opt) => (
                                     <button
                                       key={opt.key}
@@ -795,7 +795,7 @@ export default function GoalManager() {
                                         setEditForm({ ...editForm, icon: opt.key });
                                         setShowIconPicker(false);
                                       }}
-                                      className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                                      className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
                                       title={opt.label}
                                     >
                                       {opt.emoji}
@@ -1143,12 +1143,12 @@ export default function GoalManager() {
                               <button
                                 type="button"
                                 onClick={() => setShowIconPicker(!showIconPicker)}
-                                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-2xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-2 text-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
                               >
                                 {getGoalIcon(editForm.icon ?? 'star')}
                               </button>
                               {showIconPicker && (
-                                <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-3 grid grid-cols-5 gap-2 z-10">
+                                <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg p-2 grid grid-cols-6 gap-1 z-10 max-h-48 overflow-y-auto">
                                   {ICON_OPTIONS.map((opt) => (
                                     <button
                                       key={opt.key}
@@ -1157,7 +1157,7 @@ export default function GoalManager() {
                                         setEditForm({ ...editForm, icon: opt.key });
                                         setShowIconPicker(false);
                                       }}
-                                      className="text-2xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                                      className="text-xl p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
                                       title={opt.label}
                                     >
                                       {opt.emoji}
