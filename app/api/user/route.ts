@@ -207,7 +207,21 @@ export async function PATCH(request: Request) {
       username: updatedUser.username
     });
 
-    return NextResponse.json(updatedUser);
+    // Add debug info to response
+    const debugInfo = {
+      received: { firstName, lastName, birthDate, username },
+      processed: data,
+      saved: {
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        name: updatedUser.name
+      }
+    };
+
+    return NextResponse.json({
+      ...updatedUser,
+      _debug: debugInfo
+    });
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Error updating user' }, { status: 500 });

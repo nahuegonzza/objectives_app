@@ -270,6 +270,13 @@ export default function SettingsPage() {
 
       const updatedUser = await res.json();
       console.log('✅ Usuario actualizado:', updatedUser);
+      
+      if (updatedUser._debug) {
+        console.log('🔍 DEBUG BACKEND:');
+        console.log('  📨 Datos recibidos en backend:', updatedUser._debug.received);
+        console.log('  📦 Datos procesados:', updatedUser._debug.processed);
+        console.log('  💾 Datos guardados en BD:', updatedUser._debug.saved);
+      }
 
       setProfileStatus('Perfil actualizado correctamente');
       setProfileType('success');
