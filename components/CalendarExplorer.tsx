@@ -362,7 +362,7 @@ export default function CalendarExplorer() {
             <div className="text-sm text-slate-500 dark:text-slate-400">
               {mode === 'annual' ? 'Resumen de año' : `${MODE_LABELS[mode]} · ${displayLabel}`}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => navigate('prev')}
@@ -464,7 +464,7 @@ export default function CalendarExplorer() {
                     <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Detalle</p>
                     <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">{selectedDayData.points.toFixed(1)} pts</p>
                   </div>
-                  <div className="text-right text-sm text-slate-600 dark:text-slate-300">
+                  <div className="text-right text-xs text-slate-600 dark:text-slate-300 ml-1">
                     <p>{selectedDate}</p>
                     <p>{selectedDayData.entries.length + selectedDayData.events.length} registro(s)</p>
                   </div>
@@ -539,7 +539,7 @@ export default function CalendarExplorer() {
                     <button
                       type="button"
                       onClick={() => setModulesCollapsed(!modulesCollapsed)}
-                      className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                     >
                       <span className={`transform transition-transform ${modulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
                       Módulos
@@ -570,7 +570,7 @@ export default function CalendarExplorer() {
                   <button
                     type="button"
                     onClick={() => setGoalsCollapsed(!goalsCollapsed)}
-                    className="flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                   >
                     <span className={`transform transition-transform ${goalsCollapsed ? 'rotate-90' : ''}`}>▶</span>
                     Objetivos
@@ -615,7 +615,7 @@ export default function CalendarExplorer() {
                                     </p>
                                   </div>
                                   {!isEditingDay && (
-                                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                                    <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                                       <span className="text-xs font-semibold text-slate-900 dark:text-white">
                                         {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
                                       </span>
@@ -627,7 +627,7 @@ export default function CalendarExplorer() {
                               {isEditingDay ? (
                                 <div className="space-y-2">
                                   {goal.type === 'BOOLEAN' ? (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                       <button
                                         type="button"
                                         onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
@@ -644,7 +644,7 @@ export default function CalendarExplorer() {
                                       </button>
                                     </div>
                                   ) : (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -652,7 +652,7 @@ export default function CalendarExplorer() {
                                           const next = Math.max(0, current - 1);
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
                                         title="Disminuir"
                                       >
                                         −
@@ -669,7 +669,7 @@ export default function CalendarExplorer() {
                                           const next = current + (event.deltaY < 0 ? 1 : -1);
                                           handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
                                         }}
-                                        className="flex h-8 w-16 items-center justify-center rounded-lg border border-slate-300 bg-white text-center text-sm font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                        className="flex h-7 w-10 items-center justify-center rounded-md border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                                         placeholder="0"
                                       />
                                       <button
@@ -679,12 +679,12 @@ export default function CalendarExplorer() {
                                           const next = current + 1;
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
                                         title="Aumentar"
                                       >
                                         +
                                       </button>
-                                      <span className="text-sm text-slate-600 dark:text-slate-300">unidades</span>
+                                      <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
                                     </div>
                                   )}
                                 </div>
@@ -732,7 +732,7 @@ export default function CalendarExplorer() {
                                     </p>
                                   </div>
                                   {!isEditingDay && (
-                                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                                    <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                                       <span className="text-xs font-semibold text-slate-900 dark:text-white">
                                         {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
                                       </span>
@@ -744,7 +744,7 @@ export default function CalendarExplorer() {
                               {isEditingDay ? (
                                 <div className="space-y-2">
                                   {goal.type === 'BOOLEAN' ? (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                       <button
                                         type="button"
                                         onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
@@ -761,7 +761,7 @@ export default function CalendarExplorer() {
                                       </button>
                                     </div>
                                   ) : (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -769,7 +769,7 @@ export default function CalendarExplorer() {
                                           const next = Math.max(0, current - 1);
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
                                         title="Disminuir"
                                       >
                                         −
@@ -786,7 +786,7 @@ export default function CalendarExplorer() {
                                           const next = current + (event.deltaY < 0 ? 1 : -1);
                                           handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
                                         }}
-                                        className="flex h-8 w-16 items-center justify-center rounded-lg border border-slate-300 bg-white text-center text-sm font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                        className="flex h-7 w-10 items-center justify-center rounded-md border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                                         placeholder="0"
                                       />
                                       <button
@@ -796,12 +796,12 @@ export default function CalendarExplorer() {
                                           const next = current + 1;
                                           handleEntryChange(goal.id, { valueFloat: next });
                                         }}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                                        className="flex h-7 w-7 items-center justify-center rounded-md border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-sm"
                                         title="Aumentar"
                                       >
                                         +
                                       </button>
-                                      <span className="text-sm text-slate-600 dark:text-slate-300">unidades</span>
+                                      <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
                                     </div>
                                   )}
                                 </div>
