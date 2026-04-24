@@ -3,72 +3,94 @@
  */
 
 export const GOAL_ICONS = {
-  // GENERALES
+// GENERALES Y LOGROS (Foco y Éxito)
   star: '⭐',
   target: '🎯',
+  trophy: '🏆',
+  medal: '🏅',
   rocket: '🚀',
   flame: '🔥',
+  sparkles: '✨',
+  check: '✅',
   heart: '❤️',
-  checklist: '📋',
-  calendar: '📅',
   idea: '💡',
-  trophy: '🏆',
   gift: '🎁',
+  calendar: '📅',
+  notification: '🔔',
 
-  // SALUD / FITNESS
-  runner: '🏃',
-  gym: '🏋️',
+  // SALUD Y FITNESS (Cuerpo en movimiento)
   muscle: '💪',
+  runner: '🏃',
+  walk: '🚶',
+  gym: '🏋️',
   bicycle: '🚴',
+  swim: '🏊',
+  yoga: '🧘',
   stretch: '🧎',
-  meditation: '🧘',
   water: '💧',
   apple: '🍎',
   healthy_food: '🥗',
   pill: '💊',
 
-  // DESCANSO / HÁBITOS
+  // MENTE Y BIENESTAR (Cuidado personal)
+  brain: '🧠',
+  meditation: '🧘‍♂️',
   sleep: '😴',
   bed: '🛏️',
+  shower: '🚿',
+  skincare: '🧼',
+  tooth: '🦷',
+  sun: '☀️',
+  moon: '🌙',
   alarm: '⏰',
   hourglass: '⏳',
-  cigarette: '🚬',
-  alcohol: '🍺',
-  junk_food: '🍔',
-  coffee: '☕',
-  no_phone: '📵',
-  puzzle: '🧩',
 
-  // ESTUDIO / PRODUCTIVIDAD / TRABAJO
+  // ESTUDIO Y PRODUCTIVIDAD (El "Grind" diario)
   book: '📚',
-  book_read: '📖',
+  notebook: '📓',
   pen: '✏️',
-  brain: '🧠',
-  code: '💻',
+  laptop: '💻',
+  work: '💼',
   chart_up: '📈',
-  briefcase: '💼',
+  mail: '📧',
+  timer: '⏱️',
   money: '💰',
-  shopping: '🛒',
-  cleaning: '🧹',
+  savings: '🏦',
 
-  // SOCIAL / VIDA PERSONAL
-  handshake: '🤝',
-  people: '👥',
+  // HOGAR Y VIDA SOCIAL (Entorno y Relaciones)
+  home: '🏠',
+  cleaning: '🧹',
+  laundry: '🧺',
+  shopping: '🛒',
+  cooking: '🍳',
+  pet: '🐾',
   family: '👨‍👩‍👧‍👦',
+  couple: '👩‍❤️‍👨',
+  handshake: '🤝',
   speech: '💬',
   phone: '📱',
-  home: '🏠',
   party: '🎉',
+
+  // OCIO, HOBBIES Y VICIOS (Tiempo libre y Control)
   travel: '✈️',
   mountain: '⛰️',
   camera: '📷',
-
-  // CREATIVIDAD / HOBBIES
+  art: '🎨',
   music: '🎵',
   microphone: '🎤',
   game: '🎮',
-  camera_art: '📸',
-  art: '🎨',
+  movie: '🎬',
+  reading: '📖',
+  garden: '🌱',
+  coffee: '☕',
+  tea: '🍵',
+  beer: '🍺',
+  wine: '🍷',
+  cigarette: '🚬',
+  junk_food: '🍔',
+  pizza: '🍕',
+  no_phone: '📵',
+  puzzle: '🧩',
 } as const;
 
 export const GOAL_COLORS = {
