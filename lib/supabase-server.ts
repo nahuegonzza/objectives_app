@@ -123,7 +123,7 @@ export async function ensurePrismaUserForSession() {
       email: user.email,
       firstName,
       lastName,
-      birthDate,
+      // birthDate, // TODO: Uncomment after migration is applied
       name,
     },
     create: {
@@ -131,7 +131,7 @@ export async function ensurePrismaUserForSession() {
       email: user.email,
       firstName,
       lastName,
-      birthDate,
+      // birthDate, // TODO: Uncomment after migration is applied
       name,
     },
   });

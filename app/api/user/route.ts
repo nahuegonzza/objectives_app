@@ -35,24 +35,24 @@ export async function GET() {
     }
 
     // If user has incomplete data, try to enrich from Supabase metadata
-    if (user && (!dbUser.firstName || !dbUser.lastName || !dbUser.birthDate)) {
+    if (user && (!dbUser.firstName || !dbUser.lastName)) {
       const metadata = user.user_metadata as Record<string, any> | undefined;
       const enrichedUser = {
         ...dbUser,
         firstName: dbUser.firstName || (metadata?.first_name ?? metadata?.firstName) || null,
         lastName: dbUser.lastName || (metadata?.last_name ?? metadata?.lastName) || null,
-        birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null),
+        // birthDate: dbUser.birthDate || (metadata?.birth_date ?? metadata?.birthDate ? new Date(metadata.birth_date ?? metadata.birthDate) : null), // TODO: Uncomment after migration
         name: dbUser.name || (([dbUser.firstName || (metadata?.first_name ?? metadata?.firstName), dbUser.lastName || (metadata?.last_name ?? metadata?.lastName)].filter(Boolean).join(' ')) || null)
       };
 
       // Update the database with enriched data
-      if (enrichedUser.firstName !== dbUser.firstName || enrichedUser.lastName !== dbUser.lastName || enrichedUser.birthDate !== dbUser.birthDate) {
+      if (enrichedUser.firstName !== dbUser.firstName || enrichedUser.lastName !== dbUser.lastName) {
         await prisma.user.update({
           where: { id: dbUser.id },
           data: {
             firstName: enrichedUser.firstName,
             lastName: enrichedUser.lastName,
-            birthDate: enrichedUser.birthDate,
+            // birthDate: enrichedUser.birthDate, // TODO: Uncomment after migration is applied
             name: enrichedUser.name
           }
         });
@@ -94,15 +94,16 @@ export async function PATCH(request: Request) {
       name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null,
     };
 
-    if (birthDate) {
-      const date = new Date(birthDate);
-      if (isNaN(date.getTime())) {
-        return NextResponse.json({ error: 'Invalid birthDate' }, { status: 400 });
-      }
-      data.birthDate = date;
-    } else if (birthDate === '') {
-      data.birthDate = null;
-    }
+    // TODO: Uncomment birthDate handling after migration is applied
+    // if (birthDate) {
+    //   const date = new Date(birthDate);
+    //   if (isNaN(date.getTime())) {
+    //     return NextResponse.json({ error: 'Invalid birthDate' }, { status: 400 });
+    //   }
+    //   data.birthDate = date;
+    // } else if (birthDate === '') {
+    //   data.birthDate = null;
+    // }
 
     const email = user?.email;
     if (user && !email) {
