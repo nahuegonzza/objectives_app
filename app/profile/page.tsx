@@ -6,6 +6,8 @@ import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import { getLocalDateString } from '@lib/dateHelpers';
 
+export const dynamic = 'force-dynamic';
+
 export default function ProfilePage() {
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();

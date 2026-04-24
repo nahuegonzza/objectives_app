@@ -3,6 +3,8 @@
 import Navigation from '@components/Navigation';
 import CalendarExplorer from '@components/CalendarExplorer';
 
+export const dynamic = 'force-dynamic';
+
 export default function CalendarPage() {
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">

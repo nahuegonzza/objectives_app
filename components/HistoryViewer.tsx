@@ -35,11 +35,13 @@ export default function HistoryViewer() {
   useEffect(() => {
     loadGoals();
     loadModules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     loadEntries();
     loadEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
   useEffect(() => {

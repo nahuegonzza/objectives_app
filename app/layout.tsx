@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import './globals.css';
 import RootLayoutClient from './RootLayoutClient';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Goalyx',
   description: 'Motor de hábitos, eventos y score diario con módulos extendibles.',

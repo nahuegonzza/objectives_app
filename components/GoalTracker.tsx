@@ -49,6 +49,7 @@ export default function GoalTracker() {
       await loadScoreHistory();
       await loadStreakInfo();
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

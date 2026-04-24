@@ -129,10 +129,10 @@ export default function CalendarExplorer() {
     // Add module points
     moduleEntries.forEach((entry) => {
       const dateKey = entry.date.slice(0, 10);
-      const module = activeModules.find(m => m.id === entry.moduleId);
-      if (module?.definition?.calculateScore) {
-        const moduleEntriesForDay = moduleEntries.filter(e => e.moduleId === module.id && e.date.slice(0, 10) === dateKey);
-        const modulePoints = module.definition.calculateScore(moduleEntriesForDay, module.config);
+      const mod = activeModules.find(m => m.id === entry.moduleId);
+      if (mod?.definition?.calculateScore) {
+        const moduleEntriesForDay = moduleEntries.filter(e => e.moduleId === mod.id && e.date.slice(0, 10) === dateKey);
+        const modulePoints = mod.definition.calculateScore(moduleEntriesForDay, mod.config);
         const existing = map.get(dateKey) ?? { points: 0, entries: [], events: [] };
         existing.points += modulePoints;
         map.set(dateKey, existing);
@@ -140,9 +140,10 @@ export default function CalendarExplorer() {
     });
 
     return map;
-  }, [entries, events, moduleEntries, activeModules]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entries, moduleEntries, activeModules]);
 
-  const selectedDayData = scoresByDay.get(selectedDate) ?? { points: 0, entries: [], events: [] };
+  const selectedDayData = useMemo(() => scoresByDay.get(selectedDate) ?? { points: 0, entries: [], events: [] }, [scoresByDay, selectedDate]);
 
   const entriesByGoalId = useMemo(() => {
     const map = new Map<string, GoalEntryWithGoal>();

@@ -9,6 +9,8 @@ import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import type { Module } from '@types';
 
+export const dynamic = 'force-dynamic';
+
 export default function SettingsPage() {
   const router = useRouter();
   const { session, loading: sessionLoading } = useSupabaseSession();

@@ -60,11 +60,11 @@ export async function GET(request: Request) {
   }
 
   if (moduleSlug) {
-    const module = await prisma.module.findFirst({
+    const mod = await prisma.module.findFirst({
       where: { slug: moduleSlug, userId }
     });
-    if (module) {
-      whereClause.moduleId = module.id;
+    if (mod) {
+      whereClause.moduleId = mod.id;
     } else {
       return NextResponse.json([]);
     }

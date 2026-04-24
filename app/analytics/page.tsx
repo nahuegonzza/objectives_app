@@ -3,6 +3,8 @@
 import Analytics from '@components/Analytics';
 import Navigation from '@components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default function AnalyticsPage() {
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">

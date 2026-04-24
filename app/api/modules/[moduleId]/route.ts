@@ -16,14 +16,14 @@ export async function PATCH(
     if (active !== undefined) updateData.active = active;
     if (config !== undefined) updateData.config = JSON.stringify(config);
 
-    const module = await prisma.module.update({
+    const mod = await prisma.module.update({
       where: { id: params.moduleId },
       data: updateData,
     });
 
     return NextResponse.json({
-      ...module,
-      config: parseModuleConfig(module.config),
+      ...mod,
+      config: parseModuleConfig(mod.config),
     });
   } catch (error) {
     console.error('Error updating module:', error);

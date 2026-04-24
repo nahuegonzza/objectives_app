@@ -24,7 +24,11 @@ export async function GET() {
     });
 
     if (!dbUser && user) {
-      dbUser = await ensurePrismaUserForSession();
+      // Create user if doesn't exist, then fetch full record
+      await ensurePrismaUserForSession();
+      dbUser = await prisma.user.findUnique({
+        where: { id: userId }
+      });
     }
     // Remove the automatic update that was overwriting data
     // else if (dbUser && user) {

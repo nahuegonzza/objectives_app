@@ -207,12 +207,12 @@ export default function Analytics() {
 
       // Calculate module points for this date
       let modulePoints = 0;
-      for (const module of activeModules) {
-        if (module.definition?.calculateScore) {
+      for (const mod of activeModules) {
+        if (mod.definition?.calculateScore) {
           const moduleDayEntries = filteredModuleEntries.filter((e) =>
-            e.date.slice(0, 10) === date && e.moduleId === module.id
+            e.date.slice(0, 10) === date && e.moduleId === mod.id
           );
-          modulePoints += module.definition.calculateScore(moduleDayEntries, module.config);
+          modulePoints += mod.definition.calculateScore(moduleDayEntries, mod.config);
         }
       }
 
@@ -223,7 +223,7 @@ export default function Analytics() {
   }, [allDates, filteredEntries, filteredModuleEntries, activeModules]);
 
   const totalPoints = useMemo(() => dailyScores.reduce((sum: number, item: { points: number }) => sum + item.points, 0), [dailyScores]);
-  const averagePoints = useMemo(() => (allDates.length ? totalPoints / allDates.length : 0), [dailyScores, totalPoints, allDates]);
+  const averagePoints = useMemo(() => (allDates.length ? totalPoints / allDates.length : 0), [allDates.length, totalPoints]);
   const maxPoints = useMemo(() => (dailyScores.filter(s => s.hasData).length ? Math.max(...dailyScores.filter(s => s.hasData).map((item) => item.points)) : 0), [dailyScores]);
   const minPoints = useMemo(() => (dailyScores.filter(s => s.hasData).length ? Math.min(...dailyScores.filter(s => s.hasData).map((item) => item.points)) : 0), [dailyScores]);
 
@@ -272,14 +272,15 @@ export default function Analytics() {
     }, 0);
 
     let modulePoints = 0;
-    for (const module of activeModules) {
-      if (module.definition?.calculateScore) {
-        const modulePrevEntries = previousModuleEntries.filter((e) => e.moduleId === module.id);
-        modulePoints += module.definition.calculateScore(modulePrevEntries, module.config);
+    for (const mod of activeModules) {
+      if (mod.definition?.calculateScore) {
+        const modulePrevEntries = previousModuleEntries.filter((e) => e.moduleId === mod.id);
+        modulePoints += mod.definition.calculateScore(modulePrevEntries, mod.config);
       }
     }
 
     return goalPoints + modulePoints;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entries, moduleEntries, fromDate, selectedGoalId, selectedRange, viewMode, activeModules]);
 
   const periodDiff = totalPoints - previousPeriodPoints;
@@ -446,10 +447,10 @@ export default function Analytics() {
               const dayEntries = filteredEntries.filter(entry => getLocalDateStringFromEntry(entry.date) === score.date);
               const dayModuleEntries = filteredModuleEntries.filter((e) => e.date.slice(0, 10) === score.date);
               let modulePoints = 0;
-              for (const module of activeModules) {
-                if (module.definition?.calculateScore) {
-                  const moduleDayEntries = dayModuleEntries.filter((e) => e.moduleId === module.id);
-                  modulePoints += module.definition.calculateScore(moduleDayEntries, module.config);
+              for (const mod of activeModules) {
+                if (mod.definition?.calculateScore) {
+                  const moduleDayEntries = dayModuleEntries.filter((e) => e.moduleId === mod.id);
+                  modulePoints += mod.definition.calculateScore(moduleDayEntries, mod.config);
                 }
               }
 

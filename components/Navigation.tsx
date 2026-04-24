@@ -57,6 +57,7 @@ export default function Navigation() {
     const handleStreakUpdate = () => loadStreakInfo();
     window.addEventListener('streak-updated', handleStreakUpdate);
     return () => window.removeEventListener('streak-updated', handleStreakUpdate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   const isActivePath = (href: string) => {
