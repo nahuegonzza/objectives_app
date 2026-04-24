@@ -207,13 +207,21 @@ export default function SettingsPage() {
     e.preventDefault();
     setProfileStatus('');
 
+    // Validate that at least firstName or lastName is provided
+    if (!profileForm.firstName.trim() && !profileForm.lastName.trim()) {
+      setProfileStatus('Debes proporcionar al menos un nombre o apellido');
+      setProfileType('error');
+      return;
+    }
+
     // Debug: Log what we're sending
-    console.log('📤 Enviando datos del perfil:', {
+    const dataToSend = {
       firstName: profileForm.firstName.trim(),
       lastName: profileForm.lastName.trim(),
       username: profileForm.username.trim() || null,
       birthDate: profileForm.birthDate || null
-    });
+    };
+    console.log('📤 Enviando datos del perfil:', dataToSend);
 
     // Validate username if provided
     if (profileForm.username.trim()) {
@@ -259,25 +267,13 @@ export default function SettingsPage() {
       setProfileType('success');
       // Reload user
       setUser(updatedUser);
-      
-      // Update profile form with the response data
-      let firstName = updatedUser.firstName || '';
-      let lastName = updatedUser.lastName || '';
-      if ((!firstName || !lastName) && updatedUser.name) {
-        const parts = updatedUser.name.trim().split(' ');
-        firstName = firstName || parts[0] || '';
-        lastName = lastName || parts.slice(1).join(' ') || '';
-      }
-      
-      const birthDate = updatedUser.birthDate
-        ? new Date(updatedUser.birthDate).toISOString().slice(0, 10)
-        : '';
-      
+
+      // Update profile form with the data we just sent (not the response, to avoid null values)
       setProfileForm(prev => ({
         ...prev,
-        firstName,
-        lastName,
-        birthDate
+        firstName: dataToSend.firstName,
+        lastName: dataToSend.lastName,
+        birthDate: dataToSend.birthDate || prev.birthDate
       }));
     } catch (error) {
       console.error('Error updating profile:', error);
