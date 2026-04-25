@@ -128,6 +128,7 @@ export default function SettingsPage() {
   const [exportLoading, setExportLoading] = useState(false);
 
   const handleExportData = async () => {
+    console.log('Iniciando exportación...');
     setExportLoading(true);
     try {
       const [goalsRes, entriesRes, eventsRes, modulesRes, moduleEntriesRes] = await Promise.all([
@@ -142,12 +143,20 @@ export default function SettingsPage() {
         throw new Error('Error al exportar datos');
       }
 
+      const [goals, entries, events, modules, moduleEntries] = await Promise.all([
+        goalsRes.json(),
+        entriesRes.json(),
+        eventsRes.json(),
+        modulesRes.json(),
+        moduleEntriesRes.json()
+      ]);
+
       const data = {
-        goals: await goalsRes.json(),
-        entries: await entriesRes.json(),
-        events: await eventsRes.json(),
-        modules: await modulesRes.json(),
-        moduleEntries: await moduleEntriesRes.json(),
+        goals,
+        entries,
+        events,
+        modules,
+        moduleEntries,
         exportedAt: new Date().toISOString()
       };
 
@@ -160,6 +169,7 @@ export default function SettingsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      console.log('Exportación completada');
     } catch (error) {
       console.error('Export error:', error);
       alert('Error al exportar datos: ' + (error instanceof Error ? error.message : 'Unknown error'));

@@ -10,7 +10,7 @@ export default function ScoreSummary({ score }: ScoreSummaryProps) {
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-lg font-semibold text-slate-900">{score.points.toFixed(1)}</p>
-          <p className="text-sm text-slate-500">Puntos calculados para {new Date(score.date).toLocaleDateString()}</p>
+          <p className="text-sm text-slate-500">Puntos calculados para {new Date(score.date).toLocaleDateString('es-ES')}</p>
         </div>
         <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700">
           {score.points >= 0 ? 'Positivo' : 'Ajuste'}

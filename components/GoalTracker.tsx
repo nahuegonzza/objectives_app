@@ -390,7 +390,7 @@ export default function GoalTracker() {
               </p>
             </div>
             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">7 días avg</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">7 días prom</p>
               <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
                 {!scoreHistory
                   ? '–'

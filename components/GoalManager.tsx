@@ -639,9 +639,22 @@ export default function GoalManager() {
 
                         {/* Días de la semana en edición */}
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(Todos los días)'}
-                          </label>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                              Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(Todos los días)'}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const allDays = [0, 1, 2, 3, 4, 5, 6];
+                                const currentDays = (editForm.weekDays as number[]) || [];
+                                setEditForm({ ...editForm, weekDays: currentDays.length === 7 ? [] : allDays });
+                              }}
+                              className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+                            >
+                              {(editForm.weekDays as number[])?.length === 7 ? 'Desactivar todos' : 'Activar todos'}
+                            </button>
+                          </div>
                           <div className="flex gap-2 justify-center">
                             {[
                               { index: 0, label: 'D', full: 'Domingo' },
@@ -1044,9 +1057,22 @@ export default function GoalManager() {
 
                           {/* Días de la semana en edición */}
                           <div>
-                            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                              Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(Todos los días)'}
-                            </label>
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                                Días de la semana {(editForm.weekDays as number[])?.length > 0 ? `(${(editForm.weekDays as number[])?.length} seleccionados)` : '(Todos los días)'}
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const allDays = [0, 1, 2, 3, 4, 5, 6];
+                                  const currentDays = (editForm.weekDays as number[]) || [];
+                                  setEditForm({ ...editForm, weekDays: currentDays.length === 7 ? [] : allDays });
+                                }}
+                                className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+                              >
+                                {(editForm.weekDays as number[])?.length === 7 ? 'Desactivar todos' : 'Activar todos'}
+                              </button>
+                            </div>
                             <div className="flex gap-2 justify-center">
                               {[
                                 { index: 0, label: 'D', full: 'Domingo' },

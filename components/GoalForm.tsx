@@ -332,9 +332,21 @@ export default function GoalForm({ onSuccess }: GoalFormProps) {
 
       {/* Días de la semana */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-          Días de la semana {form.weekDays && form.weekDays.length > 0 ? `(seleccionados: ${form.weekDays.length})` : '(Todos los días)'}
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Días de la semana {form.weekDays && form.weekDays.length > 0 ? `(seleccionados: ${form.weekDays.length})` : '(Todos los días)'}
+          </label>
+          <button
+            type="button"
+            onClick={() => {
+              const allDays = [0, 1, 2, 3, 4, 5, 6];
+              setForm({ ...form, weekDays: form.weekDays?.length === 7 ? [] : allDays });
+            }}
+            className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
+          >
+            {form.weekDays?.length === 7 ? 'Desactivar todos' : 'Activar todos'}
+          </button>
+        </div>
         <div className="flex gap-2 justify-center">
           {WEEK_DAYS.map((day) => {
             const isSelected = (form.weekDays || []).includes(day.index);
