@@ -6,8 +6,8 @@ import Navigation from '@components/Navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import type { Module } from '@types';
-import { SleepConfig } from '../../modules/sleep/SleepConfig';
-import { MoodConfig } from '../../modules/mood/MoodConfig';
+import { SleepConfig } from '../../../modules/sleep/SleepConfig';
+import { MoodConfig } from '../../../modules/mood/MoodConfig';
 
 export const dynamic = 'force-dynamic';
 
