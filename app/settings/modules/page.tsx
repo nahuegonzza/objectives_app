@@ -202,7 +202,7 @@ export default function ModulesSettingsPage() {
                           <button
                             type="button"
                             onClick={() => setConfigModule(module)}
-                            className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+                            className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-emerald-600 text-white hover:bg-blue-700 transition"
                           >
                             Configurar
                           </button>

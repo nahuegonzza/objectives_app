@@ -117,7 +117,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 onClick={() => setPenaltyMode('automatic')}
                 className={`rounded-lg py-3 px-4 text-sm font-semibold transition ${
                   penaltyMode === 'automatic'
-                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -128,7 +128,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
                 onClick={() => setPenaltyMode('manual')}
                 className={`rounded-lg py-3 px-4 text-sm font-semibold transition ${
                   penaltyMode === 'manual'
-                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                 }`}
               >
@@ -181,7 +181,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 rounded-xl bg-indigo-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 active:bg-indigo-600"
+            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 active:bg-indigo-600"
           >
             Guardar
           </button>
