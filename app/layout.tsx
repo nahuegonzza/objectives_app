@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Goalyx',
   description: 'Motor de hábitos, eventos y score diario con módulos extendibles.',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-32x32.png',
