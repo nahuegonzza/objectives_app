@@ -31,8 +31,8 @@ export default function SettingsPage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [profileStatus, setProfileStatus] = useState('');
   const [profileType, setProfileType] = useState<'success' | 'error'>('success');
-  const [profileCollapsed, setProfileCollapsed] = useState(false);
-  const [passwordCollapsed, setPasswordCollapsed] = useState(false);
+  const [profileCollapsed, setProfileCollapsed] = useState(true);
+  const [passwordCollapsed, setPasswordCollapsed] = useState(true);
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -516,26 +516,18 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Módulos</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">Activa módulos adicionales para funcionalidades extra</p>
-            {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-24 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
-                ))}
+          <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => router.push('/settings/modules')}
+              className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 dark:hover:bg-slate-900 transition"
+            >
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Módulos</h2>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Activa y configura tus módulos</p>
               </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {modules.map((module) => (
-                  <ModuleTile
-                    key={module.id}
-                    module={module}
-                    onToggle={handleToggleModule}
-                  />
-                ))}
-              </div>
-            )}
+              <span className="text-slate-500">→</span>
+            </button>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
