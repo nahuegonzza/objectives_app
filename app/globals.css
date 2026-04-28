@@ -15,17 +15,31 @@ html.dark {
 
 html {
   scroll-behavior: smooth;
+  /* Prevenir zoom en móvil */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   min-height: 100vh;
   background: #f8fafc;
   transition: background-color 0.3s, color 0.3s;
+  /* Prevenir zoom */
+  touch-action: manipulation;
+  zoom: 1;
 }
 
 html.dark body {
   background: #0f172a;
   color: #f1f5f9;
+}
+
+/* Prevenir zoom en elementos interactivos */
+input, textarea, select, button, a, span {
+  touch-action: manipulation;
 }
 
 * {
