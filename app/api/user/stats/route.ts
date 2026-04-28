@@ -7,32 +7,32 @@ import { getServerSupabaseUser } from '@lib/supabase-server';
 
 export async function GET() {
   try {
-    const user = await getServerSupabaseUser();
-    
-    if (!user) {
+    const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
+    let userId: string | undefined;
+
+    if (user?.id) {
+      userId = user.id;
+    } else if (isServiceRole && serviceRoleAvailable) {
+      userId = process.env.DEFAULT_USER_ID;
+    } else {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Get user from database
-    const dbUser = await prisma.user.findUnique({
-      where: { email: user.email }
-    });
-
-    if (!dbUser) {
-      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+    if (!userId) {
+      return NextResponse.json({ error: 'Usuario no identificado' }, { status: 401 });
     }
 
     // Count completed goals (GoalEntries with valueBoolean = true)
     const goalsCompleted = await prisma.goalEntry.count({
       where: {
-        userId: dbUser.id,
+        userId: userId,
         valueBoolean: true
       }
     });
 
     // Get total score from Score table
     const scoreResult = await prisma.score.aggregate({
-      where: { userId: dbUser.id },
+      where: { userId: userId },
       _sum: { points: true }
     });
 
