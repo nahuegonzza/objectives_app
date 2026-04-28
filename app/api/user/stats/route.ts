@@ -52,6 +52,9 @@ export async function GET() {
     // (Modules have their own scoring logic in their definitions)
     totalScore += moduleEntries.length;
 
+    // Count completed goals (GoalEntries with valueBoolean = true)
+    const goalsCompleted = allEntries.filter((entry) => entry.valueBoolean === true).length;
+
     return NextResponse.json({
       goalsCompleted,
       totalScore
