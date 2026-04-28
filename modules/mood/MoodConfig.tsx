@@ -104,10 +104,10 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
           {states.map((state) => (
             <div
               key={state.id}
-              className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700"
+              className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700"
             >
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-full text-xl"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-xl shrink-0"
                 style={{ backgroundColor: state.color + '20' }}
               >
                 {state.emoji}
@@ -117,15 +117,17 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
                 type="text"
                 value={state.title}
                 onChange={(e) => handleUpdateState(state.id, 'title', e.target.value)}
-                className="flex-1 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                className="flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm"
                 placeholder="Título del estado"
               />
 
+              {/* Controles en móvil: fila horizontal compacta */}
+              <div className="flex items-center gap-1 justify-end shrink-0">
               {/* Selector de emoji */}
               <div className="relative">
                 <button
                   type="button"
-                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 text-xl dark:border-slate-600"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 text-lg dark:border-slate-600"
                   onClick={() => setEditingId(editingId === state.id ? null : state.id)}
                 >
                   {state.emoji}
@@ -156,7 +158,7 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
               <div className="relative">
                 <button
                   type="button"
-                  className="h-10 w-10 rounded-full border-2 border-slate-300 dark:border-slate-600"
+                  className="h-9 w-9 rounded-full border-2 border-slate-300 dark:border-slate-600"
                   style={{ backgroundColor: state.color }}
                   onClick={() => setEditingId(editingId === state.id + '_color' ? null : state.id + '_color')}
                 />
@@ -184,11 +186,12 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
               <button
                 type="button"
                 onClick={() => handleDeleteState(state.id)}
-                className="rounded-lg p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="rounded-lg p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
                 title="Eliminar estado"
               >
                 🗑️
               </button>
+              </div>
             </div>
           ))}
         </div>
