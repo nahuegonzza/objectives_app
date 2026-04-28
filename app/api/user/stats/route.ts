@@ -22,21 +22,35 @@ export async function GET() {
       return NextResponse.json({ error: 'Usuario no identificado' }, { status: 401 });
     }
 
-    // Count completed goals (GoalEntries with valueBoolean = true)
-    const goalsCompleted = await prisma.goalEntry.count({
-      where: {
-        userId: userId,
-        valueBoolean: true
-      }
-    });
-
-    // Get total score from Score table
-    const scoreResult = await prisma.score.aggregate({
+    // Get all goal entries for this user to calculate total score
+    const allEntries = await prisma.goalEntry.findMany({
       where: { userId: userId },
-      _sum: { points: true }
+      include: { goal: true }
     });
 
-    const totalScore = Math.round(scoreResult._sum.points || 0);
+    // Calculate total score from goal entries
+    let totalScore = 0;
+    for (const entry of allEntries) {
+      const goal = entry.goal;
+      if (!goal || goal.status !== 'ACTIVE') continue;
+      
+      const type = goal.type;
+      if (type === 'BOOLEAN' || type === 'HABIT') {
+        totalScore += entry.valueBoolean ? Number(goal.pointsIfTrue ?? 1) : Number(goal.pointsIfFalse ?? 0);
+      } else if (type === 'NUMERIC' || type === 'OBJECTIVE') {
+        totalScore += (entry.valueFloat ?? 0) * Number(goal.pointsPerUnit ?? 1);
+      }
+    }
+
+    // Add module scores
+    const moduleEntries = await prisma.moduleEntry.findMany({
+      where: { userId: userId },
+      include: { module: true }
+    });
+
+    // Simple module scoring - each module entry counts as 1 point
+    // (Modules have their own scoring logic in their definitions)
+    totalScore += moduleEntries.length;
 
     return NextResponse.json({
       goalsCompleted,
