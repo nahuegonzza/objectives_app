@@ -1,6 +1,7 @@
 import type { ModuleState } from '@types';
 import { useState } from 'react';
 import { SleepConfig } from '../modules/sleep/SleepConfig';
+import { MoodConfig } from '../modules/mood/MoodConfig';
 
 interface ModuleTileProps {
   module: ModuleState;
@@ -58,9 +59,25 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
             Configurar
           </button>
         )}
+        {module.active && module.slug === 'mood' && (
+          <button
+            type="button"
+            onClick={() => setShowConfig(true)}
+            className="rounded-full px-3 py-1 text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+          >
+            Configurar
+          </button>
+        )}
       </div>
-      {showConfig && (
+      {showConfig && module.slug === 'sleep' && (
         <SleepConfig
+          config={module.config || {}}
+          onSave={handleConfigSave}
+          onClose={() => setShowConfig(false)}
+        />
+      )}
+      {showConfig && module.slug === 'mood' && (
+        <MoodConfig
           config={module.config || {}}
           onSave={handleConfigSave}
           onClose={() => setShowConfig(false)}

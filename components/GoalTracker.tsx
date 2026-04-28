@@ -423,13 +423,39 @@ export default function GoalTracker() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Mood Module - siempre primero si está activo */}
+            {(() => {
+              const moodModule = activeModules.find(m => m.slug === 'mood');
+              if (!moodModule?.definition?.Component) return null;
+              const MoodComponent = moodModule.definition.Component;
+              return (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                    Estado del día
+                  </p>
+                  <MoodComponent
+                    config={moodModule.config}
+                    module={moodModule}
+                    isEditing={true}
+                    onUpdate={() => {
+                      loadModuleEntries();
+                      markTodayStreak();
+                    }}
+                    date={today}
+                  />
+                </div>
+              );
+            })()}
+
             {activeModules.length > 0 && (
               <div>
                 <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
                   Módulos
                 </p>
                 <div className="space-y-2">
-                  {activeModules.map((module) => {
+                  {activeModules
+                    .filter(m => m.slug !== 'mood') // Excluir mood que ya se mostró arriba
+                    .map((module) => {
                     const Component = module.definition?.Component;
                     if (!Component) return null;
                     return (
