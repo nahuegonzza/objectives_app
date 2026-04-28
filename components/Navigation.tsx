@@ -138,12 +138,14 @@ export default function Navigation() {
             <img src="/image-no-background-500x500.png" alt="Goalyx Logo" className="w-12 h-12" />
           </div>
 
-          <Link href="/settings/modules" title="Módulos" className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath('/settings/modules') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
-            <img src="/navbar_icons/modules_icon.png" alt="Módulos" className="w-6 h-6" />
-          </Link>
-          <Link href="/settings" title="Ajustes" className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isActivePath('/settings') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
-            <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className="w-6 h-6" />
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/settings/modules" title="Módulos" className={`flex h-10 w-10 items-center justify-center rounded-xl ${isActivePath('/settings/modules') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
+              <img src="/navbar_icons/modules_icon.png" alt="Módulos" className="w-5 h-5" />
+            </Link>
+            <Link href="/settings" title="Ajustes" className={`flex h-10 w-10 items-center justify-center rounded-xl ${isActivePath('/settings') ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition`}>
+              <img src="/navbar_icons/settings_icon.png" alt="Ajustes" className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
       </nav>
 
