@@ -94,11 +94,10 @@ async function getModuleEntriesForRange(start: Date, end: Date, userId: string) 
 export async function GET(request: Request) {
   const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
 
+  // ❌ NO fallback a usuario por defecto
   let userId: string | undefined;
   if (user?.id) {
     userId = user.id;
-  } else if (isServiceRole && serviceRoleAvailable) {
-    userId = process.env.DEFAULT_USER_ID;
   } else {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

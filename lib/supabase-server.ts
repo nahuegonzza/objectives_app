@@ -37,31 +37,16 @@ export function createServiceRoleSupabaseClient() {
   });
 }
 
-// ✅ NUEVA función basada en getUser() con fallback mejorado
+// ✅ Función de autenticación - SIN fallback a service role
+// Si no hay sesión válida, devuelve null (no usa usuario por defecto)
 export async function getServerSupabaseUser() {
   const supabase = createServerSupabaseClient();
-  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
-      console.log('✅ User session not found, checking for service role fallback');
-      console.log('Service role key available:', !!supabaseServiceRoleKey);
-      
-      // Fallback: usar service role si está disponible
-      if (supabaseServiceRoleKey) {
-        console.log('✅ Service role key found, enabling fallback mode');
-        return {
-          user: null,
-          supabase: createServiceRoleSupabaseClient(),
-          isServiceRole: true,
-          serviceRoleAvailable: true
-        };
-      }
-
-      // No hay usuario ni service role
-      console.log('❌ No user session and no service role key available');
+      console.log('❌ No user session found');
       return {
         user: null,
         supabase: null,
@@ -75,24 +60,13 @@ export async function getServerSupabaseUser() {
       user,
       supabase,
       isServiceRole: false,
-      serviceRoleAvailable: supabaseServiceRoleKey ? true : false
+      serviceRoleAvailable: false
     };
   } catch (error) {
     console.log('⚠️ Auth error:', error);
     
-    // En caso de error, intentar service role si está disponible
-    if (supabaseServiceRoleKey) {
-      console.log('✅ Falling back to service role after auth error');
-      return {
-        user: null,
-        supabase: createServiceRoleSupabaseClient(),
-        isServiceRole: true,
-        serviceRoleAvailable: true
-      };
-    }
-
-    // Error sin fallback disponible
-    console.log('❌ Auth error and no service role key available');
+    // Error de autenticación - no usar fallback
+    console.log('❌ Auth error - denying access');
     return {
       user: null,
       supabase: null,
