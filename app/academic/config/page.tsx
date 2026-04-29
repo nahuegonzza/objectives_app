@@ -14,9 +14,9 @@ export default function AcademicConfigPage() {
 
   // Estado local para simular la funcionalidad
   const [subjects, setSubjects] = useState<AcademicSubject[]>([
-    { id: '1', name: 'Matemáticas', color: '#3B82F6' },
-    { id: '2', name: 'Física', color: '#EF4444' },
-    { id: '3', name: 'Programación', color: '#10B981' }
+    { id: '1', name: 'Matemáticas', color: '#3B82F6', semester: '2024-1' },
+    { id: '2', name: 'Física', color: '#EF4444', semester: '2024-1' },
+    { id: '3', name: 'Programación', color: '#10B981', semester: '2024-1' }
   ]);
   const [isSaving, setIsSaving] = useState(false);
 
