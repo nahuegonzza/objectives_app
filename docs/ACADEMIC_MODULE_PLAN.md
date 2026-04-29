@@ -16,17 +16,51 @@ El objetivo es que el módulo sea:
 - persistente en la base de datos,
 - visualmente consistente con el resto de la app.
 
+## Cambios Recientes (Separación de Configuración)
+
+### Modificación de la UX
+Se ha separado la configuración del dashboard principal para mejorar la experiencia de usuario:
+
+- **Dashboard Principal** (`AcademicDashboard.tsx`): Ahora solo muestra eventos de hoy y próximos eventos, con un botón "Configurar" que lleva a una página dedicada.
+- **Página de Configuración** (`app/academic/config/page.tsx`): Nueva página dedicada que contiene toda la lógica de configuración de materias y creación de eventos.
+
+### Beneficios de la separación:
+- Dashboard más limpio y enfocado en la información diaria
+- Configuración más espaciosa y organizada
+- Mejor navegación y experiencia de usuario
+- Mayor facilidad para agregar funcionalidades futuras
+
 ## Qué se va a hacer
-1. Crear el módulo académico en `modules/academic/`.
-2. Definir la entidad y la configuración base.
-3. Añadir `Component`, `ConfigComponent` y `DashboardComponent` si hace falta.
-4. Extender el módulo para exponer:
+1. ✅ Crear el módulo académico en `modules/academic/`.
+2. ✅ Definir la entidad y la configuración base.
+3. ✅ Añadir `Component`, `ConfigComponent` y `DashboardComponent` si hace falta.
+4. ✅ Extender el módulo para exponer:
    - materias
    - exámenes
    - tareas
-5. Implementar función `getAcademicEventsForCalendar`.
-6. Garantizar que los checks de "completado" disparen la lógica de score.
-7. Integrar el nuevo módulo en `modules/index.ts`.
+5. ✅ Implementar función `getAcademicEventsForCalendar`.
+6. ✅ Garantizar que los checks de "completado" disparen la lógica de score.
+7. ✅ Integrar el nuevo módulo en `modules/index.ts`.
+8. ✅ Separar configuración en página dedicada con navegación desde dashboard.
+
+## Estructura de archivos propuesta
+
+- `modules/academic/module.ts`
+  - definición del módulo con `slug`, `name`, `description`, `defaultConfig`, `calculateScore` y export de helpers.
+- `modules/academic/AcademicDashboard.tsx`
+  - vista principal que carga `moduleEntries` del día y muestra tarjetas (solo eventos de hoy/próximos).
+- `modules/academic/AcademicConfig.tsx`
+  - pantalla de configuración de materias y colores (usada en página de configuración).
+- `modules/academic/AcademicEventForm.tsx`
+  - formulario para crear exámenes o tareas (usado en página de configuración).
+- `modules/academic/AcademicTodayCard.tsx`
+  - tarjeta compacta para Home / Daily View.
+- `modules/academic/academicHelpers.ts`
+  - utilidades para parsing, fecha y transformación de events.
+- `app/academic/config/page.tsx`
+  - página dedicada para configuración completa del módulo académico.
+
+## Datos y persistencia
 
 ## Estructura de archivos propuesta
 
