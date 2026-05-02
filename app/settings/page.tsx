@@ -565,20 +565,6 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => router.push('/settings/modules')}
-              className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 dark:hover:bg-slate-900 transition"
-            >
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Módulos</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Activa y configura tus módulos</p>
-              </div>
-              <span className="text-slate-500">→</span>
-            </button>
-          </div>
-
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Cuenta</h2>
             <div className="space-y-3">
