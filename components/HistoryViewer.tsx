@@ -170,7 +170,7 @@ export default function HistoryViewer() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg">
+      <div className="space-y-6">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">

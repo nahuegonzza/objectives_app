@@ -127,7 +127,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
+        <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Información del Usuario */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">

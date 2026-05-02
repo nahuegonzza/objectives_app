@@ -332,7 +332,7 @@ export default function GoalTracker() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg">
+      <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between">
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
             Registro diario

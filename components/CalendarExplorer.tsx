@@ -331,7 +331,7 @@ export default function CalendarExplorer() {
   const displayLabel = mode === 'monthly' ? formatMonthLabel(viewDate) : mode === 'annual' ? viewDate.getFullYear().toString() : selectedDate.split('-').reverse().join('/');
 
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg transition-all duration-200">
+    <div className="space-y-6 transition-all duration-200">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Calendario</p>

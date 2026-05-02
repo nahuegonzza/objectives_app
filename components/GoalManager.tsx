@@ -318,7 +318,7 @@ export default function GoalManager() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm dark:shadow-lg">
+      <div className="space-y-6">
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
