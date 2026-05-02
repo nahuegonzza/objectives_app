@@ -373,19 +373,19 @@ export default function GoalTracker() {
         )}
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 w-full">
-            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Hoy</p>
               <p className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                 {dailyScore.points.toFixed(1)}
               </p>
             </div>
-            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Ayer</p>
               <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
                 {!scoreHistory ? '–' : scoreHistory.previousDay.points.toFixed(1)}
               </p>
             </div>
-            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Diferencia</p>
               <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
                 {!scoreHistory
@@ -393,7 +393,7 @@ export default function GoalTracker() {
                   : `${(dailyScore.points - scoreHistory.previousDay.points).toFixed(1)}`}
               </p>
             </div>
-            <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">7 días prom.</p>
               <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
                 {!scoreHistory

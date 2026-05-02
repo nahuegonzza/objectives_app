@@ -473,19 +473,19 @@ export default function CalendarExplorer() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-4">
-                <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Hoy</p>
                   <p className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                     {selectedDayData.points.toFixed(1)}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Ayer</p>
                   <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
                     {loading || !scoreHistory ? '–' : scoreHistory.previousDay.points.toFixed(1)}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Diferencia</p>
                   <p className={`mt-2 text-xl font-semibold ${selectedDayData.points - (scoreHistory?.previousDay.points ?? 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                     {loading || !scoreHistory
@@ -493,7 +493,7 @@ export default function CalendarExplorer() {
                       : `${(selectedDayData.points - scoreHistory.previousDay.points).toFixed(1)}`}
                   </p>
                 </div>
-                <div className="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 text-center">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 p-4 text-center">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Promedio semanal</p>
                   <p className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
                     {loading || !scoreHistory
