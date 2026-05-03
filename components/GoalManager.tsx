@@ -6,11 +6,12 @@ import type { Goal } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/goalIconsColors';
 import GoalForm from '@components/GoalForm';
 import NumberInput from '@components/NumberInput';
+import { GoalEditModal } from '@components/GoalEditModal';
 
 export default function GoalManager() {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<Partial<Goal>>({});
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [loading, setLoading] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -48,28 +49,32 @@ export default function GoalManager() {
     }
   }
 
-  async function handleUpdateGoal(goalId: string) {
-    if (!editForm.title || !editForm.type) return;
+  function handleEditGoal(goal: Goal) {
+    setEditingGoal(goal);
+    setShowEditModal(true);
+  }
 
+  async function handleSaveEditGoal(goalId: string, updates: Partial<Goal>) {
     const payload = {
-      title: editForm.title,
-      description: editForm.description,
-      type: editForm.type,
-      icon: editForm.icon,
-      color: editForm.color,
-      order: editForm.order,
-      pointsIfTrue: editForm.pointsIfTrue,
-      pointsIfFalse: editForm.pointsIfFalse,
-      pointsPerUnit: editForm.pointsPerUnit,
-      activatedAt: editForm.activatedAt,
-      weekDays: editForm.weekDays ?? []
+      title: updates.title,
+      description: updates.description,
+      type: updates.type,
+      icon: updates.icon,
+      color: updates.color,
+      order: updates.order,
+      pointsIfTrue: updates.pointsIfTrue,
+      pointsIfFalse: updates.pointsIfFalse,
+      pointsPerUnit: updates.pointsPerUnit,
+      activatedAt: updates.activatedAt,
+      weekDays: updates.weekDays ?? []
     };
 
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -79,14 +84,14 @@ export default function GoalManager() {
 
       setStatusMessage('Objetivo actualizado correctamente');
       setStatusType('success');
+      loadGoals(); // Reload goals to reflect changes
     } catch (error) {
       console.error('Error updating goal:', error);
       setStatusMessage(error instanceof Error ? `Error actualizando objetivo: ${error.message}` : 'Error actualizando objetivo');
       setStatusType('error');
     } finally {
-      setEditingGoalId(null);
-      setEditForm({});
-      loadGoals();
+      setShowEditModal(false);
+      setEditingGoal(null);
     }
   }
 
@@ -375,7 +380,6 @@ export default function GoalManager() {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Objetivos Desactivados</h3>
               {sortedGoals.filter(g => g.isActive === false).map((goal) => {
                 const icon = getGoalIcon(goal.icon);
-                const isEditing = editingGoalId === goal.id;
                 const colorOption = getColorOption(goal.color);
 
                 return (
@@ -383,8 +387,8 @@ export default function GoalManager() {
                     key={goal.id}
                     className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all duration-200"
                   >
-                    {isEditing ? (
-                      <div className="space-y-4">
+                    <>
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="grid gap-4 md:grid-cols-2">
                           <div>
                             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Nombre</label>
@@ -702,11 +706,9 @@ export default function GoalManager() {
                           >
                             Cancelar
                           </button>
-                        </div>
                       </div>
-                    ) : (
-                      <>
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    </>
+                  </div>
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="relative">
                               <span className="text-3xl">{icon}</span>
@@ -773,7 +775,6 @@ export default function GoalManager() {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Hábitos</h3>
                 {getOrderedBooleanGoals().map((goal) => {
                   const icon = getGoalIcon(goal.icon);
-                  const isEditing = editingGoalId === goal.id;
                   const isDragging = draggedGoalId === goal.id;
                   const colorOption = getColorOption(goal.color);
 
@@ -1588,6 +1589,17 @@ export default function GoalManager() {
           </div>
         )}
       </div>
+
+      {showEditModal && (
+        <GoalEditModal
+          goal={editingGoal}
+          onSave={handleSaveEditGoal}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingGoal(null);
+          }}
+        />
+      )}
     </div>
   );
 }

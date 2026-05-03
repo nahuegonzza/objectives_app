@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { getLocalDateString } from '@lib/dateHelpers';
 import type { ModuleState } from '@types';
 import { useAcademicModule } from './useAcademicModule';
@@ -16,7 +15,6 @@ interface AcademicDashboardProps {
 }
 
 export function AcademicDashboard({ config, module, onUpdate, isEditing = false, date }: AcademicDashboardProps) {
-  const router = useRouter();
   const selectedDate = date || getLocalDateString();
   const {
     loading,
@@ -49,13 +47,6 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
             <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">Organiza tus materias, parciales y tareas.</h2>
             <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">Agrega materias, planifica exámenes y marca entregas completadas para que el score global capture tu progreso.</p>
           </div>
-          <button
-            type="button"
-            onClick={() => router.push('/academic/config')}
-            className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
-          >
-            Configurar
-          </button>
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">

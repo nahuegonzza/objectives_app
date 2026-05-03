@@ -2,6 +2,7 @@ import type { ModuleState } from '@types';
 import { useState } from 'react';
 import { SleepConfig } from '../modules/sleep/SleepConfig';
 import { MoodConfig } from '../modules/mood/MoodConfig';
+import { AcademicConfig } from '../modules/academic/AcademicConfig';
 
 interface ModuleTileProps {
   module: ModuleState;
@@ -60,7 +61,7 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
             Configurar
           </button>
         )}
-        {module.active && module.slug === 'mood' && (
+        {module.active && module.slug === 'academic' && (
           <button
             type="button"
             onClick={() => setShowConfig(true)}
@@ -77,8 +78,8 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
           onClose={() => setShowConfig(false)}
         />
       )}
-      {showConfig && module.slug === 'mood' && (
-        <MoodConfig
+      {showConfig && module.slug === 'academic' && (
+        <AcademicConfig
           config={module.config || {}}
           onSave={handleConfigSave}
           onClose={() => setShowConfig(false)}
