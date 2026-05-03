@@ -288,6 +288,8 @@ export default function ModulesSettingsPage() {
       {configModule?.slug === 'academic' && (
         <AcademicConfig
           config={configModule.config || {}}
+          moduleId={configModule.id}
+          moduleName={configModule.slug}
           onSave={handleConfigSave}
           onClose={() => setConfigModule(null)}
         />
