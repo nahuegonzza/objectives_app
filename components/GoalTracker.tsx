@@ -40,8 +40,26 @@ export default function GoalTracker() {
   const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
+  const [moodCollapsed, setMoodCollapsed] = useState(false);
+  const [sleepCollapsed, setSleepCollapsed] = useState(false);
+  const [otherModulesCollapsed, setOtherModulesCollapsed] = useState(false);
+  const [habitsCollapsed, setHabitsCollapsed] = useState(false);
+  const [metricsCollapsed, setMetricsCollapsed] = useState(false);
+  const [academicCollapsed, setAcademicCollapsed] = useState(false);
 
   const today = useMemo(() => getLocalDateString(), []);
+
+  const orderedModules = useMemo(() => {
+    const orderMap: Record<string, number> = { mood: 0, sleep: 1, academic: 4 };
+    return [...activeModules].sort(
+      (a, b) => (orderMap[a.slug] ?? 2) - (orderMap[b.slug] ?? 2)
+    );
+  }, [activeModules]);
+
+  const moodModule = orderedModules.find((m) => m.slug === 'mood');
+  const sleepModules = orderedModules.filter((m) => m.slug === 'sleep');
+  const academicModule = orderedModules.find((m) => m.slug === 'academic');
+  const otherModules = orderedModules.filter((m) => !['mood', 'sleep', 'academic'].includes(m.slug));
 
   useEffect(() => {
     (async () => {
@@ -427,17 +445,18 @@ export default function GoalTracker() {
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
-            {/* Mood Module - siempre primero si está activo */}
-            {(() => {
-              const moodModule = activeModules.find(m => m.slug === 'mood');
-              if (!moodModule?.definition?.Component) return null;
-              const MoodComponent = moodModule.definition.Component;
-              return (
-                <div>
-                  <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
-                    Estado del día
-                  </p>
+          <div className="space-y-6">
+            {moodModule?.definition?.Component && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setMoodCollapsed(!moodCollapsed)}
+                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                >
+                  <span className={`transform transition-transform ${moodCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                  Estado del día
+                </button>
+                {!moodCollapsed && (
                   <MoodComponent
                     config={moodModule.config}
                     module={moodModule}
@@ -448,36 +467,75 @@ export default function GoalTracker() {
                     }}
                     date={today}
                   />
-                </div>
-              );
-            })()}
+                )}
+              </div>
+            )}
 
-            {activeModules.length > 0 && (
-              <div>
-                <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+            {sleepModules.length > 0 && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setSleepCollapsed(!sleepCollapsed)}
+                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                >
+                  <span className={`transform transition-transform ${sleepCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                  Sueño
+                </button>
+                {!sleepCollapsed && (
+                  <div className="space-y-4">
+                    {sleepModules.map((module) => {
+                      const Component = module.definition?.Component;
+                      if (!Component) return null;
+                      return (
+                        <Component
+                          key={module.slug}
+                          config={module.config}
+                          module={module}
+                          isEditing={true}
+                          onUpdate={() => {
+                            loadModuleEntries();
+                            markTodayStreak();
+                          }}
+                          date={today}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {otherModules.length > 0 && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setOtherModulesCollapsed(!otherModulesCollapsed)}
+                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                >
+                  <span className={`transform transition-transform ${otherModulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
                   Módulos
-                </p>
-                <div className="space-y-2">
-                  {activeModules
-                    .filter(m => m.slug !== 'mood') // Excluir mood que ya se mostró arriba
-                    .map((module) => {
-                    const Component = module.definition?.Component;
-                    if (!Component) return null;
-                    return (
-                      <Component
-                        key={module.slug}
-                        config={module.config}
-                        module={module}
-                        isEditing={true}
-                        onUpdate={() => {
-                          loadModuleEntries();
-                          markTodayStreak();
-                        }}
-                        date={today}
-                      />
-                    );
-                  })}
-                </div>
+                </button>
+                {!otherModulesCollapsed && (
+                  <div className="space-y-4">
+                    {otherModules.map((module) => {
+                      const Component = module.definition?.Component;
+                      if (!Component) return null;
+                      return (
+                        <Component
+                          key={module.slug}
+                          config={module.config}
+                          module={module}
+                          isEditing={true}
+                          onUpdate={() => {
+                            loadModuleEntries();
+                            markTodayStreak();
+                          }}
+                          date={today}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -493,43 +551,87 @@ export default function GoalTracker() {
             ) : (
               <>
                 {booleanGoals.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setHabitsCollapsed(!habitsCollapsed)}
+                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                    >
+                      <span className={`transform transition-transform ${habitsCollapsed ? 'rotate-90' : ''}`}>▶</span>
                       Hábitos
-                    </p>
-                    <div className="space-y-2">
-                      {booleanGoals.map((goal) => (
-                        <CompactGoalItem
-                          key={goal.id}
-                          goal={goal}
-                          entry={goalEntriesMap.get(goal.id)}
-                          isLoading={savingGoalId === goal.id}
-                          onChange={handleSaveEntry}
-                        />
-                      ))}
-                    </div>
+                    </button>
+                    {!habitsCollapsed && (
+                      <div className="space-y-2">
+                        {booleanGoals.map((goal) => (
+                          <CompactGoalItem
+                            key={goal.id}
+                            goal={goal}
+                            entry={goalEntriesMap.get(goal.id)}
+                            isLoading={savingGoalId === goal.id}
+                            onChange={handleSaveEntry}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {numericGoals.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setMetricsCollapsed(!metricsCollapsed)}
+                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                    >
+                      <span className={`transform transition-transform ${metricsCollapsed ? 'rotate-90' : ''}`}>▶</span>
                       Métricas
-                    </p>
-                    <div className="space-y-2">
-                      {numericGoals.map((goal) => (
-                        <CompactGoalItem
-                          key={goal.id}
-                          goal={goal}
-                          entry={goalEntriesMap.get(goal.id)}
-                          isLoading={savingGoalId === goal.id}
-                          onChange={handleSaveEntry}
-                        />
-                      ))}
-                    </div>
+                    </button>
+                    {!metricsCollapsed && (
+                      <div className="space-y-2">
+                        {numericGoals.map((goal) => (
+                          <CompactGoalItem
+                            key={goal.id}
+                            goal={goal}
+                            entry={goalEntriesMap.get(goal.id)}
+                            isLoading={savingGoalId === goal.id}
+                            onChange={handleSaveEntry}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </>
+            )}
+
+            {academicModule?.definition?.Component && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setAcademicCollapsed(!academicCollapsed)}
+                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                >
+                  <span className={`transform transition-transform ${academicCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                  Gestión Universitaria
+                </button>
+                {!academicCollapsed && (
+                  (() => {
+                    const AcademicComponent = academicModule.definition?.Component;
+                    return AcademicComponent ? (
+                      <AcademicComponent
+                        config={academicModule.config}
+                        module={academicModule}
+                        isEditing={true}
+                        onUpdate={() => {
+                          loadModuleEntries();
+                          markTodayStreak();
+                        }}
+                        date={today}
+                      />
+                    ) : null;
+                  })()
+                )}
+              </div>
             )}
           </div>
         )}

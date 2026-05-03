@@ -61,10 +61,25 @@ export default function CalendarExplorer() {
   const [viewDate, setViewDate] = useState(parseLocalDate(today));
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [dayEdits, setDayEdits] = useState<Record<string, { valueBoolean?: boolean; valueFloat?: number }>>({});
-  const [modulesCollapsed, setModulesCollapsed] = useState(false);
   const [goalsCollapsed, setGoalsCollapsed] = useState(false);
+  const [moodCollapsed, setMoodCollapsed] = useState(false);
+  const [sleepCollapsed, setSleepCollapsed] = useState(false);
+  const [otherModulesCollapsed, setOtherModulesCollapsed] = useState(false);
+  const [habitsCollapsed, setHabitsCollapsed] = useState(false);
+  const [metricsCollapsed, setMetricsCollapsed] = useState(false);
+  const [academicCollapsed, setAcademicCollapsed] = useState(false);
 
   const isEditingDay = editingGoalId === selectedDate;
+
+  const orderedModules = useMemo(() => {
+    const orderMap: Record<string, number> = { mood: 0, sleep: 1, academic: 4 };
+    return [...activeModules].sort((a, b) => (orderMap[a.slug] ?? 2) - (orderMap[b.slug] ?? 2));
+  }, [activeModules]);
+
+  const moodModule = orderedModules.find((m) => m.slug === 'mood');
+  const sleepModules = orderedModules.filter((m) => m.slug === 'sleep');
+  const academicModule = orderedModules.find((m) => m.slug === 'academic');
+  const otherModules = orderedModules.filter((m) => !['mood', 'sleep', 'academic'].includes(m.slug));
 
   useEffect(() => {
     async function loadData() {
@@ -535,21 +550,43 @@ export default function CalendarExplorer() {
                 )}
               </div>
 
-              {activeModules.length > 0 && (
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                  <div className="mb-4 flex items-center justify-between gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setModulesCollapsed(!modulesCollapsed)}
-                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                    >
-                      <span className={`transform transition-transform ${modulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                      Módulos
-                    </button>
-                  </div>
-                  {!modulesCollapsed && (
-                    <div className="space-y-2">
-                      {activeModules.map((module) => {
+              {moodModule?.definition?.Component && (
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setMoodCollapsed(!moodCollapsed)}
+                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                  >
+                    <span className={`transform transition-transform ${moodCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    Estado del día
+                  </button>
+                  {!moodCollapsed && (() => {
+                    const MoodComponent = moodModule.definition?.Component;
+                    return MoodComponent ? (
+                      <MoodComponent
+                        config={moodModule.config}
+                        module={moodModule}
+                        isEditing={isEditingDay}
+                        date={selectedDate}
+                      />
+                    ) : null;
+                  })()}
+                </div>
+              )}
+
+              {sleepModules.length > 0 && (
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setSleepCollapsed(!sleepCollapsed)}
+                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                  >
+                    <span className={`transform transition-transform ${sleepCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    Sueño
+                  </button>
+                  {!sleepCollapsed && (
+                    <div className="space-y-4">
+                      {sleepModules.map((module) => {
                         const Component = module.definition?.Component;
                         if (!Component) return null;
                         return (
@@ -564,6 +601,60 @@ export default function CalendarExplorer() {
                       })}
                     </div>
                   )}
+                </div>
+              )}
+
+              {otherModules.length > 0 && (
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setOtherModulesCollapsed(!otherModulesCollapsed)}
+                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                  >
+                    <span className={`transform transition-transform ${otherModulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    Módulos
+                  </button>
+                  {!otherModulesCollapsed && (
+                    <div className="space-y-4">
+                      {otherModules.map((module) => {
+                        const Component = module.definition?.Component;
+                        if (!Component) return null;
+                        return (
+                          <Component
+                            key={module.slug}
+                            config={module.config}
+                            module={module}
+                            isEditing={isEditingDay}
+                            date={selectedDate}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {academicModule?.definition?.Component && (
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setAcademicCollapsed(!academicCollapsed)}
+                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                  >
+                    <span className={`transform transition-transform ${academicCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    Gestión Universitaria
+                  </button>
+                  {!academicCollapsed && (() => {
+                    const AcademicComponent = academicModule.definition?.Component;
+                    return AcademicComponent ? (
+                      <AcademicComponent
+                        config={academicModule.config}
+                        module={academicModule}
+                        isEditing={isEditingDay}
+                        date={selectedDate}
+                      />
+                    ) : null;
+                  })()}
                 </div>
               )}
 

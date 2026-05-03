@@ -93,20 +93,14 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">😀 Estado</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Selecciona cómo te sientes hoy.</p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Estado</p>
-          <p className="text-xl font-semibold text-slate-900 dark:text-white">
-            {selectedState ? `${selectedState.emoji} ${selectedState.title}` : '—'}
-          </p>
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Estado del día</p>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Selecciona cómo te sientes hoy.</p>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
         {states.map((state) => (
           <button
             key={state.id}
