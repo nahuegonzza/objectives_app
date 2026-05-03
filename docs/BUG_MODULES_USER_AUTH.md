@@ -100,6 +100,7 @@ Esto mejora la fiabilidad del envío de cookies de sesión en solicitudes a los 
 
 Se añadió `credentials: 'include'` en múltiples peticiones cliente a rutas protegidas de la API:
 
+
 - `components/GoalForm.tsx`
 - `components/EventForm.tsx`
 - `components/HistoryViewer.tsx`
