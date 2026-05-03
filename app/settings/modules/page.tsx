@@ -8,6 +8,7 @@ import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import type { Module } from '@types';
 import { SleepConfig } from '../../../modules/sleep/SleepConfig';
 import { MoodConfig } from '../../../modules/mood/MoodConfig';
+import { AcademicConfig } from '@modules/academic/AcademicConfig';
 
 export const dynamic = 'force-dynamic';
 
@@ -279,6 +280,13 @@ export default function ModulesSettingsPage() {
       )}
       {configModule?.slug === 'mood' && (
         <MoodConfig
+          config={configModule.config || {}}
+          onSave={handleConfigSave}
+          onClose={() => setConfigModule(null)}
+        />
+      )}
+      {configModule?.slug === 'academic' && (
+        <AcademicConfig
           config={configModule.config || {}}
           onSave={handleConfigSave}
           onClose={() => setConfigModule(null)}

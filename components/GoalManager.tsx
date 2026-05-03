@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import type { DragEvent } from 'react';
 import type { Goal } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/goalIconsColors';
-import GoalForm from '@components/GoalForm';
+import GoalCreateModal from './GoalCreateModal';
 import NumberInput from '@components/NumberInput';
 import { GoalEditModal } from '@components/GoalEditModal';
 
@@ -370,12 +370,13 @@ export default function GoalManager() {
           </div>
         </div>
         {showCreateForm && (
-          <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-            <GoalForm onSuccess={() => {
+          <GoalCreateModal
+            onClose={() => setShowCreateForm(false)}
+            onCreateSuccess={() => {
               loadGoals();
               setShowCreateForm(false);
-            }} />
-          </div>
+            }}
+          />
         )}
 
         {loading ? (
