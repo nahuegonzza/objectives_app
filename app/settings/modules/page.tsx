@@ -193,7 +193,7 @@ export default function ModulesSettingsPage() {
                         >
                           Desactivar
                         </button>
-                        {(module.slug === 'sleep' || module.slug === 'mood') && (
+                        {(module.slug === 'sleep' || module.slug === 'mood' || module.slug === 'academic') && (
                           <button
                             type="button"
                             onClick={() => setConfigModule(module)}
