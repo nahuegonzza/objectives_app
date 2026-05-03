@@ -13,10 +13,6 @@ export default function GoalManager() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showIconPicker, setShowIconPicker] = useState(false);
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showRgbPicker, setShowRgbPicker] = useState(false);
-  const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
   const [showInactive, setShowInactive] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [draggedGoalId, setDraggedGoalId] = useState<string | null>(null);
