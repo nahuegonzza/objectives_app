@@ -456,18 +456,21 @@ export default function GoalTracker() {
                   <span className={`transform transition-transform ${moodCollapsed ? 'rotate-90' : ''}`}>▶</span>
                   Estado del día
                 </button>
-                {!moodCollapsed && (
-                  <MoodComponent
-                    config={moodModule.config}
-                    module={moodModule}
-                    isEditing={true}
-                    onUpdate={() => {
-                      loadModuleEntries();
-                      markTodayStreak();
-                    }}
-                    date={today}
-                  />
-                )}
+                {!moodCollapsed && (() => {
+                  const MoodComponent = moodModule.definition?.Component;
+                  return MoodComponent ? (
+                    <MoodComponent
+                      config={moodModule.config}
+                      module={moodModule}
+                      isEditing={true}
+                      onUpdate={() => {
+                        loadModuleEntries();
+                        markTodayStreak();
+                      }}
+                      date={today}
+                    />
+                  ) : null;
+                })()}
               </div>
             )}
 

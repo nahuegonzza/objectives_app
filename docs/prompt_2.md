@@ -12,6 +12,7 @@ El sistema debe dejar de depender de eventos manuales y pasar a funcionar así:
 * El usuario interactúa directamente con esos objetivos cada día
 * El sistema calcula puntos en base a esa interacción
 
+
 ## 🎯 OBJETIVOS
 
 Un objetivo debe tener:
