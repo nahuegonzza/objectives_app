@@ -49,7 +49,7 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
   };
 
   const handleSave = () => {
-    onSave({ ...config, states, maxPoints: config.maxPoints || 1 });
+    onSave({ states, maxPoints: (config.maxPoints as number) || 1 });
   };
 
   return (

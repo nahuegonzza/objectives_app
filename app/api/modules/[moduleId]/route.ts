@@ -33,16 +33,20 @@ export async function PATCH(
 
     const updateData: any = {};
     if (active !== undefined) updateData.active = active;
-    if (config !== undefined) updateData.config = JSON.stringify(config);
+    if (config !== undefined) {
+      updateData.config = JSON.stringify(config);
+    }
 
     const mod = await prisma.module.update({
       where: { id: params.moduleId },
       data: updateData,
     });
 
+    const parsedConfig = parseModuleConfig(mod.config);
+
     return NextResponse.json({
       ...mod,
-      config: parseModuleConfig(mod.config),
+      config: parsedConfig,
     });
   } catch (error) {
     console.error('Error updating module:', error);

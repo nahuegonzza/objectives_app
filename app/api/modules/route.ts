@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
+import { parseModuleConfig } from '@lib/modules';
 
 export async function GET() {
   try {
@@ -35,7 +36,8 @@ export async function GET() {
           name: moduleDef.name,
           description: moduleDef.description,
           userId,
-          active: false
+          active: false,
+          config: JSON.stringify(moduleDef.defaultConfig || {})
         },
         update: {
           name: moduleDef.name,
@@ -51,7 +53,8 @@ export async function GET() {
 
     const mapped = modules.map((module) => ({
       ...module,
-      enabled: module.active
+      enabled: module.active,
+      config: parseModuleConfig(module.config)
     }));
 
     return NextResponse.json(mapped);
@@ -99,7 +102,8 @@ export async function PATCH(request: Request) {
         name: moduleDefinition.name,
         description: moduleDefinition.description,
         userId,
-        active: payload.active
+        active: payload.active,
+        config: JSON.stringify(moduleDefinition.defaultConfig || {})
       },
       update: {
         active: payload.active
@@ -108,7 +112,8 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({
       ...updatedModule,
-      enabled: updatedModule.active
+      enabled: updatedModule.active,
+      config: parseModuleConfig(updatedModule.config)
     });
   } catch (error) {
     console.error('Error in /api/modules PATCH:', error);

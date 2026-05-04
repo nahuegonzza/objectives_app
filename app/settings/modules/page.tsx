@@ -89,10 +89,14 @@ export default function ModulesSettingsPage() {
         body: JSON.stringify({ config: newConfig }),
       });
       if (res.ok) {
-        setModules(modules.map(m => m.id === configModule.id ? { ...m, config: newConfig } : m));
+        const updatedModule = await res.json();
+        setModules(modules.map(m => m.id === configModule.id ? updatedModule : m));
+      } else {
+        alert('Error al guardar la configuración');
       }
     } catch (error) {
       console.error('Error saving config:', error);
+      alert('Error al guardar la configuración');
     }
     setConfigModule(null);
   };
