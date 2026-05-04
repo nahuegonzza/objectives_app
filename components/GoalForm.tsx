@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { GoalPayload } from '@types';
+import type { Goal, GoalPayload } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getColorOption, getGoalIcon, isCustomColor } from '@lib/goalIconsColors';
 import NumberInput from '@components/NumberInput';
 
 interface GoalFormProps {
-  initialData?: Partial<GoalFormData>;
+  initialData?: Partial<Goal>;
   submitLabel?: string;
   onSubmit: (payload: GoalFormData) => Promise<{ success: boolean; message?: string }>;
   onSuccess?: () => void;
@@ -31,6 +31,22 @@ const initialState: GoalFormData = {
   weekDays: []
 };
 
+function normalizeInitialData(data?: Partial<Goal>): GoalFormData {
+  if (!data) return initialState;
+
+  return {
+    ...initialState,
+    ...data,
+    description: data.description ?? initialState.description,
+    icon: data.icon ?? initialState.icon,
+    color: data.color ?? initialState.color,
+    pointsIfTrue: data.pointsIfTrue ?? initialState.pointsIfTrue,
+    pointsIfFalse: data.pointsIfFalse ?? initialState.pointsIfFalse,
+    pointsPerUnit: data.pointsPerUnit ?? initialState.pointsPerUnit,
+    weekDays: Array.isArray(data.weekDays) ? data.weekDays : initialState.weekDays,
+  };
+}
+
 const WEEK_DAYS = [
   { index: 0, label: 'D', full: 'Domingo' },
   { index: 1, label: 'L', full: 'Lunes' },
@@ -42,7 +58,7 @@ const WEEK_DAYS = [
 ];
 
 export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo', onSubmit, onSuccess, onCancel, onDirtyChange }: GoalFormProps) {
-  const [form, setForm] = useState<GoalFormData>({ ...initialState, ...initialData });
+  const [form, setForm] = useState<GoalFormData>(normalizeInitialData(initialData));
   const [status, setStatus] = useState<string>('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -55,7 +71,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   const isDirty = JSON.stringify(normalizedInitial) !== JSON.stringify(normalizedCurrent);
 
   useEffect(() => {
-    const merged = { ...initialState, ...initialData };
+    const merged = normalizeInitialData(initialData);
     setForm(merged);
 
     if (merged.color && isCustomColor(merged.color)) {
