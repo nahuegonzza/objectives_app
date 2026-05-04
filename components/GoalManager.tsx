@@ -22,6 +22,7 @@ export default function GoalManager() {
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [editForm, setEditForm] = useState<Partial<Goal>>({});
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showRgbPicker, setShowRgbPicker] = useState(false);
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
@@ -29,6 +30,18 @@ export default function GoalManager() {
   useEffect(() => {
     loadGoals();
   }, []);
+
+  useEffect(() => {
+    if (statusMessage) {
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        setStatusMessage('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [statusMessage]);
 
   async function loadGoals() {
     setLoading(true);
@@ -331,16 +344,18 @@ export default function GoalManager() {
   return (
     <div className="space-y-6">
       <div className="space-y-6">
+        {showToast && statusMessage && (
+          <div className={`fixed top-4 right-4 z-50 max-w-sm rounded-lg px-4 py-3 text-sm font-medium shadow-lg ${
+            statusType === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+          }`}>
+            {statusMessage}
+          </div>
+        )}
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
               Todos los Objetivos
             </h2>
-            {statusMessage && (
-              <p className={`mt-2 text-sm font-medium ${statusType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
-                {statusMessage}
-              </p>
-            )}
             {!showInactive && (
               <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                 Arrastra los objetivos dentro de cada sección para cambiar su orden.
@@ -374,6 +389,8 @@ export default function GoalManager() {
             onCreateSuccess={() => {
               loadGoals();
               setShowCreateForm(false);
+              setStatusMessage('✓ Objetivo creado');
+              setStatusType('success');
             }}
           />
         )}

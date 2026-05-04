@@ -12,15 +12,6 @@ interface GoalEditModalProps {
 
 export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
   const [isDirty, setIsDirty] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(''), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
 
   if (!goal) return null;
 
@@ -52,12 +43,8 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
           onSubmit={async (payload) => {
             try {
               await onSave(goal.id, payload);
-              setMessage('✓ Objetivo actualizado');
-              setMessageType('success');
               return { success: true };
             } catch (error) {
-              setMessage('Error al guardar');
-              setMessageType('error');
               return {
                 success: false,
                 message: error instanceof Error ? error.message : 'Error al guardar el objetivo'
@@ -69,17 +56,6 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
           onDirtyChange={setIsDirty}
         />
 
-        {message && (
-          <div
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
-              messageType === 'success'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-red-600 text-white'
-            }`}
-          >
-            {message}
-          </div>
-        )}
       </div>
     </div>
   );
