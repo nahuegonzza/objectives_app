@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface MoodState {
@@ -32,6 +32,15 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     (config.states as MoodState[]) || defaultStates
   );
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleUpdateState = (id: string, field: keyof MoodState, value: string) => {
     setStates(states.map(s => s.id === id ? { ...s, [field]: value } : s));
@@ -49,6 +58,8 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
 
   const handleSave = () => {
     onSave({ states, maxPoints: (config.maxPoints as number) || 1 });
+    setMessage('✓ Configuración guardada');
+    setMessageType('success');
   };
 
   return (
@@ -160,6 +171,18 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
             Guardar
           </button>
         </div>
+
+        {message && (
+          <div
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
+              messageType === 'success'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-red-600 text-white'
+            }`}
+          >
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

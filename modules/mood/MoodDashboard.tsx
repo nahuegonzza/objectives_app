@@ -22,6 +22,15 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [points, setPoints] = useState(0);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Estados del config o los por defecto
   const states: MoodState[] = (config.states as MoodState[]) || [
@@ -85,6 +94,8 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
     if (!isEditing) return;
     setSelectedMood(moodId);
     saveEntry(moodId);
+    setMessage('✓ Estado del día actualizado');
+    setMessageType('success');
   };
 
   if (loading) return <div>Loading...</div>;
@@ -92,49 +103,59 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
   const selectedState = states.find(s => s.id === selectedMood);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
-      <div className="flex flex-col gap-3">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Estado del día</p>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Selecciona cómo te sientes hoy.</p>
+    <>
+      {message && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+          messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {message}
+        </div>
+      )}
+
+      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
+        <div className="flex flex-col gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Estado del día</p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Selecciona cómo te sientes hoy.</p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {states.map((state) => (
+            <button
+              key={state.id}
+              type="button"
+              onClick={() => handleMoodSelect(state.id)}
+              disabled={!isEditing}
+              className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all ${
+                selectedMood === state.id
+                  ? 'ring-2 ring-offset-2 dark:ring-offset-slate-900'
+                  : 'opacity-70 hover:opacity-100'
+              } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+              style={{
+                backgroundColor: selectedMood === state.id ? state.color + '20' : 'transparent',
+                borderColor: state.color,
+                borderWidth: '2px',
+                borderStyle: 'solid',
+                color: state.color,
+                ['--tw-ring-color' as any]: state.color,
+              }}
+            >
+              <span className="text-lg">{state.emoji}</span>
+              <span className="hidden sm:inline">{state.title}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-slate-50 p-3 text-slate-700 dark:bg-slate-950 dark:text-slate-200">
+          <div>
+            <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Puntos</p>
+            <p className={`text-2xl font-semibold ${points > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+              {points}
+            </p>
+          </div>
         </div>
       </div>
-
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
-        {states.map((state) => (
-          <button
-            key={state.id}
-            type="button"
-            onClick={() => handleMoodSelect(state.id)}
-            disabled={!isEditing}
-            className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all ${
-              selectedMood === state.id
-                ? 'ring-2 ring-offset-2 dark:ring-offset-slate-900'
-                : 'opacity-70 hover:opacity-100'
-            } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-            style={{
-              backgroundColor: selectedMood === state.id ? state.color + '20' : 'transparent',
-              borderColor: state.color,
-              borderWidth: '2px',
-              borderStyle: 'solid',
-              color: state.color,
-              ['--tw-ring-color' as any]: state.color,
-            }}
-          >
-            <span className="text-lg">{state.emoji}</span>
-            <span className="hidden sm:inline">{state.title}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-slate-50 p-3 text-slate-700 dark:bg-slate-950 dark:text-slate-200">
-        <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Puntos</p>
-          <p className={`text-2xl font-semibold ${points > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
-            {points}
-          </p>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };

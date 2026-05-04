@@ -24,6 +24,15 @@ export function AcademicConfig({
   const [subjects, setSubjects] = useState<AcademicSubject[]>([]);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"subjects" | "scoring">("subjects");
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
   
   // Configuración de scoring
   const [examPointsPartial, setExamPointsPartial] = useState(
@@ -115,8 +124,13 @@ export function AcademicConfig({
       if (onSave) {
         onSave(newConfig);
       }
+
+      setMessage('✓ Configuración guardada');
+      setMessageType('success');
     } catch (error) {
       console.error("Error saving academic config:", error);
+      setMessage('Error al guardar');
+      setMessageType('error');
     } finally {
       setSaving(false);
     }
@@ -368,7 +382,17 @@ export function AcademicConfig({
             {saving ? "Guardando..." : "Guardar"}
           </button>
         </div>
-      </div>
+        {message && (
+          <div
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
+              messageType === 'success'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-red-600 text-white'
+            }`}
+          >
+            {message}
+          </div>
+        )}      </div>
     </div>
   );
 }

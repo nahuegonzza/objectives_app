@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface SleepConfigProps {
   config: Record<string, unknown>;
@@ -13,6 +13,15 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
   const [maxPoints, setMaxPoints] = useState(config.maxPoints as number || 2);
   const [penaltyMode, setPenaltyMode] = useState(config.penaltyMode as string || 'automatic');
   const [penaltyPerHour, setPenaltyPerHour] = useState(config.penaltyPerHour as number || 1);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleSave = () => {
     onSave({
@@ -21,6 +30,8 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
       penaltyMode,
       penaltyPerHour,
     });
+    setMessage('✓ Configuración guardada');
+    setMessageType('success');
   };
 
   return (
@@ -186,6 +197,18 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
             Guardar
           </button>
         </div>
+
+        {message && (
+          <div
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
+              messageType === 'success'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-red-600 text-white'
+            }`}
+          >
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

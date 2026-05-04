@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GoalForm from '@components/GoalForm';
 
 interface GoalCreateModalProps {
@@ -10,6 +10,15 @@ interface GoalCreateModalProps {
 
 export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreateModalProps) {
   const [isDirty, setIsDirty] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
@@ -44,6 +53,8 @@ export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreate
               });
 
               if (response.ok) {
+                setMessage('✓ Objetivo creado');
+                setMessageType('success');
                 onCreateSuccess();
                 return { success: true, message: 'Objetivo creado con éxito' };
               }
@@ -58,6 +69,18 @@ export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreate
           onCancel={onClose}
           onDirtyChange={setIsDirty}
         />
+
+        {message && (
+          <div
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
+              messageType === 'success'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-red-600 text-white'
+            }`}
+          >
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

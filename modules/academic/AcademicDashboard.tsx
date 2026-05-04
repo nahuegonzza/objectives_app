@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
 import type { ModuleState } from '@types';
 import { useAcademicModule } from './useAcademicModule';
@@ -30,6 +30,15 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   } = useAcademicModule(module.id, module.slug, selectedDate, config);
 
   const [showEventForm, setShowEventForm] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleToggleCompleted = async (event: AcademicEvent) => {
     await toggleEventCompleted(event);
@@ -39,6 +48,8 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   const handleAddEvent = async (event: AcademicEvent) => {
     await addEvent(event);
     setShowEventForm(false);
+    setMessage('✓ Evento creado');
+    setMessageType('success');
     onUpdate?.({ updated: true });
   };
 
@@ -59,6 +70,14 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
         onSave={handleAddEvent}
         isSaving={isSaving}
       />
+
+      {message && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+          messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {message}
+        </div>
+      )}
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

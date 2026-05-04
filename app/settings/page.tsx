@@ -30,13 +30,20 @@ export default function SettingsPage() {
     confirmPassword: ''
   });
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const [profileStatus, setProfileStatus] = useState('');
-  const [profileType, setProfileType] = useState<'success' | 'error'>('success');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [profileCollapsed, setProfileCollapsed] = useState(true);
   const [passwordCollapsed, setPasswordCollapsed] = useState(true);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -231,12 +238,12 @@ export default function SettingsPage() {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProfileStatus('');
+    setMessage('');
 
     // Validate that at least firstName or lastName is provided
     if (!profileForm.firstName.trim() && !profileForm.lastName.trim()) {
-      setProfileStatus('Debes proporcionar al menos un nombre o apellido');
-      setProfileType('error');
+      setMessage('Debes proporcionar al menos un nombre o apellido');
+      setMessageType('error');
       return;
     }
 
@@ -253,14 +260,14 @@ export default function SettingsPage() {
     if (profileForm.username.trim()) {
       const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
       if (!usernameRegex.test(profileForm.username.trim())) {
-        setProfileStatus('El nombre de usuario debe tener 3-20 caracteres y solo contener letras, números, guiones y guiones bajos');
-        setProfileType('error');
+        setMessage('El nombre de usuario debe tener 3-20 caracteres y solo contener letras, números, guiones y guiones bajos');
+        setMessageType('error');
         return;
       }
 
       if (usernameAvailable === false) {
-        setProfileStatus('Este nombre de usuario no está disponible');
-        setProfileType('error');
+        setMessage('Este nombre de usuario no está disponible');
+        setMessageType('error');
         return;
       }
     }
@@ -289,8 +296,8 @@ export default function SettingsPage() {
       const updatedUser = await res.json();
       console.log('✅ Usuario actualizado:', updatedUser);
 
-      setProfileStatus('Perfil actualizado correctamente');
-      setProfileType('success');
+      setMessage('✓ Perfil actualizado');
+      setMessageType('success');
       // Reload user
       setUser(updatedUser);
 
@@ -303,17 +310,17 @@ export default function SettingsPage() {
       }));
     } catch (error) {
       console.error('Error updating profile:', error);
-      setProfileStatus(error instanceof Error ? error.message : 'Error updating profile');
-      setProfileType('error');
+      setMessage(error instanceof Error ? error.message : 'Error updating profile');
+      setMessageType('error');
     }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProfileStatus('');
+    setMessage('');
     if (profileForm.newPassword !== profileForm.confirmPassword) {
-      setProfileStatus('Las contraseñas no coinciden');
-      setProfileType('error');
+      setMessage('Las contraseñas no coinciden');
+      setMessageType('error');
       return;
     }
     try {
@@ -330,13 +337,13 @@ export default function SettingsPage() {
         const body = await res.json().catch(() => null);
         throw new Error(body?.error || 'Error changing password');
       }
-      setProfileStatus('Contraseña cambiada correctamente');
-      setProfileType('success');
+      setMessage('✓ Contraseña cambiada');
+      setMessageType('success');
       setProfileForm({ ...profileForm, currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
       console.error('Error changing password:', error);
-      setProfileStatus(error instanceof Error ? error.message : 'Error changing password');
-      setProfileType('error');
+      setMessage(error instanceof Error ? error.message : 'Error changing password');
+      setMessageType('error');
     }
   };
 
@@ -344,6 +351,14 @@ export default function SettingsPage() {
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
       <div className="mx-auto max-w-4xl">
         <Navigation />
+
+        {message && (
+          <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+            messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+          }`}>
+            {message}
+          </div>
+        )}
 
         <header className="mb-8">
           <div>
@@ -453,9 +468,9 @@ export default function SettingsPage() {
                     Actualizar Perfil
                   </button>
                 </form>
-                {profileStatus && (
-                  <p className={`text-sm font-medium ${profileType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
-                    {profileStatus}
+                {message && (
+                  <p className={`text-sm font-medium ${messageType === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {message}
                   </p>
                 )}
               </div>
