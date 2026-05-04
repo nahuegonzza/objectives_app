@@ -355,12 +355,12 @@ export default function GoalTracker() {
     [entries, today]
   );
   const currentEvents = useMemo(
-    () => events.filter((e) => getLocalDateStringFromEntry(e.createdAt) === today),
-    [events, today]
+    () => events.filter((e) => getLocalDateStringFromEntry(e.createdAt) === selectedDate),
+    [events, selectedDate]
   );
   const currentModuleEntries = useMemo(
     () => moduleEntries.filter((e) => getLocalDateStringFromEntry(e.date) === today),
-    [moduleEntries, today]
+    [moduleEntries, selectedDate]
   );
 
   useEffect(() => {
@@ -509,7 +509,7 @@ export default function GoalTracker() {
                         loadModuleEntries();
                         markTodayStreak();
                       }}
-                      date={today}
+                      date={selectedDate}
                     />
                   ) : null;
                 })()}
@@ -541,7 +541,7 @@ export default function GoalTracker() {
                             loadModuleEntries();
                             markTodayStreak();
                           }}
-                          date={today}
+                          date={selectedDate}
                         />
                       );
                     })}
@@ -575,7 +575,7 @@ export default function GoalTracker() {
                             loadModuleEntries();
                             markTodayStreak();
                           }}
-                          date={today}
+                          date={selectedDate}
                         />
                       );
                     })}
@@ -671,7 +671,7 @@ export default function GoalTracker() {
                           loadModuleEntries();
                           markTodayStreak();
                         }}
-                        date={today}
+                        date={selectedDate}
                       />
                     ) : null;
                   })()
