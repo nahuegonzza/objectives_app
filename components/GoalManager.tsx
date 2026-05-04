@@ -45,7 +45,6 @@ export default function GoalManager() {
 
   async function loadGoals() {
     setLoading(true);
-    setStatusMessage('');
     try {
       const res = await fetch('/api/goals', { credentials: 'include' });
       if (!res.ok) {
@@ -345,7 +344,7 @@ export default function GoalManager() {
     <div className="space-y-6">
       <div className="space-y-6">
         {showToast && statusMessage && (
-          <div className={`fixed top-4 right-4 z-50 max-w-sm rounded-lg px-4 py-3 text-sm font-medium shadow-lg ${
+          <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
             statusType === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
           }`}>
             {statusMessage}

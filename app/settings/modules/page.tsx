@@ -98,7 +98,6 @@ export default function ModulesSettingsPage() {
       console.error('Error saving config:', error);
       alert('Error al guardar la configuración');
     }
-    setConfigModule(null);
   };
 
   const activeModules = modules.filter(m => m.active);

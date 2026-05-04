@@ -26,7 +26,6 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
     } catch (error) {
       console.error('Error saving config:', error);
     }
-    setShowConfig(false);
   };
 
   return (
