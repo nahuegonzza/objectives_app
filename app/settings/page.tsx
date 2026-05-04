@@ -406,7 +406,7 @@ export default function SettingsPage() {
                         {usernameAvailable === true && (
                           <span className="text-emerald-600 dark:text-emerald-400">✓ Nombre de usuario disponible</span>
                         )}
-                        {usernameAvailable === false && (
+                        {usernameAvailable === false && user.username !== profileForm.username && (
                           <span className="text-red-600 dark:text-red-400">✗ Nombre de usuario no disponible</span>
                         )}
                       </div>

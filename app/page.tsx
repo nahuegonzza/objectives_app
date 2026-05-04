@@ -19,8 +19,8 @@ export default async function Home() {
   // Definimos la prioridad: firstName -> username -> email
   // Usamos user_metadata porque normalmente es ahí donde Supabase guarda los campos extra
   const displayName = 
-    user.user_metadata?.firstName || 
-    user.user_metadata?.username || 
+    user.firstName || 
+    user.username || 
     user.email;
 
   return (
