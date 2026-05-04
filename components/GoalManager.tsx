@@ -68,6 +68,21 @@ export default function GoalManager() {
     setShowEditModal(true);
   }
 
+  const handleCreateSuccess = () => {
+    setShowCreateForm(false);
+    setStatusMessage('✓ Registrado');
+    setStatusType('success');
+    loadGoals();
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditModal(false);
+    setEditingGoal(null);
+    setStatusMessage('✓ Registrado');
+    setStatusType('success');
+    loadGoals();
+  };
+
   async function handleUpdateGoal(goalId: string) {
     await handleSaveEditGoal(goalId, editForm);
     setEditForm({});
@@ -385,12 +400,7 @@ export default function GoalManager() {
         {showCreateForm && (
           <GoalCreateModal
             onClose={() => setShowCreateForm(false)}
-            onCreateSuccess={() => {
-              loadGoals();
-              setShowCreateForm(false);
-              setStatusMessage('✓ Objetivo creado');
-              setStatusType('success');
-            }}
+            onCreateSuccess={handleCreateSuccess}
           />
         )}
 
@@ -583,6 +593,7 @@ export default function GoalManager() {
         <GoalEditModal
           goal={editingGoal}
           onSave={handleSaveEditGoal}
+          onSuccess={handleEditSuccess}
           onClose={() => {
             setShowEditModal(false);
             setEditingGoal(null);

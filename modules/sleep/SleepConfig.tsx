@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface SleepConfigProps {
   config: Record<string, unknown>;
-  onSave: (newConfig: Record<string, unknown>) => void;
+  onSave: (newConfig: Record<string, unknown>) => Promise<boolean>;
   onClose: () => void;
 }
 
@@ -13,25 +13,29 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
   const [maxPoints, setMaxPoints] = useState(config.maxPoints as number || 2);
   const [penaltyMode, setPenaltyMode] = useState(config.penaltyMode as string || 'automatic');
   const [penaltyPerHour, setPenaltyPerHour] = useState(config.penaltyPerHour as number || 1);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(''), 3000);
-      return () => clearTimeout(timer);
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const success = await onSave({
+        idealHours,
+        maxPoints,
+        penaltyMode,
+        penaltyPerHour,
+      });
+      if (success) {
+        onClose();
+      } else {
+        setError('No se pudo guardar la configuración.');
+      }
+    } catch (err) {
+      setError('No se pudo guardar la configuración.');
+    } finally {
+      setSaving(false);
     }
-  }, [message]);
-
-  const handleSave = () => {
-    onSave({
-      idealHours,
-      maxPoints,
-      penaltyMode,
-      penaltyPerHour,
-    });
-    setMessage('✓ Configuración guardada');
-    setMessageType('success');
   };
 
   return (
@@ -192,21 +196,16 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600"
+            disabled={saving}
+            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Guardar
           </button>
         </div>
 
-        {message && (
-          <div
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
-              messageType === 'success'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-red-600 text-white'
-            }`}
-          >
-            {message}
+        {error && (
+          <div className="mt-4 rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white">
+            {error}
           </div>
         )}
       </div>

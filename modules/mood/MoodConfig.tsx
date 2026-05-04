@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface MoodState {
@@ -12,7 +12,7 @@ interface MoodState {
 
 interface MoodConfigProps {
   config: Record<string, unknown>;
-  onSave: (config: Record<string, unknown>) => void;
+  onSave: (config: Record<string, unknown>) => Promise<boolean>;
   onClose: () => void;
 }
 
@@ -32,15 +32,8 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     (config.states as MoodState[]) || defaultStates
   );
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(''), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const handleUpdateState = (id: string, field: keyof MoodState, value: string) => {
     setStates(states.map(s => s.id === id ? { ...s, [field]: value } : s));
@@ -56,10 +49,21 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     setStates([...states, { id, title: '', emoji: '😐', color: '#6b7280' }]);
   };
 
-  const handleSave = () => {
-    onSave({ states, maxPoints: (config.maxPoints as number) || 1 });
-    setMessage('✓ Configuración guardada');
-    setMessageType('success');
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const success = await onSave({ states, maxPoints: (config.maxPoints as number) || 1 });
+      if (success) {
+        onClose();
+      } else {
+        setError('No se pudo guardar la configuración.');
+      }
+    } catch (err) {
+      setError('No se pudo guardar la configuración.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -166,21 +170,16 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600"
+            disabled={saving}
+            className="flex-1 rounded-xl bg-emerald-500 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 active:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Guardar
           </button>
         </div>
 
-        {message && (
-          <div
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
-              messageType === 'success'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-red-600 text-white'
-            }`}
-          >
-            {message}
+        {error && (
+          <div className="mt-4 rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white">
+            {error}
           </div>
         )}
       </div>

@@ -21,10 +21,12 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
         body: JSON.stringify({ config: newConfig }),
       });
       if (res.ok) {
-        // Optionally update local state
+        return true;
       }
+      return false;
     } catch (error) {
       console.error('Error saving config:', error);
+      return false;
     }
   };
 

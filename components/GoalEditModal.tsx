@@ -7,10 +7,11 @@ import GoalForm from '@components/GoalForm';
 interface GoalEditModalProps {
   goal: Goal | null;
   onSave: (goalId: string, updates: Partial<Goal>) => Promise<void>;
+  onSuccess: () => void;
   onClose: () => void;
 }
 
-export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
+export function GoalEditModal({ goal, onSave, onSuccess, onClose }: GoalEditModalProps) {
   const [isDirty, setIsDirty] = useState(false);
 
   if (!goal) return null;
@@ -51,7 +52,7 @@ export function GoalEditModal({ goal, onSave, onClose }: GoalEditModalProps) {
               };
             }
           }}
-          onSuccess={onClose}
+          onSuccess={onSuccess}
           onCancel={onClose}
           onDirtyChange={setIsDirty}
         />

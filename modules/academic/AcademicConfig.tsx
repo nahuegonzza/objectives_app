@@ -10,7 +10,7 @@ interface AcademicConfigProps {
   config?: Record<string, unknown>;
   moduleId?: string;
   moduleName?: string;
-  onSave?: (newConfig: Record<string, unknown>) => void;
+  onSave?: (newConfig: Record<string, unknown>) => Promise<boolean>;
   onClose?: () => void;
 }
 
@@ -24,15 +24,7 @@ export function AcademicConfig({
   const [subjects, setSubjects] = useState<AcademicSubject[]>([]);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"subjects" | "scoring">("subjects");
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(''), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
+  const [error, setError] = useState('');
   
   // Configuración de scoring
   const [examPointsPartial, setExamPointsPartial] = useState(
@@ -122,15 +114,17 @@ export function AcademicConfig({
 
       // Luego guardar la configuración
       if (onSave) {
-        onSave(newConfig);
+        const success = await onSave(newConfig);
+        if (!success) {
+          setError('No se pudo guardar la configuración.');
+          return;
+        }
       }
 
-      setMessage('✓ Configuración guardada');
-      setMessageType('success');
+      onClose?.();
     } catch (error) {
       console.error("Error saving academic config:", error);
-      setMessage('Error al guardar');
-      setMessageType('error');
+      setError('Error al guardar');
     } finally {
       setSaving(false);
     }
@@ -382,17 +376,12 @@ export function AcademicConfig({
             {saving ? "Guardando..." : "Guardar"}
           </button>
         </div>
-        {message && (
-          <div
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ${
-              messageType === 'success'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-red-600 text-white'
-            }`}
-          >
-            {message}
+        {error && (
+          <div className="mt-4 rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white">
+            {error}
           </div>
-        )}      </div>
+        )}
+      </div>
     </div>
   );
 }

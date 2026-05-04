@@ -40,6 +40,15 @@ export default function ModulesSettingsPage() {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [configModule, setConfigModule] = useState<Module | null>(null);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    if (!showToast) return;
+    const timer = setTimeout(() => setShowToast(false), 3000);
+    return () => clearTimeout(timer);
+  }, [showToast]);
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -80,7 +89,7 @@ export default function ModulesSettingsPage() {
   };
 
   const handleConfigSave = async (newConfig: Record<string, unknown>) => {
-    if (!configModule) return;
+    if (!configModule) return false;
     try {
       const res = await fetch(`/api/modules/${configModule.id}`, {
         method: 'PATCH',
@@ -91,12 +100,21 @@ export default function ModulesSettingsPage() {
       if (res.ok) {
         const updatedModule = await res.json();
         setModules(modules.map(m => m.id === configModule.id ? updatedModule : m));
-      } else {
-        alert('Error al guardar la configuración');
+        setMessage('✓ Registrado');
+        setMessageType('success');
+        setShowToast(true);
+        return true;
       }
+      setMessage('Error al guardar la configuración');
+      setMessageType('error');
+      setShowToast(true);
+      return false;
     } catch (error) {
       console.error('Error saving config:', error);
-      alert('Error al guardar la configuración');
+      setMessage('Error al guardar la configuración');
+      setMessageType('error');
+      setShowToast(true);
+      return false;
     }
   };
 
@@ -134,6 +152,14 @@ export default function ModulesSettingsPage() {
             <p className="mt-2 text-slate-600 dark:text-slate-400">Personaliza tu experiencia</p>
           </div>
         </div>
+
+        {showToast && (
+          <div className="fixed inset-x-0 top-24 z-50 flex justify-center px-4">
+            <div className={`rounded-full px-4 py-2 text-sm font-semibold shadow-lg shadow-slate-900/10 ${messageType === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+              {message}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">

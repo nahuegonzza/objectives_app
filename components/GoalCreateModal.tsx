@@ -44,7 +44,6 @@ export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreate
               });
 
               if (response.ok) {
-                onCreateSuccess();
                 return { success: true, message: 'Objetivo creado con éxito' };
               }
 
