@@ -40,12 +40,9 @@ export default function GoalTracker() {
   const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [longestStreak, setLongestStreak] = useState(0);
-  const [moodCollapsed, setMoodCollapsed] = useState(false);
-  const [sleepCollapsed, setSleepCollapsed] = useState(false);
-  const [otherModulesCollapsed, setOtherModulesCollapsed] = useState(false);
   const [habitsCollapsed, setHabitsCollapsed] = useState(false);
   const [metricsCollapsed, setMetricsCollapsed] = useState(false);
-  const [academicCollapsed, setAcademicCollapsed] = useState(false);
+  const [moduleCollapseStates, setModuleCollapseStates] = useState<Record<string, boolean>>({});
 
   const today = useMemo(() => getLocalDateString(), []);
   const [selectedDate, setSelectedDate] = useState(today);
@@ -239,6 +236,13 @@ export default function GoalTracker() {
     } catch (error) {
       console.error('Error loading streak info:', error);
     }
+  }
+
+  function toggleModuleCollapse(slug: string) {
+    setModuleCollapseStates((current) => ({
+      ...current,
+      [slug]: !current[slug],
+    }));
   }
 
   async function markTodayStreak() {
@@ -489,101 +493,39 @@ export default function GoalTracker() {
           </div>
         ) : (
           <div className="space-y-6">
-            {moodModule?.definition?.Component && (
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setMoodCollapsed(!moodCollapsed)}
-                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                >
-                  <span className={`transform transition-transform ${moodCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                  Estado del día
-                </button>
-                {!moodCollapsed && (() => {
-                  const MoodComponent = moodModule.definition?.Component;
-                  return MoodComponent ? (
-                    <MoodComponent
-                      config={moodModule.config}
-                      module={moodModule}
-                      isEditing={true}
-                      onUpdate={() => {
-                        loadModuleEntries();
-                        markTodayStreak();
-                      }}
-                      date={selectedDate}
-                    />
-                  ) : null;
-                })()}
-              </div>
-            )}
+            <div className="space-y-4">
+          {orderedModules.map((module) => {
+            const Component = module.definition?.Component;
+            if (!Component) return null;
 
-            {sleepModules.length > 0 && (
-              <div className="space-y-2">
+            const isCollapsed = moduleCollapseStates[module.slug] ?? false;
+
+            return (
+              <div key={module.id} className="space-y-2">
                 <button
                   type="button"
-                  onClick={() => setSleepCollapsed(!sleepCollapsed)}
+                  onClick={() => toggleModuleCollapse(module.slug)}
                   className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                 >
-                  <span className={`transform transition-transform ${sleepCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                  Sueño
+                  <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                  {module.name}
                 </button>
-                {!sleepCollapsed && (
-                  <div className="space-y-4">
-                    {sleepModules.map((module) => {
-                      const Component = module.definition?.Component;
-                      if (!Component) return null;
-                      return (
-                        <Component
-                          key={module.slug}
-                          config={module.config}
-                          module={module}
-                          isEditing={true}
-                          onUpdate={() => {
-                            loadModuleEntries();
-                            markTodayStreak();
-                          }}
-                          date={selectedDate}
-                        />
-                      );
-                    })}
-                  </div>
+                {!isCollapsed && (
+                  <Component
+                    config={module.config}
+                    module={module}
+                    isEditing={true}
+                    onUpdate={() => {
+                      loadModuleEntries();
+                      markTodayStreak();
+                    }}
+                    date={selectedDate}
+                  />
                 )}
               </div>
-            )}
-
-            {otherModules.length > 0 && (
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setOtherModulesCollapsed(!otherModulesCollapsed)}
-                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                >
-                  <span className={`transform transition-transform ${otherModulesCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                  Módulos
-                </button>
-                {!otherModulesCollapsed && (
-                  <div className="space-y-4">
-                    {otherModules.map((module) => {
-                      const Component = module.definition?.Component;
-                      if (!Component) return null;
-                      return (
-                        <Component
-                          key={module.slug}
-                          config={module.config}
-                          module={module}
-                          isEditing={true}
-                          onUpdate={() => {
-                            loadModuleEntries();
-                            markTodayStreak();
-                          }}
-                          date={selectedDate}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+            );
+          })}
+        </div>
 
             {goals.length === 0 ? (
               <div className="text-center py-8">
@@ -648,36 +590,6 @@ export default function GoalTracker() {
                   </div>
                 )}
               </>
-            )}
-
-            {academicModule?.definition?.Component && (
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setAcademicCollapsed(!academicCollapsed)}
-                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                >
-                  <span className={`transform transition-transform ${academicCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                  Gestión Universitaria
-                </button>
-                {!academicCollapsed && (
-                  (() => {
-                    const AcademicComponent = academicModule.definition?.Component;
-                    return AcademicComponent ? (
-                      <AcademicComponent
-                        config={academicModule.config}
-                        module={academicModule}
-                        isEditing={true}
-                        onUpdate={() => {
-                          loadModuleEntries();
-                          markTodayStreak();
-                        }}
-                        date={selectedDate}
-                      />
-                    ) : null;
-                  })()
-                )}
-              </div>
             )}
           </div>
         )}
