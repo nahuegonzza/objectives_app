@@ -22,6 +22,8 @@ const moduleIcons: Record<string, string> = {
   finance: '💰',
   gym: '🏋️',
   work: '💼',
+  academic: '📚',
+  goals: '🎯',
 };
 
 // Colores para cada módulo
@@ -33,6 +35,8 @@ const moduleColors: Record<string, { bg: string; border: string; text: string; g
   finance: { bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300', gradient: 'from-green-500 to-lime-600' },
   gym: { bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800', text: 'text-rose-700 dark:text-rose-300', gradient: 'from-rose-500 to-red-600' },
   work: { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300', gradient: 'from-slate-500 to-zinc-600' },
+  academic: { bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300', gradient: 'from-blue-500 to-sky-600' },
+  goals: { bg: 'bg-purple-50 dark:bg-purple-950/30', border: 'border-purple-200 dark:border-purple-800', text: 'text-purple-700 dark:text-purple-300', gradient: 'from-purple-500 to-fuchsia-600' },
 };
 
 export default function ModulesSettingsPage() {
@@ -313,6 +317,16 @@ export default function ModulesSettingsPage() {
           <ModuleOrderManager
             modules={modules.filter(m => m.active)}
             onClose={() => setShowOrderManager(false)}
+            onOrderSaved={(orderUpdates) => {
+              const orderMap = new Map(orderUpdates.map((item) => [item.id, item.order]));
+              setModules((prev) =>
+                [...prev].sort((a, b) => {
+                  const aOrder = orderMap.has(a.id) ? orderMap.get(a.id)! : a.order ?? 0;
+                  const bOrder = orderMap.has(b.id) ? orderMap.get(b.id)! : b.order ?? 0;
+                  return aOrder - bOrder;
+                })
+              );
+            }}
           />
         )}
       </div>

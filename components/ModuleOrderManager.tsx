@@ -92,9 +92,10 @@ function ModuleReorderItem({ item, isDragging, onDragStart, onDragEnd }: ModuleR
 type ModuleOrderManagerProps = {
   modules: Module[];
   onClose: () => void;
+  onOrderSaved?: (orderUpdates: Array<{ id: string; order: number }>) => void;
 };
 
-export default function ModuleOrderManager({ modules, onClose }: ModuleOrderManagerProps) {
+export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: ModuleOrderManagerProps) {
   const [orderedItems, setOrderedItems] = useState<ModuleOrderItem[]>([]);
   const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -161,6 +162,7 @@ export default function ModuleOrderManager({ modules, onClose }: ModuleOrderMana
 
       setMessage('✓ Orden guardado');
       setMessageType('success');
+      onOrderSaved?.(orderUpdates);
       onClose();
     } catch (error) {
       console.error('Error saving module order:', error);
