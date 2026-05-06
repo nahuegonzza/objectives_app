@@ -131,32 +131,28 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
+<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Sueño</p>
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para mejorar tu rendimiento.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                const lastNap = naps[naps.length - 1];
-                if (!lastNap || (lastNap.start && lastNap.end)) {
-                  setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
-                }
-              }}
-              disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
-              className="inline-flex items-center justify-center rounded-lg border border-emerald-500 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Agregar Siesta
-            </button>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Sueño</p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para mejorar tu rendimiento.</p>
           </div>
         </div>
         <div className="text-left sm:text-right shrink-0 mt-2 sm:mt-0">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Duración</p>
-          <p className="text-xl font-semibold text-slate-900 dark:text-white">{hours.toFixed(1)}h</p>
+          <button
+            type="button"
+            onClick={() => {
+              const lastNap = naps[naps.length - 1];
+              if (!lastNap || (lastNap.start && lastNap.end)) {
+                setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
+              }
+            }}
+            disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
+            className="inline-flex items-center justify-center rounded-lg border border-emerald-500 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Agregar Siesta
+          </button>
         </div>
       </div>
 
@@ -240,8 +236,11 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             {points >= 0 ? `+${points.toFixed(1)}` : points.toFixed(1)}
           </p>
         </div>
-        <div className="text-right text-sm text-slate-500 dark:text-slate-400">
-          Ideal: {(config.idealHours as number) || 8}h
+        <div className="text-right">
+          <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Duración</p>
+          <p className="text-2xl font-semibold text-slate-900 dark:text-white">
+            {hours.toFixed(1)}h / {(config.idealHours as number) || 8}h
+          </p>
         </div>
       </div>
     </div>

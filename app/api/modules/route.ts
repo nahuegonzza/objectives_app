@@ -25,6 +25,8 @@ export async function GET() {
     // Ensure Prisma user exists for the authenticated session
     await ensurePrismaUserForSession();
 
+    const validSlugs = moduleDefinitions.map((moduleDef) => moduleDef.slug);
+
     for (const moduleDef of moduleDefinitions) {
       await prisma.module.upsert({
         where: { userId_slug: { userId, slug: moduleDef.slug } },
@@ -43,6 +45,13 @@ export async function GET() {
         }
       });
     }
+
+    await prisma.module.deleteMany({
+      where: {
+        userId,
+        slug: { notIn: validSlugs }
+      }
+    });
 
     const modules = await prisma.module.findMany({
       where: { userId },
