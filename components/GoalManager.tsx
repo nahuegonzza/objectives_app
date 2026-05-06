@@ -13,9 +13,11 @@ type GoalReorderItemProps = {
   onEdit: (goal: Goal) => void;
   onDeactivate: (goalId: string) => void;
   onDragEnd: () => void;
+  onDragStart: (goalId: string) => void;
+  isDragging: boolean;
 };
 
-function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderItemProps) {
+function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd, onDragStart, isDragging }: GoalReorderItemProps) {
   const dragControls = useDragControls();
   const icon = getGoalIcon(goal.icon);
   const colorOption = getColorOption(goal.color);
@@ -24,14 +26,14 @@ function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderI
     <Reorder.Item
       key={goal.id}
       value={goal.id}
-      layout
-      layoutId={goal.id}
+      layout={isDragging ? undefined : true}
       dragListener={false}
       dragControls={dragControls}
-      dragTransition={{ bounceStiffness: 600, bounceDamping: 40 }}
+      dragMomentum={false}
+      dragTransition={{ bounceStiffness: 180, bounceDamping: 25, timeConstant: 20 }}
       whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
       onDragEnd={onDragEnd}
-      className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
+      className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3 min-w-0">
@@ -69,6 +71,7 @@ function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderI
             type="button"
             onPointerDown={(event) => {
               event.preventDefault();
+              onDragStart(goal.id);
               dragControls.start(event, { snapToCursor: true });
             }}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
@@ -99,6 +102,7 @@ export default function GoalManager() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showRgbPicker, setShowRgbPicker] = useState(false);
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
+  const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
   const habitGoalsRef = useRef<Goal[]>([]);
   const metricGoalsRef = useRef<Goal[]>([]);
 
@@ -345,13 +349,19 @@ export default function GoalManager() {
   }
 
   function handleHabitReorderEnd() {
+    setDraggingItemId(null);
     updateGoalsOrderState(habitGoalsRef.current);
     persistOrderedGoals(habitGoalsRef.current);
   }
 
   function handleMetricReorderEnd() {
+    setDraggingItemId(null);
     updateGoalsOrderState(metricGoalsRef.current);
     persistOrderedGoals(metricGoalsRef.current);
+  }
+
+  function handleDragStartItem(goalId: string) {
+    setDraggingItemId(goalId);
   }
 
   const sortedGoals = [...goals].sort((a, b) => {
@@ -478,6 +488,8 @@ export default function GoalManager() {
                         onEdit={handleEditGoal}
                         onDeactivate={handleDeactivateGoal}
                         onDragEnd={handleHabitReorderEnd}
+                        onDragStart={handleDragStartItem}
+                        isDragging={draggingItemId === goal.id}
                       />
                     ))}
                   </Reorder.Group>
@@ -497,6 +509,8 @@ export default function GoalManager() {
                         onEdit={handleEditGoal}
                         onDeactivate={handleDeactivateGoal}
                         onDragEnd={handleMetricReorderEnd}
+                        onDragStart={handleDragStartItem}
+                        isDragging={draggingItemId === goal.id}
                       />
                     ))}
                   </Reorder.Group>
