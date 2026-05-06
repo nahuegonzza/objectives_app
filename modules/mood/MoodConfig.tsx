@@ -2,6 +2,7 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Reorder, useDragControls } from 'framer-motion';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 
 interface MoodState {
@@ -36,6 +37,7 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [draggingStateId, setDraggingStateId] = useState<string | null>(null);
   const emojiButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const emojiOverlayRef = useRef<HTMLDivElement | null>(null);
   const [emojiOverlayStyle, setEmojiOverlayStyle] = useState<Record<string, number>>({});
@@ -50,6 +52,21 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     if (states.length <= 1) return;
     setError('');
     setStates(states.filter(s => s.id !== id));
+  };
+
+  const reorderStatesById = (nextIds: string[]) => {
+    return nextIds
+      .map((id) => states.find((state) => state.id === id))
+      .filter((state): state is MoodState => Boolean(state));
+  };
+
+  const handleStatesReorder = (nextIds: string[]) => {
+    const reorderedStates = reorderStatesById(nextIds);
+    setStates(reorderedStates);
+  };
+
+  const handleDragStartState = (id: string) => {
+    setDraggingStateId(id);
   };
 
   const hasEmptyState = states.some(state => !state.title.trim());
@@ -171,95 +188,121 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
         </p>
 
         <div className="space-y-3">
-          {states.map((state) => (
-            <div
-              key={state.id}
-              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-2 pr-3 dark:border-slate-700/50 dark:bg-slate-800/50"
-            >
-              {/* Emoji Picker Button (Unificado) */}
-              <div className="relative shrink-0">
-                <button
-                  type="button"
-                  ref={(el) => {
-                    emojiButtonRefs.current[state.id] = el;
-                  }}
-                  onClick={() => setEditingId(editingId === state.id ? null : state.id)}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg text-2xl transition-transform active:scale-90"
-                  style={{ backgroundColor: state.color + '20' }}
+          <Reorder.Group
+            axis="y"
+            values={states.map((state) => state.id)}
+            onReorder={handleStatesReorder}
+            className="space-y-3"
+          >
+            {states.map((state) => {
+              const dragControls = useDragControls();
+              return (
+                <Reorder.Item
+                  key={state.id}
+                  value={state.id}
+                  layout={draggingStateId === state.id ? undefined : true}
+                  dragListener={false}
+                  dragControls={dragControls}
+                  dragMomentum={false}
+                  dragTransition={{ bounceStiffness: 180, bounceDamping: 25, timeConstant: 20 }}
+                  whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
+                  onDragEnd={() => setDraggingStateId(null)}
+                  className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-2 pr-3 dark:border-slate-700/50 dark:bg-slate-800/50"
                 >
-                  {state.emoji}
-                </button>
-                
-                {editingId === state.id && typeof document !== 'undefined' && createPortal(
-                  <div
-                    ref={emojiOverlayRef}
-                    className="fixed z-50 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900"
-                    style={{
-                      top: emojiOverlayStyle.top,
-                      left: emojiOverlayStyle.left,
-                      width: emojiOverlayStyle.width,
-                    }}
-                  >
-                    <div className="grid grid-cols-6 gap-1">
-                      {availableEmojis.map((emoji) => (
-                        <button
-                          key={emoji}
-                          onClick={() => {
-                            handleUpdateState(state.id, 'emoji', emoji);
-                            setEditingId(null);
-                          }}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
-                  </div>,
-                  document.body
-                )}
-              </div>
+                  <div className="relative shrink-0">
+                    <button
+                      type="button"
+                      onPointerDown={(event) => {
+                        event.preventDefault();
+                        handleDragStartState(state.id);
+                        dragControls.start(event, { snapToCursor: true });
+                      }}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
+                      aria-label="Arrastrar estado"
+                    >
+                      <span className="text-lg">≡</span>
+                    </button>
+                  </div>
 
-              {/* Input de Título */}
-              <input
-                type="text"
-                value={state.title}
-                onChange={(e) => handleUpdateState(state.id, 'title', e.target.value)}
-                className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
-                placeholder="Nombre del estado..."
-              />
+                  <div className="relative shrink-0">
+                    <button
+                      type="button"
+                      ref={(el) => {
+                        emojiButtonRefs.current[state.id] = el;
+                      }}
+                      onClick={() => setEditingId(editingId === state.id ? null : state.id)}
+                      className="flex h-11 w-11 items-center justify-center rounded-lg text-2xl transition-transform active:scale-90"
+                      style={{ backgroundColor: state.color + '20' }}
+                    >
+                      {state.emoji}
+                    </button>
 
-              {/* Input de Puntos */}
-              <input
-                type="number"
-                value={state.points}
-                onChange={(e) => handleUpdateState(state.id, 'points', e.target.value)}
-                className="w-16 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200 border border-slate-300 rounded px-2"
-                placeholder="1"
-                min="-10"
-                max="10"
-              />
+                    {editingId === state.id && typeof document !== 'undefined' && createPortal(
+                      <div
+                        ref={emojiOverlayRef}
+                        className="fixed z-50 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                        style={{
+                          top: emojiOverlayStyle.top,
+                          left: emojiOverlayStyle.left,
+                          width: emojiOverlayStyle.width,
+                        }}
+                      >
+                        <div className="grid grid-cols-6 gap-1">
+                          {availableEmojis.map((emoji) => (
+                            <button
+                              key={emoji}
+                              onClick={() => {
+                                handleUpdateState(state.id, 'emoji', emoji);
+                                setEditingId(null);
+                              }}
+                              className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>,
+                      document.body
+                    )}
+                  </div>
 
-              {/* Acciones Derecha */}
-              <div className="flex items-center gap-2">
-                {/* Color Picker */}
-                <div className="min-w-[3rem]">
-                  <UnifiedColorPicker
-                    value={state.color}
-                    onChange={(color) => handleUpdateState(state.id, 'color', color)}
+                  <input
+                    type="text"
+                    value={state.title}
+                    onChange={(e) => handleUpdateState(state.id, 'title', e.target.value)}
+                    className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
+                    placeholder="Nombre del estado..."
                   />
-                </div>
 
-                {/* Botón Eliminar */}
-                <button
-                  type="button"
-                  onClick={() => handleDeleteState(state.id)}
-                  className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <TrashIcon />
-                </button>
-              </div>
-            </div>
-          ))}
+                  <input
+                    type="number"
+                    value={state.points}
+                    onChange={(e) => handleUpdateState(state.id, 'points', e.target.value)}
+                    className="w-16 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200 border border-slate-300 rounded px-2"
+                    placeholder="1"
+                    min="-10"
+                    max="10"
+                  />
+
+                  <div className="flex items-center gap-2">
+                    <div className="min-w-[3rem]">
+                      <UnifiedColorPicker
+                        value={state.color}
+                        onChange={(color) => handleUpdateState(state.id, 'color', color)}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteState(state.id)}
+                      className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                </Reorder.Item>
+              );
+            })}
+          </Reorder.Group>
         </div>
 
         <button
