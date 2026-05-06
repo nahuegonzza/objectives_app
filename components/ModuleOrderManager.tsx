@@ -107,17 +107,9 @@ export default function ModuleOrderManager({ modules, onClose }: ModuleOrderMana
     const items: ModuleOrderItem[] = modules.map((module) => ({
       id: module.id,
       slug: module.slug,
-      name: module.name,
-      isGoalsPlaceholder: false,
+      name: module.slug === 'goals' ? `${module.name} (Objetivos y Métricas)` : module.name,
+      isGoalsPlaceholder: module.slug === 'goals',
     }));
-
-    // Add a placeholder for Goals at the end
-    items.push({
-      id: '__goals_placeholder__',
-      slug: 'goals',
-      name: 'Objetivos',
-      isGoalsPlaceholder: true,
-    });
 
     setOrderedItems(items);
     orderedItemsRef.current = items;
@@ -145,19 +137,16 @@ export default function ModuleOrderManager({ modules, onClose }: ModuleOrderMana
 
   function handleDragEnd() {
     setDraggingItemId(null);
-    persistOrderedModules();
   }
 
   async function persistOrderedModules() {
     setSaving(true);
     try {
-      // Build payload with order information
       const orderUpdates = orderedItemsRef.current
         .map((item, index) => ({
           id: item.id,
           order: index,
-        }))
-        .filter(item => item.id !== '__goals_placeholder__'); // Don't save the placeholder
+        }));
 
       const res = await fetch('/api/modules', {
         method: 'PUT',
@@ -172,6 +161,7 @@ export default function ModuleOrderManager({ modules, onClose }: ModuleOrderMana
 
       setMessage('✓ Orden guardado');
       setMessageType('success');
+      onClose();
     } catch (error) {
       console.error('Error saving module order:', error);
       setMessage('Error al guardar el orden');
