@@ -48,7 +48,7 @@ export async function GET() {
 
     const modules = await prisma.module.findMany({
       where: { userId },
-      orderBy: { name: 'asc' }
+      orderBy: [{ order: 'asc' }, { name: 'asc' }]
     });
 
     const mapped = modules.map((module) => ({
@@ -117,6 +117,52 @@ export async function PATCH(request: Request) {
     });
   } catch (error) {
     console.error('Error in /api/modules PATCH:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const { user } = await getServerSupabaseUser();
+
+    let userId: string | undefined;
+    if (user?.id) {
+      userId = user.id;
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Ensure Prisma user exists
+    if (user) {
+      await ensurePrismaUserForSession();
+    }
+
+    const payload = await request.json() as { modules: Array<{ id: string; order: number }> };
+
+    if (!Array.isArray(payload.modules)) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    // Update order for each module
+    const updatePromises = payload.modules.map((moduleUpdate) =>
+      prisma.module.update({
+        where: { id: moduleUpdate.id },
+        data: { order: moduleUpdate.order },
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error in /api/modules PUT:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

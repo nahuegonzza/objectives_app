@@ -123,6 +123,7 @@ model Module {
   slug        String
   description String?
   active      Boolean  @default(true)
+  order       Int?     @default(0)
   config      String   @default("{}")
   createdAt   DateTime @default(now())
   events      Event[]

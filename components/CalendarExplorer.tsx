@@ -72,8 +72,9 @@ export default function CalendarExplorer() {
   const isEditingDay = editingGoalId === selectedDate;
 
   const orderedModules = useMemo(() => {
-    const orderMap: Record<string, number> = { mood: 0, sleep: 1, academic: 4 };
-    return [...activeModules].sort((a, b) => (orderMap[a.slug] ?? 2) - (orderMap[b.slug] ?? 2));
+    // Sort modules by the 'order' field from the database
+    // Modules without an order field default to a high number (at the end)
+    return [...activeModules].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   }, [activeModules]);
 
   const moodModule = orderedModules.find((m) => m.slug === 'mood');

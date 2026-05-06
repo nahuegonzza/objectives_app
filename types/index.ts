@@ -140,6 +140,7 @@ export interface ModuleState {
   name: string;
   description?: string | null;
   active: boolean;
+  order?: number | null;
   config: Record<string, unknown>;
   createdAt: string;
 }

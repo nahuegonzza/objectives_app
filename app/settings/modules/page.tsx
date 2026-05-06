@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Navigation from '@components/Navigation';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
+import ModuleOrderManager from '@components/ModuleOrderManager';
 import type { Module } from '@types';
 import { SleepConfig } from '../../../modules/sleep/SleepConfig';
 import { MoodConfig } from '../../../modules/mood/MoodConfig';
@@ -43,6 +44,7 @@ export default function ModulesSettingsPage() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [showToast, setShowToast] = useState(false);
+  const [showOrderManager, setShowOrderManager] = useState(false);
 
   useEffect(() => {
     if (!showToast) return;
@@ -151,6 +153,12 @@ export default function ModulesSettingsPage() {
             <h1 className="text-4xl font-bold tracking-tight">Módulos</h1>
             <p className="mt-2 text-slate-600 dark:text-slate-400">Personaliza tu experiencia</p>
           </div>
+          <button
+            onClick={() => setShowOrderManager(true)}
+            className="rounded-lg bg-emerald-600 text-white px-4 py-2 font-medium hover:bg-emerald-700 transition"
+          >
+            🔀 Ordenar módulos
+          </button>
         </div>
 
         {showToast && (
@@ -296,6 +304,14 @@ export default function ModulesSettingsPage() {
             <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">No hay módulos</h3>
             <p className="mt-2 text-slate-600 dark:text-slate-400">No se encontraron módulos disponibles</p>
           </div>
+        )}
+
+        {/* Module Order Manager Modal */}
+        {showOrderManager && (
+          <ModuleOrderManager
+            modules={modules.filter(m => m.active)}
+            onClose={() => setShowOrderManager(false)}
+          />
         )}
       </div>
 
