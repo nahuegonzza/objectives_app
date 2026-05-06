@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { DragEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Reorder, useDragControls } from 'framer-motion';
 import type { Goal } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/goalIconsColors';
 import GoalCreateModal from './GoalCreateModal';
@@ -10,14 +10,13 @@ import { GoalEditModal } from '@components/GoalEditModal';
 
 export default function GoalManager() {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [habitGoals, setHabitGoals] = useState<Goal[]>([]);
+  const [metricGoals, setMetricGoals] = useState<Goal[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [loading, setLoading] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [draggedGoalId, setDraggedGoalId] = useState<string | null>(null);
-  const [dragOverGoalId, setDragOverGoalId] = useState<string | null>(null);
-  const [dragOverPosition, setDragOverPosition] = useState<'before' | 'after' | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [editForm, setEditForm] = useState<Partial<Goal>>({});
@@ -26,6 +25,10 @@ export default function GoalManager() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showRgbPicker, setShowRgbPicker] = useState(false);
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
+  const habitGoalsRef = useRef<Goal[]>([]);
+  const metricGoalsRef = useRef<Goal[]>([]);
+  const habitDragControls = useDragControls();
+  const metricDragControls = useDragControls();
 
   useEffect(() => {
     loadGoals();
@@ -42,6 +45,23 @@ export default function GoalManager() {
     }
     return undefined;
   }, [statusMessage]);
+
+  const sortGoalsByOrder = (items: Goal[]) => [...items].sort((a, b) => {
+    const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+    const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
+  });
+
+  useEffect(() => {
+    const activeGoals = goals.filter((goal) => goal.isActive !== false);
+    const sortedHabitGoals = sortGoalsByOrder(activeGoals.filter((goal) => goal.type === 'BOOLEAN'));
+    const sortedMetricGoals = sortGoalsByOrder(activeGoals.filter((goal) => goal.type === 'NUMERIC'));
+
+    setHabitGoals(sortedHabitGoals);
+    setMetricGoals(sortedMetricGoals);
+    habitGoalsRef.current = sortedHabitGoals;
+    metricGoalsRef.current = sortedMetricGoals;
+  }, [goals]);
 
   async function loadGoals() {
     setLoading(true);
@@ -193,29 +213,6 @@ export default function GoalManager() {
 
   const activeGoals = goals.filter((goal) => goal.isActive !== false);
 
-  const booleanGoals = activeGoals.filter((goal) => goal.type === 'BOOLEAN');
-  const numericGoals = activeGoals.filter((goal) => goal.type === 'NUMERIC');
-
-  const getOrderedBooleanGoals = () => {
-    return [...booleanGoals].sort((a, b) => {
-      const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
-      const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
-      return orderA - orderB;
-    });
-  };
-
-  const getOrderedNumericGoals = () => {
-    return [...numericGoals].sort((a, b) => {
-      const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
-      const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
-      return orderA - orderB;
-    });
-  };
-
-  const getCombinedOrderedGoals = () => {
-    return [...getOrderedBooleanGoals(), ...getOrderedNumericGoals()];
-  };
-
   async function persistOrderedGoals(orderedGoals: Goal[]) {
     try {
       const responses = await Promise.all(
@@ -242,111 +239,26 @@ export default function GoalManager() {
       setStatusMessage(error instanceof Error ? `Error actualizando orden: ${error.message}` : 'Error actualizando orden');
       setStatusType('error');
     } finally {
-      setDraggedGoalId(null);
-      setDragOverGoalId(null);
       loadGoals();
     }
   }
 
-  function getOrderedActiveGoals() {
-    return getCombinedOrderedGoals();
+  function handleHabitReorder(nextGoals: Goal[]) {
+    setHabitGoals(nextGoals);
+    habitGoalsRef.current = nextGoals;
   }
 
-  function getVisuallyOrderedGoals() {
-    if (!draggedGoalId || !dragOverGoalId || draggedGoalId === dragOverGoalId) {
-      return getOrderedActiveGoals();
-    }
-
-    const orderedGoals = getOrderedActiveGoals();
-    const draggedIndex = orderedGoals.findIndex((goal) => goal.id === draggedGoalId);
-    const targetIndex = orderedGoals.findIndex((goal) => goal.id === dragOverGoalId);
-
-    if (draggedIndex === -1 || targetIndex === -1) {
-      return orderedGoals;
-    }
-
-    if (draggedIndex === targetIndex) {
-      return orderedGoals;
-    }
-
-    const nextGoals = [...orderedGoals];
-    const [movedGoal] = nextGoals.splice(draggedIndex, 1);
-    const finalIndex = draggedIndex < targetIndex 
-      ? (dragOverPosition === 'before' ? targetIndex - 1 : targetIndex)
-      : (dragOverPosition === 'before' ? targetIndex : targetIndex + 1);
-    nextGoals.splice(finalIndex, 0, movedGoal);
-
-    return nextGoals;
+  function handleMetricReorder(nextGoals: Goal[]) {
+    setMetricGoals(nextGoals);
+    metricGoalsRef.current = nextGoals;
   }
 
-  function handleDragStart(event: DragEvent<HTMLDivElement>, goalId: string) {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', goalId);
-    setDraggedGoalId(goalId);
+  function handleHabitReorderEnd() {
+    persistOrderedGoals(habitGoalsRef.current);
   }
 
-  function handleDragOver(event: DragEvent<HTMLDivElement>, goalId: string) {
-    event.preventDefault();
-    
-    const rect = event.currentTarget.getBoundingClientRect();
-    const midpoint = rect.top + rect.height / 2;
-    const position = event.clientY < midpoint ? 'before' : 'after';
-    
-    if (goalId !== dragOverGoalId || dragOverPosition !== position) {
-      setDragOverGoalId(goalId);
-      setDragOverPosition(position);
-    }
-  }
-
-  function handleDragLeave(goalId: string) {
-    if (dragOverGoalId === goalId) {
-      setDragOverGoalId(null);
-      setDragOverPosition(null);
-    }
-  }
-
-  async function handleDrop(event: DragEvent<HTMLDivElement>, goalId: string) {
-    event.preventDefault();
-    const draggedId = event.dataTransfer.getData('text/plain');
-    if (!draggedId) {
-      setDraggedGoalId(null);
-      setDragOverGoalId(null);
-      setDragOverPosition(null);
-      return;
-    }
-
-    const orderedGoals = getOrderedActiveGoals();
-    const draggedIndex = orderedGoals.findIndex((goal) => goal.id === draggedId);
-    const targetIndex = orderedGoals.findIndex((goal) => goal.id === goalId);
-    
-    if (draggedIndex === -1 || targetIndex === -1) {
-      setDraggedGoalId(null);
-      setDragOverGoalId(null);
-      setDragOverPosition(null);
-      return;
-    }
-
-    if (draggedIndex === targetIndex) {
-      setDraggedGoalId(null);
-      setDragOverGoalId(null);
-      setDragOverPosition(null);
-      return;
-    }
-
-    const nextGoals = [...orderedGoals];
-    const [movedGoal] = nextGoals.splice(draggedIndex, 1);
-    const finalIndex = draggedIndex < targetIndex 
-      ? (dragOverPosition === 'before' ? targetIndex - 1 : targetIndex)
-      : (dragOverPosition === 'before' ? targetIndex : targetIndex + 1);
-    nextGoals.splice(finalIndex, 0, movedGoal);
-
-    await persistOrderedGoals(nextGoals);
-  }
-
-  function handleDragEnd() {
-    setDraggedGoalId(null);
-    setDragOverGoalId(null);
-    setDragOverPosition(null);
+  function handleMetricReorderEnd() {
+    persistOrderedGoals(metricGoalsRef.current);
   }
 
   const sortedGoals = [...goals].sort((a, b) => {
@@ -461,123 +373,145 @@ export default function GoalManager() {
           <p className="text-slate-500 dark:text-slate-400">No hay objetivos creados aún.</p>
         ) : (
           <>
-            {getOrderedBooleanGoals().length > 0 && (
+            {habitGoals.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Hábitos</h3>
-                {getOrderedBooleanGoals().map((goal) => {
-                  const icon = getGoalIcon(goal.icon);
-                  const colorOption = getColorOption(goal.color);
-                  return (
-                    <div 
-                      key={goal.id}
-                      draggable
-                      onDragStart={(event) => handleDragStart(event, goal.id)}
-                      onDragOver={(event) => handleDragOver(event, goal.id)}
-                      onDragEnter={(event) => handleDragOver(event, goal.id)}
-                      onDragLeave={() => handleDragLeave(goal.id)}
-                      onDrop={(event) => handleDrop(event, goal.id)}
-                      onDragEnd={handleDragEnd}
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all duration-200"
-                    >
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="relative">
-                            <span className="text-3xl">{icon}</span>
-                            <div 
-                              className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
-                              style={{
-                                backgroundColor: colorOption?.bgColor || '#9ca3af',
-                              }}
-                              title={goal.color}
-                            />
+                <div className="overflow-y-auto rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2 max-h-[54vh]">
+                  <Reorder.Group axis="y" values={habitGoals} onReorder={handleHabitReorder} className="space-y-3">
+                    {habitGoals.map((goal) => {
+                      const icon = getGoalIcon(goal.icon);
+                      const colorOption = getColorOption(goal.color);
+                      return (
+                        <Reorder.Item
+                          key={goal.id}
+                          value={goal}
+                          id={goal.id}
+                          dragListener={false}
+                          dragControls={habitDragControls}
+                          layout
+                          layoutScroll
+                          whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
+                          onDragEnd={handleHabitReorderEnd}
+                          className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
+                        >
+                          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="relative">
+                                <span className="text-3xl">{icon}</span>
+                                <div
+                                  className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
+                                  style={{ backgroundColor: colorOption?.bgColor || '#9ca3af' }}
+                                  title={goal.color}
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <button
+                                type="button"
+                                onPointerDown={(event) => habitDragControls.start(event)}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
+                                aria-label="Arrastrar objetivo"
+                              >
+                                <span className="text-lg">≡</span>
+                              </button>
+                              <button
+                                title="Editar"
+                                type="button"
+                                onClick={() => handleEditGoal(goal)}
+                                className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                title="Desactivar"
+                                type="button"
+                                onClick={() => handleDeactivateGoal(goal.id)}
+                                className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
+                              >
+                                ⛔
+                              </button>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            title="Editar"
-                            type="button"
-                            onClick={() => handleEditGoal(goal)}
-                            className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            title="Desactivar"
-                            type="button"
-                            onClick={() => handleDeactivateGoal(goal.id)}
-                            className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
-                          >
-                            ⛔
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                        </Reorder.Item>
+                      );
+                    })}
+                  </Reorder.Group>
+                </div>
               </div>
             )}
 
-            {getOrderedNumericGoals().length > 0 && (
+            {metricGoals.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Métricas</h3>
-                {getOrderedNumericGoals().map((goal) => {
-                  const icon = getGoalIcon(goal.icon);
-                  const colorOption = getColorOption(goal.color);
-                  return (
-                    <div 
-                      key={goal.id}
-                      draggable
-                      onDragStart={(event) => handleDragStart(event, goal.id)}
-                      onDragOver={(event) => handleDragOver(event, goal.id)}
-                      onDragEnter={(event) => handleDragOver(event, goal.id)}
-                      onDragLeave={() => handleDragLeave(goal.id)}
-                      onDrop={(event) => handleDrop(event, goal.id)}
-                      onDragEnd={handleDragEnd}
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition-all duration-200"
-                    >
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="relative">
-                            <span className="text-3xl">{icon}</span>
-                            <div 
-                              className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
-                              style={{
-                                backgroundColor: colorOption?.bgColor || '#9ca3af',
-                              }}
-                              title={goal.color}
-                            />
+                <div className="overflow-y-auto rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2 max-h-[54vh]">
+                  <Reorder.Group axis="y" values={metricGoals} onReorder={handleMetricReorder} className="space-y-3">
+                    {metricGoals.map((goal) => {
+                      const icon = getGoalIcon(goal.icon);
+                      const colorOption = getColorOption(goal.color);
+                      return (
+                        <Reorder.Item
+                          key={goal.id}
+                          value={goal}
+                          id={goal.id}
+                          dragListener={false}
+                          dragControls={metricDragControls}
+                          layout
+                          layoutScroll
+                          whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
+                          onDragEnd={handleMetricReorderEnd}
+                          className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
+                        >
+                          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="relative">
+                                <span className="text-3xl">{icon}</span>
+                                <div
+                                  className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
+                                  style={{ backgroundColor: colorOption?.bgColor || '#9ca3af' }}
+                                  title={goal.color}
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <button
+                                type="button"
+                                onPointerDown={(event) => metricDragControls.start(event)}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
+                                aria-label="Arrastrar objetivo"
+                              >
+                                <span className="text-lg">≡</span>
+                              </button>
+                              <button
+                                title="Editar"
+                                type="button"
+                                onClick={() => handleEditGoal(goal)}
+                                className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                title="Desactivar"
+                                type="button"
+                                onClick={() => handleDeactivateGoal(goal.id)}
+                                className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
+                              >
+                                ⛔
+                              </button>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            title="Editar"
-                            type="button"
-                            onClick={() => handleEditGoal(goal)}
-                            className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            title="Desactivar"
-                            type="button"
-                            onClick={() => handleDeactivateGoal(goal.id)}
-                            className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
-                          >
-                            ⛔
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                        </Reorder.Item>
+                      );
+                    })}
+                  </Reorder.Group>
+                </div>
               </div>
             )}
           </>
