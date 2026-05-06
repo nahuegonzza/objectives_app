@@ -223,13 +223,15 @@ export default function ModulesSettingsPage() {
                       </p>
 
                       <div className="mt-4 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleModule(module.id, false)}
-                          className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 transition"
-                        >
-                          Desactivar
-                        </button>
+                        {module.slug !== 'goals' && (
+                          <button
+                            type="button"
+                            onClick={() => handleToggleModule(module.id, false)}
+                            className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 transition"
+                          >
+                            Desactivar
+                          </button>
+                        )}
                         {(module.slug === 'sleep' || module.slug === 'mood' || module.slug === 'academic') && (
                           <button
                             type="button"

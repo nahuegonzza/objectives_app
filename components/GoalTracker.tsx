@@ -493,104 +493,111 @@ export default function GoalTracker() {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="space-y-4">
+          <div className="space-y-4">
           {orderedModules.map((module) => {
-            const Component = module.definition?.Component;
-            if (!Component) return null;
+            if (module.slug === 'goals') {
+              // Renderizar los goals aquí
+              return (
+                <div key={module.id} className="space-y-2">
+                  {goals.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-slate-500 dark:text-slate-400">
+                        No hay objetivos. Crea algunos en{' '}
+                        <a href="/goals" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                          Objetivos
+                        </a>
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {booleanGoals.length > 0 && (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => setHabitsCollapsed(!habitsCollapsed)}
+                            className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                          >
+                            <span className={`transform transition-transform ${habitsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                            Hábitos
+                          </button>
+                          {!habitsCollapsed && (
+                            <div className="space-y-2">
+                              {booleanGoals.map((goal) => (
+                                <CompactGoalItem
+                                  key={goal.id}
+                                  goal={goal}
+                                  entry={goalEntriesMap.get(goal.id)}
+                                  isLoading={savingGoalId === goal.id}
+                                  onChange={handleSaveEntry}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
-            const isCollapsed = moduleCollapseStates[module.slug] ?? false;
+                      {numericGoals.length > 0 && (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => setMetricsCollapsed(!metricsCollapsed)}
+                            className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                          >
+                            <span className={`transform transition-transform ${metricsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                            Métricas
+                          </button>
+                          {!metricsCollapsed && (
+                            <div className="space-y-2">
+                              {numericGoals.map((goal) => (
+                                <CompactGoalItem
+                                  key={goal.id}
+                                  goal={goal}
+                                  entry={goalEntriesMap.get(goal.id)}
+                                  isLoading={savingGoalId === goal.id}
+                                  onChange={handleSaveEntry}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            } else {
+              const Component = module.definition?.Component;
+              if (!Component) return null;
 
-            return (
-              <div key={module.id} className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => toggleModuleCollapse(module.slug)}
-                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                >
-                  <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                  {module.name}
-                </button>
-                {!isCollapsed && (
-                  <Component
-                    config={module.config}
-                    module={module}
-                    isEditing={true}
-                    onUpdate={() => {
-                      loadModuleEntries();
-                      markTodayStreak();
-                    }}
-                    date={selectedDate}
-                  />
-                )}
-              </div>
-            );
+              const isCollapsed = moduleCollapseStates[module.slug] ?? false;
+
+              return (
+                <div key={module.id} className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleModuleCollapse(module.slug)}
+                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                  >
+                    <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    {module.name}
+                  </button>
+                  {!isCollapsed && (
+                    <Component
+                      config={module.config}
+                      module={module}
+                      isEditing={true}
+                      onUpdate={() => {
+                        loadModuleEntries();
+                        markTodayStreak();
+                      }}
+                      date={selectedDate}
+                    />
+                  )}
+                </div>
+              );
+            }
           })}
         </div>
-
-            {goals.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-slate-500 dark:text-slate-400">
-                  No hay objetivos. Crea algunos en{' '}
-                  <a href="/goals" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
-                    Objetivos
-                  </a>
-                </p>
-              </div>
-            ) : (
-              <>
-                {booleanGoals.length > 0 && (
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setHabitsCollapsed(!habitsCollapsed)}
-                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                    >
-                      <span className={`transform transition-transform ${habitsCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                      Hábitos
-                    </button>
-                    {!habitsCollapsed && (
-                      <div className="space-y-2">
-                        {booleanGoals.map((goal) => (
-                          <CompactGoalItem
-                            key={goal.id}
-                            goal={goal}
-                            entry={goalEntriesMap.get(goal.id)}
-                            isLoading={savingGoalId === goal.id}
-                            onChange={handleSaveEntry}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {numericGoals.length > 0 && (
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setMetricsCollapsed(!metricsCollapsed)}
-                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                    >
-                      <span className={`transform transition-transform ${metricsCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                      Métricas
-                    </button>
-                    {!metricsCollapsed && (
-                      <div className="space-y-2">
-                        {numericGoals.map((goal) => (
-                          <CompactGoalItem
-                            key={goal.id}
-                            goal={goal}
-                            entry={goalEntriesMap.get(goal.id)}
-                            isLoading={savingGoalId === goal.id}
-                            onChange={handleSaveEntry}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
           </div>
         )}
 
