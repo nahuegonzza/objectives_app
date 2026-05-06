@@ -238,26 +238,47 @@ export default function GoalManager() {
       console.error('Error updating goal order:', error);
       setStatusMessage(error instanceof Error ? `Error actualizando orden: ${error.message}` : 'Error actualizando orden');
       setStatusType('error');
-    } finally {
-      loadGoals();
     }
   }
 
-  function handleHabitReorder(nextGoals: Goal[]) {
+  function reorderGoalsById(goalsList: Goal[], nextIds: string[]) {
+    return nextIds
+      .map((id) => goalsList.find((goal) => goal.id === id))
+      .filter((goal): goal is Goal => Boolean(goal));
+  }
+
+  function updateGoalsOrderState(reorderedGoals: Goal[]) {
+    setGoals((prevGoals) =>
+      prevGoals.map((goal) => {
+        const reordered = reorderedGoals.find((item) => item.id === goal.id);
+        if (!reordered) return goal;
+        return {
+          ...goal,
+          order: reorderedGoals.findIndex((item) => item.id === goal.id) + 1
+        };
+      })
+    );
+  }
+
+  function handleHabitReorder(nextIds: string[]) {
+    const nextGoals = reorderGoalsById(habitGoals, nextIds);
     setHabitGoals(nextGoals);
     habitGoalsRef.current = nextGoals;
   }
 
-  function handleMetricReorder(nextGoals: Goal[]) {
+  function handleMetricReorder(nextIds: string[]) {
+    const nextGoals = reorderGoalsById(metricGoals, nextIds);
     setMetricGoals(nextGoals);
     metricGoalsRef.current = nextGoals;
   }
 
   function handleHabitReorderEnd() {
+    updateGoalsOrderState(habitGoalsRef.current);
     persistOrderedGoals(habitGoalsRef.current);
   }
 
   function handleMetricReorderEnd() {
+    updateGoalsOrderState(metricGoalsRef.current);
     persistOrderedGoals(metricGoalsRef.current);
   }
 
@@ -376,20 +397,18 @@ export default function GoalManager() {
             {habitGoals.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Hábitos</h3>
-                <div className="overflow-y-auto rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2 max-h-[54vh]">
-                  <Reorder.Group axis="y" values={habitGoals} onReorder={handleHabitReorder} className="space-y-3">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2">
+                  <Reorder.Group axis="y" values={habitGoals.map((goal) => goal.id)} onReorder={handleHabitReorder} className="space-y-3">
                     {habitGoals.map((goal) => {
                       const icon = getGoalIcon(goal.icon);
                       const colorOption = getColorOption(goal.color);
                       return (
                         <Reorder.Item
                           key={goal.id}
-                          value={goal}
-                          id={goal.id}
+                          value={goal.id}
                           dragListener={false}
                           dragControls={habitDragControls}
                           layout
-                          layoutScroll
                           whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
                           onDragEnd={handleHabitReorderEnd}
                           className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
@@ -412,7 +431,10 @@ export default function GoalManager() {
                             <div className="flex items-center gap-2 flex-shrink-0">
                               <button
                                 type="button"
-                                onPointerDown={(event) => habitDragControls.start(event)}
+                                onPointerDown={(event) => {
+                                  event.preventDefault();
+                                  habitDragControls.start(event);
+                                }}
                                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
                                 aria-label="Arrastrar objetivo"
                               >
@@ -447,20 +469,18 @@ export default function GoalManager() {
             {metricGoals.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Métricas</h3>
-                <div className="overflow-y-auto rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2 max-h-[54vh]">
-                  <Reorder.Group axis="y" values={metricGoals} onReorder={handleMetricReorder} className="space-y-3">
+                <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2">
+                  <Reorder.Group axis="y" values={metricGoals.map((goal) => goal.id)} onReorder={handleMetricReorder} className="space-y-3">
                     {metricGoals.map((goal) => {
                       const icon = getGoalIcon(goal.icon);
                       const colorOption = getColorOption(goal.color);
                       return (
                         <Reorder.Item
                           key={goal.id}
-                          value={goal}
-                          id={goal.id}
+                          value={goal.id}
                           dragListener={false}
                           dragControls={metricDragControls}
                           layout
-                          layoutScroll
                           whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
                           onDragEnd={handleMetricReorderEnd}
                           className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
@@ -483,7 +503,10 @@ export default function GoalManager() {
                             <div className="flex items-center gap-2 flex-shrink-0">
                               <button
                                 type="button"
-                                onPointerDown={(event) => metricDragControls.start(event)}
+                                onPointerDown={(event) => {
+                                  event.preventDefault();
+                                  metricDragControls.start(event);
+                                }}
                                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
                                 aria-label="Arrastrar objetivo"
                               >
