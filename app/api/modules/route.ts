@@ -9,9 +9,8 @@ import { parseModuleConfig } from '@lib/modules';
 
 export async function GET() {
   try {
-    const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
+    const { user } = await getServerSupabaseUser();
 
-    // ❌ NO fallback a usuario por defecto
     let userId: string | undefined;
     if (user?.id) {
       userId = user.id;
@@ -23,10 +22,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Ensure Prisma user exists
-    if (user) {
-      await ensurePrismaUserForSession();
-    }
+    // Ensure Prisma user exists for the authenticated session
+    await ensurePrismaUserForSession();
 
     for (const moduleDef of moduleDefinitions) {
       await prisma.module.upsert({
@@ -36,7 +33,8 @@ export async function GET() {
           name: moduleDef.name,
           description: moduleDef.description,
           userId,
-          active: false,
+          active: true,
+          order: 0,
           config: JSON.stringify(moduleDef.defaultConfig || {})
         },
         update: {
@@ -150,7 +148,6 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
-    // Update order for each module
     const updatePromises = payload.modules.map((moduleUpdate) =>
       prisma.module.update({
         where: { id: moduleUpdate.id },
