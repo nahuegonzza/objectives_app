@@ -11,6 +11,7 @@ interface SleepConfigProps {
 export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClose }) => {
   const [idealHours, setIdealHours] = useState(config.idealHours as number || 8);
   const [maxPoints, setMaxPoints] = useState(config.maxPoints as number || 2);
+  const [toleranceMinutes, setToleranceMinutes] = useState(config.toleranceMinutes as number || 30);
   const [penaltyMode, setPenaltyMode] = useState(config.penaltyMode as string || 'automatic');
   const [penaltyPerHour, setPenaltyPerHour] = useState(config.penaltyPerHour as number || 1);
   const [saving, setSaving] = useState(false);
@@ -23,6 +24,7 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
       const success = await onSave({
         idealHours,
         maxPoints,
+        toleranceMinutes,
         penaltyMode,
         penaltyPerHour,
       });
@@ -119,6 +121,45 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
               </button>
               <span className="text-sm text-slate-500">puntos</span>
             </div>
+          </div>
+
+          {/* Minutos de tolerancia */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              Minutos de tolerancia
+            </label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setToleranceMinutes(Math.max(0, toleranceMinutes - 5))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                -
+              </button>
+              <span className="text-3xl font-bold text-slate-900 dark:text-white w-16 text-center">
+                {toleranceMinutes}
+              </span>
+              <button
+                type="button"
+                onClick={() => setToleranceMinutes(Math.min(120, toleranceMinutes + 5))}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                +
+              </button>
+              <span className="text-sm text-slate-500">minutos</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="120"
+              step="5"
+              value={toleranceMinutes}
+              onChange={(e) => setToleranceMinutes(Number(e.target.value))}
+              className="mt-3 w-full accent-indigo-500"
+            />
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              No se penaliza hasta este rango alrededor de tu hora ideal.
+            </p>
           </div>
 
           {/* Modo de penalización */}

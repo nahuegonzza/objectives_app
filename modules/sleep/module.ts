@@ -10,6 +10,7 @@ export const sleepModule: ModuleDefinition = {
   defaultConfig: {
     idealHours: 8,
     maxPoints: 2,
+    toleranceMinutes: 30,
     penaltyMode: 'automatic', // 'automatic' or 'manual'
     penaltyPerHour: 1, // for manual mode
   },
@@ -36,11 +37,14 @@ export const sleepModule: ModuleDefinition = {
 
     const idealHours = (config.idealHours as number) || 8;
     const maxPoints = (config.maxPoints as number) || 2;
+    const toleranceMinutes = (config.toleranceMinutes as number) ?? 30;
     const penaltyMode = (config.penaltyMode as string) || 'automatic';
     const penaltyPerHour = (config.penaltyPerHour as number) || 1;
 
     const diff = Math.abs(hours - idealHours);
-    const penalty = penaltyMode === 'automatic' ? diff : penaltyPerHour * diff;
+    const toleranceHours = toleranceMinutes / 60;
+    const adjustedDiff = Math.max(0, diff - toleranceHours);
+    const penalty = penaltyMode === 'automatic' ? adjustedDiff : penaltyPerHour * adjustedDiff;
 
     // Permitir puntos negativos
     return maxPoints - penalty;

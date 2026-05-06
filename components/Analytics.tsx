@@ -488,7 +488,6 @@ export default function Analytics() {
       {/* Data Table */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Datos diarios</h3>
           <button
             type="button"
             onClick={() => setDailyCollapsed(!dailyCollapsed)}
@@ -496,7 +495,7 @@ export default function Analytics() {
             className="inline-flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
           >
             <span className={`transform transition-transform ${dailyCollapsed ? '' : 'rotate-90'}`}>▶</span>
-            {dailyCollapsed ? 'Abrir' : 'Cerrar'}
+            Datos diarios
           </button>
         </div>
 
