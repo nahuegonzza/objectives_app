@@ -8,6 +8,78 @@ import GoalCreateModal from './GoalCreateModal';
 import NumberInput from '@components/NumberInput';
 import { GoalEditModal } from '@components/GoalEditModal';
 
+type GoalReorderItemProps = {
+  goal: Goal;
+  onEdit: (goal: Goal) => void;
+  onDeactivate: (goalId: string) => void;
+  onDragEnd: () => void;
+};
+
+function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderItemProps) {
+  const dragControls = useDragControls();
+  const icon = getGoalIcon(goal.icon);
+  const colorOption = getColorOption(goal.color);
+
+  return (
+    <Reorder.Item
+      key={goal.id}
+      value={goal.id}
+      dragListener={false}
+      dragControls={dragControls}
+      layout
+      whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
+      onDragEnd={onDragEnd}
+      className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
+    >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative">
+            <span className="text-3xl">{icon}</span>
+            <div
+              className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
+              style={{ backgroundColor: colorOption?.bgColor || '#9ca3af' }}
+              title={goal.color}
+            />
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            type="button"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              dragControls.start(event, { snapToCursor: true });
+            }}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
+            aria-label="Arrastrar objetivo"
+          >
+            <span className="text-lg">≡</span>
+          </button>
+          <button
+            title="Editar"
+            type="button"
+            onClick={() => onEdit(goal)}
+            className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+          >
+            ✏️
+          </button>
+          <button
+            title="Desactivar"
+            type="button"
+            onClick={() => onDeactivate(goal.id)}
+            className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
+          >
+            ⛔
+          </button>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export default function GoalManager() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [habitGoals, setHabitGoals] = useState<Goal[]>([]);
@@ -27,8 +99,6 @@ export default function GoalManager() {
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
   const habitGoalsRef = useRef<Goal[]>([]);
   const metricGoalsRef = useRef<Goal[]>([]);
-  const habitDragControls = useDragControls();
-  const metricDragControls = useDragControls();
 
   useEffect(() => {
     loadGoals();
@@ -399,68 +469,15 @@ export default function GoalManager() {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Hábitos</h3>
                 <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2">
                   <Reorder.Group axis="y" values={habitGoals.map((goal) => goal.id)} onReorder={handleHabitReorder} className="space-y-3">
-                    {habitGoals.map((goal) => {
-                      const icon = getGoalIcon(goal.icon);
-                      const colorOption = getColorOption(goal.color);
-                      return (
-                        <Reorder.Item
-                          key={goal.id}
-                          value={goal.id}
-                          dragListener={false}
-                          dragControls={habitDragControls}
-                          layout
-                          whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
-                          onDragEnd={handleHabitReorderEnd}
-                          className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
-                        >
-                          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="relative">
-                                <span className="text-3xl">{icon}</span>
-                                <div
-                                  className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
-                                  style={{ backgroundColor: colorOption?.bgColor || '#9ca3af' }}
-                                  title={goal.color}
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <button
-                                type="button"
-                                onPointerDown={(event) => {
-                                  event.preventDefault();
-                                  habitDragControls.start(event);
-                                }}
-                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
-                                aria-label="Arrastrar objetivo"
-                              >
-                                <span className="text-lg">≡</span>
-                              </button>
-                              <button
-                                title="Editar"
-                                type="button"
-                                onClick={() => handleEditGoal(goal)}
-                                className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                              >
-                                ✏️
-                              </button>
-                              <button
-                                title="Desactivar"
-                                type="button"
-                                onClick={() => handleDeactivateGoal(goal.id)}
-                                className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
-                              >
-                                ⛔
-                              </button>
-                            </div>
-                          </div>
-                        </Reorder.Item>
-                      );
-                    })}
+                    {habitGoals.map((goal) => (
+                      <GoalReorderItem
+                        key={goal.id}
+                        goal={goal}
+                        onEdit={handleEditGoal}
+                        onDeactivate={handleDeactivateGoal}
+                        onDragEnd={handleHabitReorderEnd}
+                      />
+                    ))}
                   </Reorder.Group>
                 </div>
               </div>
@@ -471,68 +488,15 @@ export default function GoalManager() {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Métricas</h3>
                 <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2">
                   <Reorder.Group axis="y" values={metricGoals.map((goal) => goal.id)} onReorder={handleMetricReorder} className="space-y-3">
-                    {metricGoals.map((goal) => {
-                      const icon = getGoalIcon(goal.icon);
-                      const colorOption = getColorOption(goal.color);
-                      return (
-                        <Reorder.Item
-                          key={goal.id}
-                          value={goal.id}
-                          dragListener={false}
-                          dragControls={metricDragControls}
-                          layout
-                          whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
-                          onDragEnd={handleMetricReorderEnd}
-                          className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
-                        >
-                          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="relative">
-                                <span className="text-3xl">{icon}</span>
-                                <div
-                                  className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900"
-                                  style={{ backgroundColor: colorOption?.bgColor || '#9ca3af' }}
-                                  title={goal.color}
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="font-semibold text-slate-900 dark:text-white truncate">{goal.title}</h3>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{goal.description ?? 'Sin descripción'}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <button
-                                type="button"
-                                onPointerDown={(event) => {
-                                  event.preventDefault();
-                                  metricDragControls.start(event);
-                                }}
-                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900"
-                                aria-label="Arrastrar objetivo"
-                              >
-                                <span className="text-lg">≡</span>
-                              </button>
-                              <button
-                                title="Editar"
-                                type="button"
-                                onClick={() => handleEditGoal(goal)}
-                                className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
-                              >
-                                ✏️
-                              </button>
-                              <button
-                                title="Desactivar"
-                                type="button"
-                                onClick={() => handleDeactivateGoal(goal.id)}
-                                className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
-                              >
-                                ⛔
-                              </button>
-                            </div>
-                          </div>
-                        </Reorder.Item>
-                      );
-                    })}
+                    {metricGoals.map((goal) => (
+                      <GoalReorderItem
+                        key={goal.id}
+                        goal={goal}
+                        onEdit={handleEditGoal}
+                        onDeactivate={handleDeactivateGoal}
+                        onDragEnd={handleMetricReorderEnd}
+                      />
+                    ))}
                   </Reorder.Group>
                 </div>
               </div>
