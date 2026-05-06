@@ -2,15 +2,25 @@
 
 import React from 'react';
 
+interface SleepNap {
+  start?: string;
+  end?: string;
+}
+
 interface SleepHistoryProps {
   date: string;
-  data: any; // Adjust based on actual data structure
+  data: {
+    bedtime?: string;
+    waketime?: string;
+    naps?: SleepNap[];
+    hours?: number;
+  };
 }
 
 export const SleepHistory: React.FC<SleepHistoryProps> = ({ date, data }) => {
   const bedtime = data?.bedtime || '';
   const waketime = data?.waketime || '';
-  const naps = Array.isArray(data?.naps) ? data.naps : [];
+  const naps: SleepNap[] = Array.isArray(data?.naps) ? data.naps : [];
 
   const totalHours = (() => {
     let total = Number(data?.hours || 0);
