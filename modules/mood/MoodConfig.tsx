@@ -30,6 +30,142 @@ const defaultStates: MoodState[] = [
 
 const availableEmojis = ['😊', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '😉', '😌', '😍', '🥰', '😘', '😎', '🤩', '😇', '🤗', '🤔', '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐', '😯', '😪', '😫', '🥱', '😴', '😌', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'];
 
+type MoodStateReorderItemProps = {
+  state: MoodState;
+  isDragging: boolean;
+  onDragStart: (id: string) => void;
+  onDragEnd: () => void;
+  onToggleEmojiEditor: (id: string) => void;
+  onUpdateState: (id: string, field: keyof MoodState, value: string) => void;
+  onDeleteState: (id: string) => void;
+  editingId: string | null;
+  emojiButtonRefs: React.MutableRefObject<Record<string, HTMLButtonElement | null>>;
+  emojiOverlayStyle: Record<string, number>;
+  emojiOverlayRef: React.RefObject<HTMLDivElement>;
+};
+
+function MoodStateReorderItem({
+  state,
+  isDragging,
+  onDragStart,
+  onDragEnd,
+  onToggleEmojiEditor,
+  onUpdateState,
+  onDeleteState,
+  editingId,
+  emojiButtonRefs,
+  emojiOverlayStyle,
+  emojiOverlayRef,
+}: MoodStateReorderItemProps) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      key={state.id}
+      value={state.id}
+      layout={isDragging ? undefined : true}
+      dragListener={false}
+      dragControls={dragControls}
+      dragMomentum={false}
+      dragTransition={{ bounceStiffness: 180, bounceDamping: 25, timeConstant: 20 }}
+      whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
+      onDragEnd={onDragEnd}
+      className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-2 pr-3 dark:border-slate-700/50 dark:bg-slate-800/50"
+    >
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            onDragStart(state.id);
+            dragControls.start(event, { snapToCursor: true });
+          }}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
+          aria-label="Arrastrar estado"
+        >
+          <span className="text-lg">≡</span>
+        </button>
+      </div>
+
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          ref={(el) => {
+            emojiButtonRefs.current[state.id] = el;
+          }}
+          onClick={() => onToggleEmojiEditor(state.id)}
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-2xl transition-transform active:scale-90"
+          style={{ backgroundColor: state.color + '20' }}
+        >
+          {state.emoji}
+        </button>
+
+        {editingId === state.id && typeof document !== 'undefined' && createPortal(
+          <div
+            ref={emojiOverlayRef}
+            className="fixed z-50 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            style={{
+              top: emojiOverlayStyle.top,
+              left: emojiOverlayStyle.left,
+              width: emojiOverlayStyle.width,
+            }}
+          >
+            <div className="grid grid-cols-6 gap-1">
+              {availableEmojis.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => {
+                    onUpdateState(state.id, 'emoji', emoji);
+                    onToggleEmojiEditor(state.id);
+                  }}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>,
+          document.body
+        )}
+      </div>
+
+      <input
+        type="text"
+        value={state.title}
+        onChange={(e) => onUpdateState(state.id, 'title', e.target.value)}
+        className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
+        placeholder="Nombre del estado..."
+      />
+
+      <input
+        type="number"
+        value={state.points}
+        onChange={(e) => onUpdateState(state.id, 'points', e.target.value)}
+        className="w-16 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200 border border-slate-300 rounded px-2"
+        placeholder="1"
+        min="-10"
+        max="10"
+      />
+
+      <div className="flex items-center gap-2">
+        <div className="min-w-[3rem]">
+          <UnifiedColorPicker
+            value={state.color}
+            onChange={(color) => onUpdateState(state.id, 'color', color)}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => onDeleteState(state.id)}
+          className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+        >
+          <TrashIcon />
+        </button>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose }) => {
   const [states, setStates] = useState<MoodState[]>(
     (config.states as MoodState[]) || defaultStates
@@ -168,142 +304,6 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
       setSaving(false);
     }
   };
-
-  type MoodStateReorderItemProps = {
-    state: MoodState;
-    isDragging: boolean;
-    onDragStart: (id: string) => void;
-    onDragEnd: () => void;
-    onToggleEmojiEditor: (id: string) => void;
-    onUpdateState: (id: string, field: keyof MoodState, value: string) => void;
-    onDeleteState: (id: string) => void;
-    editingId: string | null;
-    emojiButtonRefs: React.MutableRefObject<Record<string, HTMLButtonElement | null>>;
-    emojiOverlayStyle: Record<string, number>;
-    emojiOverlayRef: React.RefObject<HTMLDivElement>;
-  };
-
-  function MoodStateReorderItem({
-    state,
-    isDragging,
-    onDragStart,
-    onDragEnd,
-    onToggleEmojiEditor,
-    onUpdateState,
-    onDeleteState,
-    editingId,
-    emojiButtonRefs,
-    emojiOverlayStyle,
-    emojiOverlayRef,
-  }: MoodStateReorderItemProps) {
-    const dragControls = useDragControls();
-
-    return (
-      <Reorder.Item
-        key={state.id}
-        value={state.id}
-        layout={isDragging ? undefined : true}
-        dragListener={false}
-        dragControls={dragControls}
-        dragMomentum={false}
-        dragTransition={{ bounceStiffness: 180, bounceDamping: 25, timeConstant: 20 }}
-        whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
-        onDragEnd={onDragEnd}
-        className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-2 pr-3 dark:border-slate-700/50 dark:bg-slate-800/50"
-      >
-        <div className="relative shrink-0">
-          <button
-            type="button"
-            onPointerDown={(event) => {
-              event.preventDefault();
-              onDragStart(state.id);
-              dragControls.start(event, { snapToCursor: true });
-            }}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
-            aria-label="Arrastrar estado"
-          >
-            <span className="text-lg">≡</span>
-          </button>
-        </div>
-
-        <div className="relative shrink-0">
-          <button
-            type="button"
-            ref={(el) => {
-              emojiButtonRefs.current[state.id] = el;
-            }}
-            onClick={() => onToggleEmojiEditor(state.id)}
-            className="flex h-11 w-11 items-center justify-center rounded-lg text-2xl transition-transform active:scale-90"
-            style={{ backgroundColor: state.color + '20' }}
-          >
-            {state.emoji}
-          </button>
-
-          {editingId === state.id && typeof document !== 'undefined' && createPortal(
-            <div
-              ref={emojiOverlayRef}
-              className="fixed z-50 max-h-52 w-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900"
-              style={{
-                top: emojiOverlayStyle.top,
-                left: emojiOverlayStyle.left,
-                width: emojiOverlayStyle.width,
-              }}
-            >
-              <div className="grid grid-cols-6 gap-1">
-                {availableEmojis.map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => {
-                      onUpdateState(state.id, 'emoji', emoji);
-                      onToggleEmojiEditor(state.id);
-                    }}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>,
-            document.body
-          )}
-        </div>
-
-        <input
-          type="text"
-          value={state.title}
-          onChange={(e) => onUpdateState(state.id, 'title', e.target.value)}
-          className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
-          placeholder="Nombre del estado..."
-        />
-
-        <input
-          type="number"
-          value={state.points}
-          onChange={(e) => onUpdateState(state.id, 'points', e.target.value)}
-          className="w-16 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200 border border-slate-300 rounded px-2"
-          placeholder="1"
-          min="-10"
-          max="10"
-        />
-
-        <div className="flex items-center gap-2">
-          <div className="min-w-[3rem]">
-            <UnifiedColorPicker
-              value={state.color}
-              onChange={(color) => onUpdateState(state.id, 'color', color)}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={() => onDeleteState(state.id)}
-            className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-          >
-            <TrashIcon />
-          </button>
-        </div>
-      </Reorder.Item>
-    );
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
