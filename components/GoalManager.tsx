@@ -370,11 +370,6 @@ export default function GoalManager() {
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
               Todos los Objetivos
             </h2>
-            {!showInactive && (
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                Arrastra los objetivos dentro de cada sección para cambiar su orden.
-              </p>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <button
