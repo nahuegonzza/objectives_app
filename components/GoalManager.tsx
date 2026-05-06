@@ -24,9 +24,11 @@ function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderI
     <Reorder.Item
       key={goal.id}
       value={goal.id}
+      layout
+      layoutId={goal.id}
       dragListener={false}
       dragControls={dragControls}
-      layout
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 40 }}
       whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
       onDragEnd={onDragEnd}
       className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 transition-all duration-200"
@@ -48,17 +50,6 @@ function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderI
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
-            type="button"
-            onPointerDown={(event) => {
-              event.preventDefault();
-              dragControls.start(event, { snapToCursor: true });
-            }}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
-            aria-label="Arrastrar objetivo"
-          >
-            <span className="text-lg">≡</span>
-          </button>
-          <button
             title="Editar"
             type="button"
             onClick={() => onEdit(goal)}
@@ -73,6 +64,17 @@ function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd }: GoalReorderI
             className="rounded-lg border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 px-3 py-2 text-sm font-medium text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
           >
             ⛔
+          </button>
+          <button
+            type="button"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              dragControls.start(event, { snapToCursor: true });
+            }}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
+            aria-label="Arrastrar objetivo"
+          >
+            <span className="text-lg">≡</span>
           </button>
         </div>
       </div>
