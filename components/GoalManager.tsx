@@ -479,7 +479,7 @@ export default function GoalManager() {
             {habitGoals.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Hábitos</h3>
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2">
+                <div>
                   <Reorder.Group axis="y" values={habitGoals.map((goal) => goal.id)} onReorder={handleHabitReorder} className="space-y-3">
                     {habitGoals.map((goal) => (
                       <GoalReorderItem
@@ -500,7 +500,7 @@ export default function GoalManager() {
             {metricGoals.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Métricas</h3>
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-950/90 p-2">
+                <div>
                   <Reorder.Group axis="y" values={metricGoals.map((goal) => goal.id)} onReorder={handleMetricReorder} className="space-y-3">
                     {metricGoals.map((goal) => (
                       <GoalReorderItem
