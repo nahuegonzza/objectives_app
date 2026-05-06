@@ -149,7 +149,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
               }
             }}
             disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
-            className="inline-flex items-center justify-center rounded-lg border border-emerald-500 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
           >
             Agregar Siesta
           </button>

@@ -118,10 +118,19 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
       )}
 
       <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-row justify-between items-start gap-6">
+          {/* Título y Descripción - Izquierda */}
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Estado del día</p>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Selecciona cómo te sientes hoy.</p>
+          </div>
+
+          {/* Puntos - Derecha */}
+          <div className="flex flex-col items-end">
+            <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Puntos</p>
+            <p className={`text-2xl font-semibold ${points > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+              {points}
+            </p>
           </div>
         </div>
 
@@ -150,15 +159,6 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
               <span className="hidden sm:inline">{state.title}</span>
             </button>
           ))}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-slate-50 p-3 text-slate-700 dark:bg-slate-950 dark:text-slate-200">
-          <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Puntos</p>
-            <p className={`text-2xl font-semibold ${points > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
-              {points}
-            </p>
-          </div>
         </div>
       </div>
     </>
