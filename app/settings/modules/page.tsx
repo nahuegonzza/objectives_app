@@ -157,7 +157,7 @@ export default function ModulesSettingsPage() {
             onClick={() => setShowOrderManager(true)}
             className="rounded-lg bg-emerald-600 text-white px-4 py-2 font-medium hover:bg-emerald-700 transition"
           >
-            🔀 Ordenar módulos
+            Ordenar módulos
           </button>
         </div>
 

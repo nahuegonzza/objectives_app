@@ -6,5 +6,6 @@ import { workModule } from './work/module';
 import { waterModule } from './water/module';
 import { moodModule } from './mood/module';
 import { academicModule } from './academic/module';
+import { goalsModule } from './goals/module';
 
-export const moduleDefinitions = [habitModule, financeModule, gymModule, sleepModule, workModule, waterModule, moodModule, academicModule] as const;
+export const moduleDefinitions = [habitModule, financeModule, gymModule, sleepModule, workModule, waterModule, moodModule, academicModule, goalsModule] as const;

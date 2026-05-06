@@ -75,21 +75,6 @@ function MoodStateReorderItem({
       <div className="relative shrink-0">
         <button
           type="button"
-          onPointerDown={(event) => {
-            event.preventDefault();
-            onDragStart(state.id);
-            dragControls.start(event, { snapToCursor: true });
-          }}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
-          aria-label="Arrastrar estado"
-        >
-          <span className="text-lg">≡</span>
-        </button>
-      </div>
-
-      <div className="relative shrink-0">
-        <button
-          type="button"
           ref={(el) => {
             emojiButtonRefs.current[state.id] = el;
           }}
@@ -160,6 +145,21 @@ function MoodStateReorderItem({
           className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
         >
           <TrashIcon />
+        </button>
+      </div>
+
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            onDragStart(state.id);
+            dragControls.start(event, { snapToCursor: true });
+          }}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
+          aria-label="Arrastrar estado"
+        >
+          <span className="text-lg">≡</span>
         </button>
       </div>
     </Reorder.Item>

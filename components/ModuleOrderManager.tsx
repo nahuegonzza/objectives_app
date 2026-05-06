@@ -68,7 +68,7 @@ function ModuleReorderItem({ item, isDragging, onDragStart, onDragEnd }: ModuleR
           <h3 className="font-semibold text-slate-900 dark:text-white truncate">
             {item.name}
             {item.isGoalsPlaceholder && (
-              <span className="text-xs ml-2 text-slate-500 dark:text-slate-400">(Objetivos y Métricas)</span>
+              <span className="text-xs ml-2 text-slate-500 dark:text-slate-400">(Habitos y Métricas)</span>
             )}
           </h3>
         </div>
@@ -107,8 +107,8 @@ export default function ModuleOrderManager({ modules, onClose }: ModuleOrderMana
     const items: ModuleOrderItem[] = modules.map((module) => ({
       id: module.id,
       slug: module.slug,
-      name: module.slug === 'goals' ? `${module.name} (Objetivos y Métricas)` : module.name,
-      isGoalsPlaceholder: module.slug === 'goals',
+      name: module.name,
+      isGoalsPlaceholder: false,
     }));
 
     setOrderedItems(items);
