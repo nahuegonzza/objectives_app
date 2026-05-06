@@ -40,15 +40,15 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
     loadTodayEntry();
   }, [selectedDate]);
 
-  const calculateHours = () => {
+  const calculateHours = React.useCallback(() => {
     if (!bedtime || !waketime) return 0;
     const bed = new Date(`1970-01-01T${bedtime}:00`);
     const wake = new Date(`1970-01-01T${waketime}:00`);
     if (wake < bed) wake.setDate(wake.getDate() + 1); // next day
     return (wake.getTime() - bed.getTime()) / (1000 * 60 * 60);
-  };
+  }, [bedtime, waketime]);
 
-  const calculatePoints = (hours: number) => {
+  const calculatePoints = React.useCallback((hours: number) => {
     // Si ambos horarios son iguales (no hay registro), 0 puntos
     if (bedtime === waketime) return 0;
     
@@ -57,28 +57,20 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
 
     const idealHours = (config.idealHours as number) || 8;
     const maxPoints = (config.maxPoints as number) || 2;
+    const toleranceMinutes = (config.toleranceMinutes as number) ?? 30;
     const penaltyMode = (config.penaltyMode as string) || 'automatic';
     const penaltyPerHour = (config.penaltyPerHour as number) || 1;
 
     const diff = Math.abs(hours - idealHours);
-    const penalty = penaltyMode === 'automatic' ? diff : penaltyPerHour * diff;
+    const toleranceHours = toleranceMinutes / 60;
+    const adjustedDiff = Math.max(0, diff - toleranceHours);
+    const penalty = penaltyMode === 'automatic' ? adjustedDiff : penaltyPerHour * adjustedDiff;
 
     // Permitir puntos negativos
     return maxPoints - penalty;
-  };
+  }, [bedtime, waketime, config]);
 
-  useEffect(() => {
-    const hours = calculateHours();
-    const pts = calculatePoints(hours);
-    setPoints(pts);
-
-    // Auto-save when both times are set and in editing mode
-    if (bedtime && waketime && isEditing) {
-      saveEntry(hours);
-    }
-  }, [bedtime, waketime, config, isEditing]);
-
-  const saveEntry = async (hours: number) => {
+  const saveEntry = React.useCallback(async (hours: number) => {
     try {
       const res = await fetch('/api/moduleEntries', {
         method: 'POST',
@@ -97,7 +89,18 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
     } catch (error) {
       console.error('Error saving sleep data', error);
     }
-  };
+  }, [bedtime, waketime, module.id, onUpdate, selectedDate]);
+
+  useEffect(() => {
+    const hours = calculateHours();
+    const pts = calculatePoints(hours);
+    setPoints(pts);
+
+    // Auto-save when both times are set and in editing mode
+    if (bedtime && waketime && isEditing) {
+      saveEntry(hours);
+    }
+  }, [bedtime, waketime, config, isEditing, calculateHours, calculatePoints, saveEntry]);
 
   const hours = calculateHours();
 
