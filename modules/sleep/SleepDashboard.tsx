@@ -49,63 +49,81 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
     onChange(formatted);
   };
 
-  const hourOptions = Array.from({ length: 24 }, (_, i) => i);
-  const minuteOptions = [0, 15, 30, 45];
+  const incrementHour = () => updateTime((hours + 1) % 24, minutes);
+  const decrementHour = () => updateTime((hours - 1 + 24) % 24, minutes);
+  const incrementMinute = () => updateTime(hours, (minutes + 15) % 60);
+  const decrementMinute = () => updateTime(hours, (minutes - 15 + 60) % 60);
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 mb-2">
-            Horas
-          </label>
-          <div className="grid grid-cols-4 gap-1">
-            {hourOptions.map((hour) => (
-              <button
-                key={hour}
-                type="button"
-                disabled={disabled}
-                onClick={() => updateTime(hour, minutes)}
-                className={`rounded-lg border px-2 py-2 text-sm font-medium transition ${
-                  disabled
-                    ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
-                    : hour === hours
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-500/10 dark:text-emerald-300'
-                    : 'border-slate-300 bg-white text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/10'
-                }`}
-              >
-                {String(hour).padStart(2, '0')}
-              </button>
-            ))}
-          </div>
+    <div className="flex items-center justify-center gap-4">
+      <div className="flex flex-col items-center gap-2">
+        <button
+          type="button"
+          onClick={incrementHour}
+          disabled={disabled}
+          className={`p-2 rounded-lg transition ${
+            disabled
+              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
+              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+        <div className="text-3xl font-bold w-16 text-center text-slate-900 dark:text-white">
+          {String(hours).padStart(2, '0')}
         </div>
-        <div>
-          <label className="block text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 mb-2">
-            Minutos
-          </label>
-          <div className="grid grid-cols-2 gap-1">
-            {minuteOptions.map((minute) => (
-              <button
-                key={minute}
-                type="button"
-                disabled={disabled}
-                onClick={() => updateTime(hours, minute)}
-                className={`rounded-lg border px-2 py-2 text-sm font-medium transition ${
-                  disabled
-                    ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
-                    : minute === minutes
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-500/10 dark:text-emerald-300'
-                    : 'border-slate-300 bg-white text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/10'
-                }`}
-              >
-                {String(minute).padStart(2, '0')}
-              </button>
-            ))}
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={decrementHour}
+          disabled={disabled}
+          className={`p-2 rounded-lg transition ${
+            disabled
+              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
+              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
       </div>
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-base font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
-        {value || 'Seleccionar hora'}
+
+      <div className="text-3xl font-bold text-slate-900 dark:text-white">:</div>
+
+      <div className="flex flex-col items-center gap-2">
+        <button
+          type="button"
+          onClick={incrementMinute}
+          disabled={disabled}
+          className={`p-2 rounded-lg transition ${
+            disabled
+              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
+              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+        <div className="text-3xl font-bold w-16 text-center text-slate-900 dark:text-white">
+          {String(minutes).padStart(2, '0')}
+        </div>
+        <button
+          type="button"
+          onClick={decrementMinute}
+          disabled={disabled}
+          className={`p-2 rounded-lg transition ${
+            disabled
+              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
+              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
+          }`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
       </div>
     </div>
   );
