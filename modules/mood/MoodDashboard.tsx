@@ -198,11 +198,11 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
                 backgroundColor: selectedMood === state.id ? (state.color || '#6b7280') + '20' : 'transparent',
-                borderColor: state.color || '#6b7280',
+                borderColor: adjustColorLuminance(state.color || '#6b7280', 0.7),
                 borderWidth: '2px',
                 borderStyle: 'solid',
                 color: getTextColor(state.color || '#6b7280'),
-                ['--tw-ring-color' as any]: state.color || '#6b7280',
+                ['--tw-ring-color' as any]: adjustColorLuminance(state.color || '#6b7280', 0.7),
               }}
             >
               <span className="text-lg">{state.emoji}</span>
