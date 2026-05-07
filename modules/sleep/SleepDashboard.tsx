@@ -290,7 +290,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <>
+    <div>
       <style>{HIDE_SPINNER_CSS}</style>
       <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
@@ -298,23 +298,23 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Sueño</p>
               <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para mejorar tu rendimiento.</p>
+            </div>
           </div>
-        </div>
-        <div className="text-left sm:text-right shrink-0 mt-2 sm:mt-0">
-          <button
-            type="button"
-            onClick={() => {
-              const lastNap = naps[naps.length - 1];
-              if (!lastNap || (lastNap.start && lastNap.end)) {
-                setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
-              }
-            }}
-            disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
-            className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
-          >
-            Agregar Siesta
-          </button>
-        </div>
+          <div className="text-left sm:text-right shrink-0 mt-2 sm:mt-0">
+            <button
+              type="button"
+              onClick={() => {
+                const lastNap = naps[naps.length - 1];
+                if (!lastNap || (lastNap.start && lastNap.end)) {
+                  setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
+                }
+              }}
+              disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
+              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
+            >
+              Agregar Siesta
+            </button>
+          </div>
         </div>
       </div>
 
@@ -389,6 +389,6 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
