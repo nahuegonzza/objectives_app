@@ -316,9 +316,81 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             </button>
           </div>
         </div>
-      </div>
+      
 
-      <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2">
+          <div>
+            <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
+            <TimePicker
+              value={bedtime}
+              onChange={setBedtime}
+              disabled={!isEditing}
+            />
+          </div>
+          <div>
+            <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
+            <TimePicker
+              value={waketime}
+              onChange={setWaketime}
+              disabled={!isEditing}
+            />
+          </div>
+        </div>
+
+        {naps.length > 0 && (
+          <div className="mt-6 space-y-4">
+            {naps.map((nap, index) => (
+              <div key={nap.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Siesta {index + 1}</h3>
+                  <button
+                    type="button"
+                    onClick={() => setNaps((prev) => prev.filter((item) => item.id !== nap.id))}
+                    disabled={!isEditing}
+                    className="text-sm text-rose-600 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+                <div className="mt-3 grid gap-4 grid-cols-1 sm:grid-cols-2">
+                  <div>
+                    <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
+                    <TimePicker
+                      value={nap.start}
+                      onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
+                    <TimePicker
+                      value={nap.end}
+                      onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-slate-50 p-3 text-slate-700 dark:bg-slate-950 dark:text-slate-200">
+          <div>
+            <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Puntos</p>
+            <p className={`text-2xl font-semibold ${points >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+              {points >= 0 ? `+${points.toFixed(1)}` : points.toFixed(1)}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Duración</p>
+            <p className="text-2xl font-semibold text-slate-900 dark:text-white">
+              {hours.toFixed(1)}h / {(config.idealHours as number) || 8}h
+            </p>
+          </div>
+        </div>
+      </div>
+     <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2">
         <div>
           <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
           <TimePicker
