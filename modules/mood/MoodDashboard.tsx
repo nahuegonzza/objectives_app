@@ -19,81 +19,94 @@ interface MoodDashboardProps {
   date?: string;
 }
 
-// Función para calcular la luminosidad de un color hex
-function getLuminance(hex: string): number {
-  if (!hex || !hex.startsWith('#')) return 0.5; // Default neutral
-  let color = hex;
-  if (color.length === 4) {
-    // Convert #RGB to #RRGGBB
-    color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+type Rgb = { r: number; g: number; b: number };
+
+function normalizeHexColor(color: string): string {
+  const hex = color.trim().replace(/^#/, '');
+  if (/^[0-9a-fA-F]{3}$/.test(hex)) {
+    return `#${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`.toLowerCase();
   }
-  if (color.length !== 7) return 0.5;
-  try {
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
-    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  } catch {
-    return 0.5;
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return `#${hex.toLowerCase()}`;
   }
+  return '';
 }
 
-// Función para ajustar la luminosidad de un color hex
-function adjustColorLuminance(hex: string, factor: number): string {
-  if (!hex || !hex.startsWith('#')) return hex || '#3b82f6'; // Return original if not hex
-  let color = hex;
-  if (color.length === 4) {
-    // Convert #RGB to #RRGGBB
-    color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
-  }
-  if (color.length !== 7) return hex || '#3b82f6';
-  try {
-    const r = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(1, 3), 16) * factor)));
-    const g = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(3, 5), 16) * factor)));
-    const b = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(5, 7), 16) * factor)));
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  } catch {
-    return hex || '#3b82f6';
-  }
+function parseRgbString(value: string): Rgb | null {
+  const match = value.match(/rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(\d*\.?\d+))?\s*\)/i);
+  if (!match) return null;
+  const r = Math.min(255, Math.max(0, Number(match[1])));
+  const g = Math.min(255, Math.max(0, Number(match[2])));
+  const b = Math.min(255, Math.max(0, Number(match[3])));
+  return { r, g, b };
 }
 
-// Función para obtener el color del texto con buen contraste
-function getTextColor(color: string): string {
-  const luminance = getLuminance(color);
-  if (luminance < 0.4) {
-    // Color oscuro: aclarar significativamente para mejor contraste
-    return adjustColorLuminance(color, 4);
-  } else {
-    // Color medio o claro: oscurecer moderadamente para mejor contraste
-    return adjustColorLuminance(color, 0.5);
-  }
+function rgbToHex(r: number, g: number, b: number): string {
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-// Función para normalizar colores
+function resolveCssColor(color: string): string {
+  if (typeof document === 'undefined') return '';
+  const ctx = document.createElement('canvas').getContext('2d');
+  if (!ctx) return '';
+  ctx.fillStyle = '#000';
+  ctx.fillStyle = color;
+  const computed = ctx.fillStyle;
+  if (computed.startsWith('#')) return normalizeHexColor(computed) || '';
+  const rgb = parseRgbString(computed);
+  return rgb ? rgbToHex(rgb.r, rgb.g, rgb.b) : '';
+}
+
 function normalizeColor(color: string): string {
-  if (!color) return '#3b82f6'; // Azul por defecto
-  if (color.startsWith('#')) return color;
-  if (/^[0-9a-fA-F]{6}$/.test(color)) return '#' + color; // Agregar # si falta
-  if (/^[0-9a-fA-F]{3}$/.test(color)) return '#' + color;
-  return color; // Nombres de colores
+  if (!color) return '#3b82f6';
+  const trimmed = color.trim();
+  const hex = normalizeHexColor(trimmed);
+  if (hex) return hex;
+  const rgb = parseRgbString(trimmed);
+  if (rgb) return rgbToHex(rgb.r, rgb.g, rgb.b);
+  const resolved = resolveCssColor(trimmed);
+  return resolved || '#3b82f6';
 }
 
-// Función para obtener el color de borde
+function getLuminance(hex: string): number {
+  const normalized = normalizeHexColor(hex);
+  if (!normalized) return 0.5;
+  const r = parseInt(normalized.slice(1, 3), 16);
+  const g = parseInt(normalized.slice(3, 5), 16);
+  const b = parseInt(normalized.slice(5, 7), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function adjustColorLuminance(hex: string, factor: number): string {
+  const normalized = normalizeHexColor(hex);
+  if (!normalized) return '#3b82f6';
+  const r = Math.min(255, Math.max(0, Math.round(parseInt(normalized.slice(1, 3), 16) * factor)));
+  const g = Math.min(255, Math.max(0, Math.round(parseInt(normalized.slice(3, 5), 16) * factor)));
+  const b = Math.min(255, Math.max(0, Math.round(parseInt(normalized.slice(5, 7), 16) * factor)));
+  return rgbToHex(r, g, b);
+}
+
+function getTextColor(color: string): string {
+  const resolved = normalizeColor(color);
+  const luminance = getLuminance(resolved);
+  if (luminance < 0.4) {
+    return adjustColorLuminance(resolved, 4);
+  }
+  return adjustColorLuminance(resolved, 0.5);
+}
+
 function getBorderColor(color: string): string {
-  const luminance = getLuminance(color);
-  if (luminance > 0.7) return '#000000'; // Negro para colores muy claros
-  return adjustColorLuminance(color, 0.8);
+  const resolved = normalizeColor(color);
+  const luminance = getLuminance(resolved);
+  if (luminance > 0.7) return '#000000';
+  return adjustColorLuminance(resolved, 0.8);
 }
 
-// Función para obtener el color de fondo con opacidad
 function getBackgroundColor(color: string): string {
-  if (!color || !color.startsWith('#')) return 'transparent';
-  let c = color;
-  if (c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
-  if (c.length !== 7) return 'transparent';
-  const luminance = getLuminance(c);
-  if (luminance > 0.6) return 'transparent'; // Colores muy claros sin background
-  return c + '20';
+  const resolved = normalizeColor(color);
+  const luminance = getLuminance(resolved);
+  if (luminance > 0.7) return 'transparent';
+  return `${resolved}22`;
 }
 
 export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
