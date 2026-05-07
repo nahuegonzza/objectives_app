@@ -19,6 +19,44 @@ interface MoodDashboardProps {
   date?: string;
 }
 
+// Función para calcular la luminosidad de un color hex
+function getLuminance(hex: string): number {
+  if (!hex || !hex.startsWith('#') || hex.length !== 7) return 0.5; // Default neutral
+  try {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  } catch {
+    return 0.5;
+  }
+}
+
+// Función para ajustar la luminosidad de un color hex
+function adjustColorLuminance(hex: string, factor: number): string {
+  if (!hex || !hex.startsWith('#') || hex.length !== 7) return '#6b7280'; // Default gray
+  try {
+    const r = Math.min(255, Math.max(0, Math.round(parseInt(hex.slice(1, 3), 16) * factor)));
+    const g = Math.min(255, Math.max(0, Math.round(parseInt(hex.slice(3, 5), 16) * factor)));
+    const b = Math.min(255, Math.max(0, Math.round(parseInt(hex.slice(5, 7), 16) * factor)));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  } catch {
+    return '#6b7280';
+  }
+}
+
+// Función para obtener el color del texto con buen contraste
+function getTextColor(color: string): string {
+  const luminance = getLuminance(color);
+  if (luminance < 0.5) {
+    // Color oscuro: aclarar para mejor contraste
+    return adjustColorLuminance(color, 1.5);
+  } else {
+    // Color claro: oscurecer para mejor contraste
+    return adjustColorLuminance(color, 0.7);
+  }
+}
+
 export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,12 +185,12 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
                   : 'opacity-70 hover:opacity-100'
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
-                backgroundColor: selectedMood === state.id ? state.color + '20' : 'transparent',
-                borderColor: state.color,
+                backgroundColor: selectedMood === state.id ? (state.color || '#6b7280') + '20' : 'transparent',
+                borderColor: state.color || '#6b7280',
                 borderWidth: '2px',
                 borderStyle: 'solid',
-                color: state.color,
-                ['--tw-ring-color' as any]: state.color,
+                color: getTextColor(state.color || '#6b7280'),
+                ['--tw-ring-color' as any]: state.color || '#6b7280',
               }}
             >
               <span className="text-lg">{state.emoji}</span>
