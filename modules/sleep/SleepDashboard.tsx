@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
 
 interface SleepDashboardProps {
@@ -17,70 +17,91 @@ interface SleepNap {
   end: string;
 }
 
-const TIME_OPTIONS = Array.from({ length: 24 * 4 }, (_, index) => {
-  const hour = String(Math.floor(index / 4)).padStart(2, '0');
-  const minute = String((index % 4) * 15).padStart(2, '0');
-  return `${hour}:${minute}`;
-});
-
 interface TimePickerProps {
   value: string;
   onChange: (time: string) => void;
   disabled?: boolean;
 }
 
+const formatTime = (hours: number, minutes: number) => `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+const clampToStep = (value: number) => {
+  const step = 15;
+  const clamped = Math.round(value / step) * step;
+  return Math.min(45, Math.max(0, clamped));
+};
+
+const parseTime = (value: string) => {
+  const [rawHours = '0', rawMinutes = '0'] = value.split(':');
+  const hours = Math.min(23, Math.max(0, Number(rawHours) || 0));
+  const minutes = clampToStep(Number(rawMinutes) || 0);
+  return { hours, minutes };
+};
+
 const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = false }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [hours, setHours] = useState(0);
+  const [minutes, setMinutes] = useState(0);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+    const parsed = parseTime(value);
+    setHours(parsed.hours);
+    setMinutes(parsed.minutes);
+  }, [value]);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const updateTime = (newHours: number, newMinutes: number) => {
+    const formatted = formatTime(newHours, newMinutes);
+    setHours(newHours);
+    setMinutes(newMinutes);
+    onChange(formatted);
+  };
 
   return (
-    <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen((current) => !current)}
-        disabled={disabled}
-        className={`w-full rounded-lg border px-3 py-3 text-left text-base transition focus:outline-none focus:ring-2 ${
-          disabled
-            ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
-            : 'border-slate-300 bg-white text-slate-900 hover:border-emerald-400 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:border-emerald-400 dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
-        }`}
-      >
-        <span>{value || 'Seleccionar hora'}</span>
-        <span className="float-right text-slate-400 dark:text-slate-500">⌄</span>
-      </button>
-
-      {!disabled && isOpen && (
-        <div className="absolute left-0 right-0 z-10 mt-2 max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
-          {TIME_OPTIONS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => {
-                onChange(option);
-                setIsOpen(false);
-              }}
-              className={`w-full px-3 py-2 text-left text-sm transition ${
-                option === value
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-                  : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
-              }`}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="grid gap-2">
+      <div className="grid grid-cols-2 gap-2">
+        <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
+          <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Horas</span>
+          <input
+            type="number"
+            min={0}
+            max={23}
+            step={1}
+            value={hours}
+            disabled={disabled}
+            onChange={(e) => {
+              const newHours = Math.min(23, Math.max(0, Number(e.target.value) || 0));
+              updateTime(newHours, minutes);
+            }}
+            className={`w-full rounded-lg border px-3 py-3 text-base outline-none transition focus:ring-2 ${
+              disabled
+                ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                : 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+            }`}
+          />
+        </label>
+        <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
+          <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Minutos</span>
+          <input
+            type="number"
+            min={0}
+            max={45}
+            step={15}
+            value={minutes}
+            disabled={disabled}
+            onChange={(e) => {
+              const newMinutes = clampToStep(Number(e.target.value) || 0);
+              updateTime(hours, newMinutes);
+            }}
+            className={`w-full rounded-lg border px-3 py-3 text-base outline-none transition focus:ring-2 ${
+              disabled
+                ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                : 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+            }`}
+          />
+        </label>
+      </div>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-base text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
+        {value || 'Seleccionar hora'}
+      </div>
     </div>
   );
 };
