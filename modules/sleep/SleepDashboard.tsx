@@ -35,6 +35,8 @@ const parseTime = (value: string) => {
 const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = false }) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
+  const [editingHours, setEditingHours] = useState(false);
+  const [editingMinutes, setEditingMinutes] = useState(false);
 
   useEffect(() => {
     const parsed = parseTime(value);
@@ -54,8 +56,18 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
   const incrementMinute = () => updateTime(hours, (minutes + 15) % 60);
   const decrementMinute = () => updateTime(hours, (minutes - 15 + 60) % 60);
 
+  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value === '' ? 0 : Math.min(23, Math.max(0, Number(e.target.value)));
+    updateTime(val, minutes);
+  };
+
+  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value === '' ? 0 : Math.min(59, Math.max(0, Number(e.target.value)));
+    updateTime(hours, val);
+  };
+
   return (
-    <div className="flex items-center justify-center gap-4">
+    <div className="flex items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
       <div className="flex flex-col items-center gap-2">
         <button
           type="button"
@@ -71,9 +83,21 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
         </button>
-        <div className="text-3xl font-bold w-16 text-center text-slate-900 dark:text-white">
-          {String(hours).padStart(2, '0')}
-        </div>
+        <input
+          type="number"
+          min={0}
+          max={23}
+          value={String(hours).padStart(2, '0')}
+          onChange={handleHoursChange}
+          disabled={disabled}
+          onFocus={() => setEditingHours(true)}
+          onBlur={() => setEditingHours(false)}
+          className={`w-16 text-3xl font-bold text-center rounded-lg border outline-none transition ${
+            disabled
+              ? 'border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
+              : 'border-emerald-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-700 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+          }`}
+        />
         <button
           type="button"
           onClick={decrementHour}
@@ -107,9 +131,21 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
         </button>
-        <div className="text-3xl font-bold w-16 text-center text-slate-900 dark:text-white">
-          {String(minutes).padStart(2, '0')}
-        </div>
+        <input
+          type="number"
+          min={0}
+          max={59}
+          value={String(minutes).padStart(2, '0')}
+          onChange={handleMinutesChange}
+          disabled={disabled}
+          onFocus={() => setEditingMinutes(true)}
+          onBlur={() => setEditingMinutes(false)}
+          className={`w-16 text-3xl font-bold text-center rounded-lg border outline-none transition ${
+            disabled
+              ? 'border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
+              : 'border-emerald-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-700 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+          }`}
+        />
         <button
           type="button"
           onClick={decrementMinute}
@@ -268,23 +304,23 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2">
-        <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
-          <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</span>
+      <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2">
+        <div>
+          <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
           <TimePicker
             value={bedtime}
             onChange={setBedtime}
             disabled={!isEditing}
           />
-        </label>
-        <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
-          <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</span>
+        </div>
+        <div>
+          <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
           <TimePicker
             value={waketime}
             onChange={setWaketime}
             disabled={!isEditing}
           />
-        </label>
+        </div>
       </div>
 
       {naps.length > 0 && (
@@ -302,23 +338,23 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   Eliminar
                 </button>
               </div>
-              <div className="mt-3 grid gap-3 grid-cols-1 sm:grid-cols-2">
-                <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
-                  <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</span>
+              <div className="mt-3 grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <div>
+                  <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
                   <TimePicker
                     value={nap.start}
                     onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item))}
                     disabled={!isEditing}
                   />
-                </label>
-                <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
-                  <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</span>
+                </div>
+                <div>
+                  <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
                   <TimePicker
                     value={nap.end}
                     onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item))}
                     disabled={!isEditing}
                   />
-                </label>
+                </div>
               </div>
             </div>
           ))}
