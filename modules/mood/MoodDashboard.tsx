@@ -64,9 +64,18 @@ function getTextColor(color: string): string {
     // Color oscuro: aclarar significativamente para mejor contraste
     return adjustColorLuminance(color, 4);
   } else {
-    // Color medio o claro: oscurecer para mejor contraste
-    return adjustColorLuminance(color, 0.2);
+    // Color medio o claro: oscurecer moderadamente para mejor contraste
+    return adjustColorLuminance(color, 0.5);
   }
+}
+
+// Función para obtener el color de fondo con opacidad
+function getBackgroundColor(color: string): string {
+  if (!color || !color.startsWith('#')) return 'transparent';
+  let c = color;
+  if (c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+  if (c.length !== 7) return 'transparent';
+  return c + '20';
 }
 
 export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
@@ -197,12 +206,12 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
                   : 'opacity-70 hover:opacity-100'
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
-                backgroundColor: selectedMood === state.id ? (state.color || '#6b7280') + '20' : 'transparent',
-                borderColor: adjustColorLuminance(state.color || '#6b7280', 0.7),
+                backgroundColor: getBackgroundColor(state.color || '#6b7280'),
+                borderColor: adjustColorLuminance(state.color || '#6b7280', 0.8),
                 borderWidth: '2px',
                 borderStyle: 'solid',
                 color: getTextColor(state.color || '#6b7280'),
-                ['--tw-ring-color' as any]: adjustColorLuminance(state.color || '#6b7280', 0.7),
+                ['--tw-ring-color' as any]: adjustColorLuminance(state.color || '#6b7280', 0.8),
               }}
             >
               <span className="text-lg">{state.emoji}</span>
