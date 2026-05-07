@@ -90,6 +90,12 @@ function adjustColorLuminance(hex: string, factor: number): string {
 
 function getTextColor(color: string, isDarkMode: boolean): string {
   const resolved = normalizeColor(color);
+  if (resolved === '#ffffff' && !isDarkMode) {
+    return '#d1d5db'; // subtle gray for white on light mode
+  }
+  if (resolved === '#000000' && isDarkMode) {
+    return '#9ca3af'; // softer gray for black on dark mode
+  }
   const factor = isDarkMode ? 1.5 : 0.5; // lighter in dark, darker in light
   return adjustColorLuminance(resolved, factor);
 }
