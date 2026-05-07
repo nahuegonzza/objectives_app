@@ -69,12 +69,21 @@ function getTextColor(color: string): string {
   }
 }
 
+// Función para obtener el color de borde
+function getBorderColor(color: string): string {
+  const luminance = getLuminance(color);
+  if (luminance > 0.7) return '#000000'; // Negro para colores muy claros
+  return adjustColorLuminance(color, 0.8);
+}
+
 // Función para obtener el color de fondo con opacidad
 function getBackgroundColor(color: string): string {
   if (!color || !color.startsWith('#')) return 'transparent';
   let c = color;
   if (c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
   if (c.length !== 7) return 'transparent';
+  const luminance = getLuminance(c);
+  if (luminance > 0.6) return 'transparent'; // Colores muy claros sin background
   return c + '20';
 }
 
@@ -207,11 +216,11 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
                 backgroundColor: getBackgroundColor(state.color || '#6b7280'),
-                borderColor: adjustColorLuminance(state.color || '#6b7280', 0.8),
+                borderColor: getBorderColor(state.color || '#6b7280'),
                 borderWidth: '2px',
                 borderStyle: 'solid',
                 color: getTextColor(state.color || '#6b7280'),
-                ['--tw-ring-color' as any]: adjustColorLuminance(state.color || '#6b7280', 0.8),
+                ['--tw-ring-color' as any]: getBorderColor(state.color || '#6b7280'),
               }}
             >
               <span className="text-lg">{state.emoji}</span>
