@@ -21,11 +21,17 @@ interface MoodDashboardProps {
 
 // Función para calcular la luminosidad de un color hex
 function getLuminance(hex: string): number {
-  if (!hex || !hex.startsWith('#') || hex.length !== 7) return 0.5; // Default neutral
+  if (!hex || !hex.startsWith('#')) return 0.5; // Default neutral
+  let color = hex;
+  if (color.length === 4) {
+    // Convert #RGB to #RRGGBB
+    color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+  }
+  if (color.length !== 7) return 0.5;
   try {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
     return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   } catch {
     return 0.5;
@@ -34,26 +40,32 @@ function getLuminance(hex: string): number {
 
 // Función para ajustar la luminosidad de un color hex
 function adjustColorLuminance(hex: string, factor: number): string {
-  if (!hex || !hex.startsWith('#') || hex.length !== 7) return '#6b7280'; // Default gray
+  if (!hex || !hex.startsWith('#')) return hex || '#6b7280'; // Return original if not hex
+  let color = hex;
+  if (color.length === 4) {
+    // Convert #RGB to #RRGGBB
+    color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+  }
+  if (color.length !== 7) return hex || '#6b7280';
   try {
-    const r = Math.min(255, Math.max(0, Math.round(parseInt(hex.slice(1, 3), 16) * factor)));
-    const g = Math.min(255, Math.max(0, Math.round(parseInt(hex.slice(3, 5), 16) * factor)));
-    const b = Math.min(255, Math.max(0, Math.round(parseInt(hex.slice(5, 7), 16) * factor)));
+    const r = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(1, 3), 16) * factor)));
+    const g = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(3, 5), 16) * factor)));
+    const b = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(5, 7), 16) * factor)));
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   } catch {
-    return '#6b7280';
+    return hex || '#6b7280';
   }
 }
 
 // Función para obtener el color del texto con buen contraste
 function getTextColor(color: string): string {
   const luminance = getLuminance(color);
-  if (luminance < 0.5) {
-    // Color oscuro: aclarar para mejor contraste
-    return adjustColorLuminance(color, 1.5);
+  if (luminance < 0.4) {
+    // Color oscuro: aclarar significativamente para mejor contraste
+    return adjustColorLuminance(color, 4);
   } else {
-    // Color claro: oscurecer para mejor contraste
-    return adjustColorLuminance(color, 0.7);
+    // Color medio o claro: oscurecer para mejor contraste
+    return adjustColorLuminance(color, 0.2);
   }
 }
 
