@@ -40,20 +40,20 @@ function getLuminance(hex: string): number {
 
 // Función para ajustar la luminosidad de un color hex
 function adjustColorLuminance(hex: string, factor: number): string {
-  if (!hex || !hex.startsWith('#')) return hex || '#6b7280'; // Return original if not hex
+  if (!hex || !hex.startsWith('#')) return hex || '#3b82f6'; // Return original if not hex
   let color = hex;
   if (color.length === 4) {
     // Convert #RGB to #RRGGBB
     color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
   }
-  if (color.length !== 7) return hex || '#6b7280';
+  if (color.length !== 7) return hex || '#3b82f6';
   try {
     const r = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(1, 3), 16) * factor)));
     const g = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(3, 5), 16) * factor)));
     const b = Math.min(255, Math.max(0, Math.round(parseInt(color.slice(5, 7), 16) * factor)));
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   } catch {
-    return hex || '#6b7280';
+    return hex || '#3b82f6';
   }
 }
 
@@ -67,6 +67,15 @@ function getTextColor(color: string): string {
     // Color medio o claro: oscurecer moderadamente para mejor contraste
     return adjustColorLuminance(color, 0.5);
   }
+}
+
+// Función para normalizar colores
+function normalizeColor(color: string): string {
+  if (!color) return '#3b82f6'; // Azul por defecto
+  if (color.startsWith('#')) return color;
+  if (/^[0-9a-fA-F]{6}$/.test(color)) return '#' + color; // Agregar # si falta
+  if (/^[0-9a-fA-F]{3}$/.test(color)) return '#' + color;
+  return color; // Nombres de colores
 }
 
 // Función para obtener el color de borde
@@ -215,12 +224,12 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
                   : 'opacity-70 hover:opacity-100'
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
-                backgroundColor: getBackgroundColor(state.color || '#6b7280'),
-                borderColor: getBorderColor(state.color || '#6b7280'),
+                backgroundColor: getBackgroundColor(normalizeColor(state.color)),
+                borderColor: getBorderColor(normalizeColor(state.color)),
                 borderWidth: '2px',
                 borderStyle: 'solid',
-                color: getTextColor(state.color || '#6b7280'),
-                ['--tw-ring-color' as any]: getBorderColor(state.color || '#6b7280'),
+                color: getTextColor(normalizeColor(state.color)),
+                ['--tw-ring-color' as any]: getBorderColor(normalizeColor(state.color)),
               }}
             >
               <span className="text-lg">{state.emoji}</span>
