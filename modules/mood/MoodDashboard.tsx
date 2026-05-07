@@ -89,15 +89,18 @@ function adjustColorLuminance(hex: string, factor: number): string {
 }
 
 function getTextColor(color: string, isDarkMode: boolean): string {
+  if (!isDarkMode) {
+    return '#000000';
+  }
   const resolved = normalizeColor(color);
-  if (resolved === '#ffffff' && !isDarkMode) {
-    return '#d1d5db'; // subtle gray for white on light mode
+  if (resolved === '#000000') {
+    return '#9ca3af';
   }
-  if (resolved === '#000000' && isDarkMode) {
-    return '#9ca3af'; // softer gray for black on dark mode
+  if (resolved === '#001f3f') {
+    return '#537294';
   }
-  const factor = isDarkMode ? 1.5 : 0.5; // lighter in dark, darker in light
-  return adjustColorLuminance(resolved, factor);
+
+  return adjustColorLuminance(resolved, 1.5); // keep the darker theme behavior
 }
 
 function getBorderColor(color: string, isDarkMode: boolean): string {
@@ -106,7 +109,10 @@ function getBorderColor(color: string, isDarkMode: boolean): string {
     return '#d1d5db'; // subtle gray border for white on light mode
   }
   if (resolved === '#000000' && isDarkMode) {
-    return '#9ca3af'; // softer gray border for black on dark mode
+    return '#3c3c3c'; // softer gray border for black on dark mode
+  }
+    if (resolved === '#001f3f' && isDarkMode) {
+    return '#06315e';
   }
   return resolved;
 }
