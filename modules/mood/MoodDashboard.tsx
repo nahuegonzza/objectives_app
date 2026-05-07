@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
+import { getColorOption } from '@lib/goalIconsColors';
 
 interface MoodState {
   id: string;
@@ -45,68 +46,68 @@ function rgbToHex(r: number, g: number, b: number): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-function resolveCssColor(color: string): string {
-  if (typeof document === 'undefined') return '';
-  const ctx = document.createElement('canvas').getContext('2d');
-  if (!ctx) return '';
-  ctx.fillStyle = '#000';
-  ctx.fillStyle = color;
-  const computed = ctx.fillStyle;
-  if (computed.startsWith('#')) return normalizeHexColor(computed) || '';
-  const rgb = parseRgbString(computed);
-  return rgb ? rgbToHex(rgb.r, rgb.g, rgb.b) : '';
-}
-
 function normalizeColor(color: string): string {
   if (!color) return '#3b82f6';
   const trimmed = color.trim();
+  const option = getColorOption(trimmed);
+  if (option && option.bgColor) {
+    return option.bgColor;
+  }
   const hex = normalizeHexColor(trimmed);
   if (hex) return hex;
   const rgb = parseRgbString(trimmed);
   if (rgb) return rgbToHex(rgb.r, rgb.g, rgb.b);
-  const resolved = resolveCssColor(trimmed);
-  return resolved || '#3b82f6';
+  return '#3b82f6';
 }
 
-function getLuminance(hex: string): number {
+function hexToRgb(hex: string): Rgb | null {
   const normalized = normalizeHexColor(hex);
+  if (!normalized) return null;
+  return {
+    r: parseInt(normalized.slice(1, 3), 16),
+    g: parseInt(normalized.slice(3, 5), 16),
+    b: parseInt(normalized.slice(5, 7), 16),
+  };
+}
+
+function getLuminance(color: string): number {
+  const normalized = normalizeHexColor(color);
   if (!normalized) return 0.5;
-  const r = parseInt(normalized.slice(1, 3), 16);
-  const g = parseInt(normalized.slice(3, 5), 16);
-  const b = parseInt(normalized.slice(5, 7), 16);
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  const rgb = hexToRgb(normalized)!;
+  return (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
 }
 
 function adjustColorLuminance(hex: string, factor: number): string {
   const normalized = normalizeHexColor(hex);
   if (!normalized) return '#3b82f6';
-  const r = Math.min(255, Math.max(0, Math.round(parseInt(normalized.slice(1, 3), 16) * factor)));
-  const g = Math.min(255, Math.max(0, Math.round(parseInt(normalized.slice(3, 5), 16) * factor)));
-  const b = Math.min(255, Math.max(0, Math.round(parseInt(normalized.slice(5, 7), 16) * factor)));
-  return rgbToHex(r, g, b);
+  const rgb = hexToRgb(normalized)!;
+  return rgbToHex(
+    Math.min(255, Math.max(0, Math.round(rgb.r * factor))),
+    Math.min(255, Math.max(0, Math.round(rgb.g * factor))),
+    Math.min(255, Math.max(0, Math.round(rgb.b * factor)))
+  );
 }
 
 function getTextColor(color: string): string {
   const resolved = normalizeColor(color);
   const luminance = getLuminance(resolved);
-  if (luminance < 0.4) {
-    return adjustColorLuminance(resolved, 4);
-  }
-  return adjustColorLuminance(resolved, 0.5);
+  return luminance < 0.5 ? '#ffffff' : '#0f172a';
 }
 
 function getBorderColor(color: string): string {
   const resolved = normalizeColor(color);
   const luminance = getLuminance(resolved);
-  if (luminance > 0.7) return '#000000';
-  return adjustColorLuminance(resolved, 0.8);
+  if (luminance < 0.2) return adjustColorLuminance(resolved, 1.3);
+  if (luminance > 0.85) return adjustColorLuminance(resolved, 0.45);
+  return adjustColorLuminance(resolved, 0.75);
 }
 
 function getBackgroundColor(color: string): string {
   const resolved = normalizeColor(color);
-  const luminance = getLuminance(resolved);
-  if (luminance > 0.7) return 'transparent';
-  return `${resolved}22`;
+  const rgb = hexToRgb(resolved);
+  if (!rgb) return 'transparent';
+  const alpha = getLuminance(resolved) > 0.8 ? 0.24 : 0.16;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
 }
 
 export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
