@@ -32,6 +32,17 @@ const parseTime = (value: string) => {
   return { hours, minutes };
 };
 
+const HIDE_SPINNER_CSS = `
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+`;
+
 const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = false }) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -279,12 +290,14 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   if (loading) return <div>Loading...</div>;
 
   return (
-<div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-        <div className="flex flex-col gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Sueño</p>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para mejorar tu rendimiento.</p>
+    <>
+      <style>{HIDE_SPINNER_CSS}</style>
+      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">Sueño</p>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Registra tu hora de dormir y despertar para mejorar tu rendimiento.</p>
           </div>
         </div>
         <div className="text-left sm:text-right shrink-0 mt-2 sm:mt-0">
@@ -302,11 +315,12 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             Agregar Siesta
           </button>
         </div>
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2">
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
+          <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
           <TimePicker
             value={bedtime}
             onChange={setBedtime}
@@ -314,7 +328,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
           />
         </div>
         <div>
-          <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
+          <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
           <TimePicker
             value={waketime}
             onChange={setWaketime}
@@ -340,7 +354,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
               </div>
               <div className="mt-3 grid gap-4 grid-cols-1 sm:grid-cols-2">
                 <div>
-                  <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
+                  <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
                   <TimePicker
                     value={nap.start}
                     onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item))}
@@ -348,7 +362,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   />
                 </div>
                 <div>
-                  <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
+                  <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
                   <TimePicker
                     value={nap.end}
                     onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item))}
@@ -375,6 +389,6 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
           </p>
         </div>
       </div>
-    </div>
+    </>
   );
 };
