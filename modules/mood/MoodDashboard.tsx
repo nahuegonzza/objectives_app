@@ -88,26 +88,18 @@ function adjustColorLuminance(hex: string, factor: number): string {
   );
 }
 
-function getTextColor(color: string): string {
+function getTextColor(color: string, isDarkMode: boolean): string {
   const resolved = normalizeColor(color);
-  const luminance = getLuminance(resolved);
-  return luminance < 0.5 ? '#ffffff' : '#0f172a';
+  const factor = isDarkMode ? 1.5 : 0.5; // lighter in dark, darker in light
+  return adjustColorLuminance(resolved, factor);
 }
 
 function getBorderColor(color: string): string {
-  const resolved = normalizeColor(color);
-  const luminance = getLuminance(resolved);
-  if (luminance < 0.2) return adjustColorLuminance(resolved, 1.3);
-  if (luminance > 0.85) return adjustColorLuminance(resolved, 0.45);
-  return adjustColorLuminance(resolved, 0.75);
+  return normalizeColor(color);
 }
 
 function getBackgroundColor(color: string): string {
-  const resolved = normalizeColor(color);
-  const rgb = hexToRgb(resolved);
-  if (!rgb) return 'transparent';
-  const alpha = getLuminance(resolved) > 0.8 ? 0.24 : 0.16;
-  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+  return 'transparent';
 }
 
 export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
@@ -116,6 +108,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
   const [points, setPoints] = useState(0);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     if (message) {
@@ -123,6 +116,10 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  useEffect(() => {
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+  }, []);
 
   // Estados del config o los por defecto
   const states: MoodState[] = (config.states as MoodState[]) || [
@@ -242,7 +239,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
                 borderColor: getBorderColor(normalizeColor(state.color)),
                 borderWidth: '2px',
                 borderStyle: 'solid',
-                color: getTextColor(normalizeColor(state.color)),
+                color: getTextColor(normalizeColor(state.color), isDarkMode),
                 ['--tw-ring-color' as any]: getBorderColor(normalizeColor(state.color)),
               }}
             >
