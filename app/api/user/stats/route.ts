@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import { getServerSupabaseUser } from '@lib/supabase-server';
+import { parseAcademicData } from '../../../../modules/academic/academicHelpers';
 
 export async function GET() {
   try {
@@ -52,7 +53,30 @@ export async function GET() {
     totalScore += moduleEntries.length;
 
     // Count completed goals (GoalEntries with valueBoolean = true)
-    const goalsCompleted = allEntries.filter((entry) => entry.valueBoolean === true).length;
+    let goalsCompleted = allEntries.filter((entry) => entry.valueBoolean === true).length;
+
+    // Count module goals completed
+    let moduleGoalsCompleted = 0;
+
+    const moodEntries = moduleEntries.filter(e => e.module.slug === 'mood');
+    const sleepEntries = moduleEntries.filter(e => e.module.slug === 'sleep');
+    const academicEntries = moduleEntries.filter(e => e.module.slug === 'academic');
+
+    // Unique days for mood
+    const moodDays = new Set(moodEntries.map(e => e.date.slice(0, 10)));
+    moduleGoalsCompleted += moodDays.size;
+
+    // Unique days for sleep
+    const sleepDays = new Set(sleepEntries.map(e => e.date.slice(0, 10)));
+    moduleGoalsCompleted += sleepDays.size;
+
+    // Completed academic events
+    for (const entry of academicEntries) {
+      const data = parseAcademicData(entry.data);
+      moduleGoalsCompleted += data.events.filter(event => event.completed).length;
+    }
+
+    goalsCompleted += moduleGoalsCompleted;
 
     return NextResponse.json({
       goalsCompleted,
