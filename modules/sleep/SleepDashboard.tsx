@@ -25,16 +25,10 @@ interface TimePickerProps {
 
 const formatTime = (hours: number, minutes: number) => `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 
-const clampToStep = (value: number) => {
-  const step = 15;
-  const clamped = Math.round(value / step) * step;
-  return Math.min(45, Math.max(0, clamped));
-};
-
 const parseTime = (value: string) => {
   const [rawHours = '0', rawMinutes = '0'] = value.split(':');
   const hours = Math.min(23, Math.max(0, Number(rawHours) || 0));
-  const minutes = clampToStep(Number(rawMinutes) || 0);
+  const minutes = Math.min(45, Math.max(0, Number(rawMinutes) || 0));
   return { hours, minutes };
 };
 
@@ -55,51 +49,62 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
     onChange(formatted);
   };
 
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i);
+  const minuteOptions = [0, 15, 30, 45];
+
   return (
-    <div className="grid gap-2">
-      <div className="grid grid-cols-2 gap-2">
-        <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
-          <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Horas</span>
-          <input
-            type="number"
-            min={0}
-            max={23}
-            step={1}
-            value={hours}
-            disabled={disabled}
-            onChange={(e) => {
-              const newHours = Math.min(23, Math.max(0, Number(e.target.value) || 0));
-              updateTime(newHours, minutes);
-            }}
-            className={`w-full rounded-lg border px-3 py-3 text-base outline-none transition focus:ring-2 ${
-              disabled
-                ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
-                : 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
-            }`}
-          />
-        </label>
-        <label className="flex flex-col text-sm text-slate-700 dark:text-slate-200">
-          <span className="mb-2 text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Minutos</span>
-          <input
-            type="number"
-            min={0}
-            max={45}
-            step={15}
-            value={minutes}
-            disabled={disabled}
-            onChange={(e) => {
-              const newMinutes = clampToStep(Number(e.target.value) || 0);
-              updateTime(hours, newMinutes);
-            }}
-            className={`w-full rounded-lg border px-3 py-3 text-base outline-none transition focus:ring-2 ${
-              disabled
-                ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
-                : 'border-slate-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
-            }`}
-          />
-        </label>
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 mb-2">
+            Horas
+          </label>
+          <div className="grid grid-cols-4 gap-1">
+            {hourOptions.map((hour) => (
+              <button
+                key={hour}
+                type="button"
+                disabled={disabled}
+                onClick={() => updateTime(hour, minutes)}
+                className={`rounded-lg border px-2 py-2 text-sm font-medium transition ${
+                  disabled
+                    ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                    : hour === hours
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-500/10 dark:text-emerald-300'
+                    : 'border-slate-300 bg-white text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/10'
+                }`}
+              >
+                {String(hour).padStart(2, '0')}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 mb-2">
+            Minutos
+          </label>
+          <div className="grid grid-cols-2 gap-1">
+            {minuteOptions.map((minute) => (
+              <button
+                key={minute}
+                type="button"
+                disabled={disabled}
+                onClick={() => updateTime(hours, minute)}
+                className={`rounded-lg border px-2 py-2 text-sm font-medium transition ${
+                  disabled
+                    ? 'border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                    : minute === minutes
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-400 dark:bg-emerald-500/10 dark:text-emerald-300'
+                    : 'border-slate-300 bg-white text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/10'
+                }`}
+              >
+                {String(minute).padStart(2, '0')}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-base text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-base font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
         {value || 'Seleccionar hora'}
       </div>
     </div>
