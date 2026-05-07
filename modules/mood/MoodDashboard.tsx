@@ -100,8 +100,15 @@ function getTextColor(color: string, isDarkMode: boolean): string {
   return adjustColorLuminance(resolved, factor);
 }
 
-function getBorderColor(color: string): string {
-  return normalizeColor(color);
+function getBorderColor(color: string, isDarkMode: boolean): string {
+  const resolved = normalizeColor(color);
+  if (resolved === '#ffffff' && !isDarkMode) {
+    return '#d1d5db'; // subtle gray border for white on light mode
+  }
+  if (resolved === '#000000' && isDarkMode) {
+    return '#9ca3af'; // softer gray border for black on dark mode
+  }
+  return resolved;
 }
 
 function getBackgroundColor(color: string): string {
@@ -242,11 +249,11 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
                 backgroundColor: getBackgroundColor(normalizeColor(state.color)),
-                borderColor: getBorderColor(normalizeColor(state.color)),
+                borderColor: getBorderColor(normalizeColor(state.color), isDarkMode),
                 borderWidth: '2px',
                 borderStyle: 'solid',
                 color: getTextColor(normalizeColor(state.color), isDarkMode),
-                ['--tw-ring-color' as any]: getBorderColor(normalizeColor(state.color)),
+                ['--tw-ring-color' as any]: getBorderColor(normalizeColor(state.color), isDarkMode),
               }}
             >
               <span className="text-lg">{state.emoji}</span>
