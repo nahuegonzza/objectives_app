@@ -36,7 +36,6 @@ export async function GET() {
           description: moduleDef.description,
           userId,
           active: true,
-          order: 0,
           config: JSON.stringify(moduleDef.defaultConfig || {})
         },
         update: {

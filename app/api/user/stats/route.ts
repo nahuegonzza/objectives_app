@@ -63,11 +63,11 @@ export async function GET() {
     const academicEntries = moduleEntries.filter(e => e.module.slug === 'academic');
 
     // Unique days for mood
-    const moodDays = new Set(moodEntries.map(e => e.date.slice(0, 10)));
+    const moodDays = new Set(moodEntries.map(e => e.date.toISOString().slice(0, 10)));
     moduleGoalsCompleted += moodDays.size;
 
     // Unique days for sleep
-    const sleepDays = new Set(sleepEntries.map(e => e.date.slice(0, 10)));
+    const sleepDays = new Set(sleepEntries.map(e => e.date.toISOString().slice(0, 10)));
     moduleGoalsCompleted += sleepDays.size;
 
     // Completed academic events
