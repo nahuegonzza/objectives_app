@@ -28,150 +28,36 @@ const formatTime = (hours: number, minutes: number) => `${String(hours).padStart
 const parseTime = (value: string) => {
   const [rawHours = '0', rawMinutes = '0'] = value.split(':');
   const hours = Math.min(23, Math.max(0, Number(rawHours) || 0));
-  const minutes = Math.min(45, Math.max(0, Number(rawMinutes) || 0));
+  const minutes = Math.min(59, Math.max(0, Number(rawMinutes) || 0));
   return { hours, minutes };
 };
 
-const HIDE_SPINNER_CSS = `
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type="number"] {
-    -moz-appearance: textfield;
-  }
-`;
-
 const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = false }) => {
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [editingHours, setEditingHours] = useState(false);
-  const [editingMinutes, setEditingMinutes] = useState(false);
+  const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
-    const parsed = parseTime(value);
-    setHours(parsed.hours);
-    setMinutes(parsed.minutes);
+    setLocalValue(value);
   }, [value]);
 
-  const updateTime = (newHours: number, newMinutes: number) => {
-    const formatted = formatTime(newHours, newMinutes);
-    setHours(newHours);
-    setMinutes(newMinutes);
-    onChange(formatted);
-  };
-
-  const incrementHour = () => updateTime((hours + 1) % 24, minutes);
-  const decrementHour = () => updateTime((hours - 1 + 24) % 24, minutes);
-  const incrementMinute = () => updateTime(hours, (minutes + 15) % 60);
-  const decrementMinute = () => updateTime(hours, (minutes - 15 + 60) % 60);
-
-  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value === '' ? 0 : Math.min(23, Math.max(0, Number(e.target.value)));
-    updateTime(val, minutes);
-  };
-
-  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value === '' ? 0 : Math.min(59, Math.max(0, Number(e.target.value)));
-    updateTime(hours, val);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = e.target.value;
+    setLocalValue(time);
+    onChange(time);
   };
 
   return (
-    <div className="flex items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-      <div className="flex flex-col items-center gap-2">
-        <button
-          type="button"
-          onClick={incrementHour}
-          disabled={disabled}
-          className={`p-2 rounded-lg transition ${
-            disabled
-              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
-              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
-          }`}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-        <input
-          type="number"
-          min={0}
-          max={23}
-          value={String(hours).padStart(2, '0')}
-          onChange={handleHoursChange}
-          disabled={disabled}
-          onFocus={() => setEditingHours(true)}
-          onBlur={() => setEditingHours(false)}
-          className={`w-16 text-3xl font-bold text-center rounded-lg border outline-none transition ${
-            disabled
-              ? 'border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
-              : 'border-emerald-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-700 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
-          }`}
-        />
-        <button
-          type="button"
-          onClick={decrementHour}
-          disabled={disabled}
-          className={`p-2 rounded-lg transition ${
-            disabled
-              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
-              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
-          }`}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="text-3xl font-bold text-slate-900 dark:text-white">:</div>
-
-      <div className="flex flex-col items-center gap-2">
-        <button
-          type="button"
-          onClick={incrementMinute}
-          disabled={disabled}
-          className={`p-2 rounded-lg transition ${
-            disabled
-              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
-              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
-          }`}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-        <input
-          type="number"
-          min={0}
-          max={59}
-          value={String(minutes).padStart(2, '0')}
-          onChange={handleMinutesChange}
-          disabled={disabled}
-          onFocus={() => setEditingMinutes(true)}
-          onBlur={() => setEditingMinutes(false)}
-          className={`w-16 text-3xl font-bold text-center rounded-lg border outline-none transition ${
-            disabled
-              ? 'border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
-              : 'border-emerald-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-700 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
-          }`}
-        />
-        <button
-          type="button"
-          onClick={decrementMinute}
-          disabled={disabled}
-          className={`p-2 rounded-lg transition ${
-            disabled
-              ? 'text-slate-400 cursor-not-allowed dark:text-slate-600'
-              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
-          }`}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      </div>
+    <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+      <input
+        type="time"
+        value={localValue}
+        onChange={handleChange}
+        disabled={disabled}
+        className={`text-3xl font-bold text-center rounded-lg border outline-none transition ${
+          disabled
+            ? 'border-slate-300 bg-slate-100 text-slate-500 cursor-not-allowed dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
+            : 'border-emerald-300 bg-white text-slate-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-700 dark:bg-slate-900 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900'
+        }`}
+      />
     </div>
   );
 };
@@ -291,7 +177,6 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
 
   return (
     <div>
-      <style>{HIDE_SPINNER_CSS}</style>
       <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
           <div className="flex flex-col gap-3">
