@@ -28,7 +28,7 @@ const formatTime = (hours: number, minutes: number) => `${String(hours).padStart
 const parseTime = (value: string) => {
   const [rawHours = '0', rawMinutes = '0'] = value.split(':');
   const hours = Math.min(23, Math.max(0, Number(rawHours) || 0));
-  const minutes = Math.min(45, Math.max(0, Number(rawMinutes) || 0));
+  const minutes = Math.min(59, Math.max(0, Number(rawMinutes) || 0));
   return { hours, minutes };
 };
 
