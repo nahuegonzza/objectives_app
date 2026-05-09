@@ -65,6 +65,8 @@ export default function CalendarExplorer() {
   const [habitsCollapsed, setHabitsCollapsed] = useState(false);
   const [metricsCollapsed, setMetricsCollapsed] = useState(false);
   const [moduleCollapseStates, setModuleCollapseStates] = useState<Record<string, boolean>>({});
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   const isEditingDay = editingGoalId === selectedDate;
 
