@@ -34,7 +34,7 @@ export function calculateDailyScore(entries: GoalEntryWithGoal[], events: Event[
   for (const module of activeModules) {
     if (module.definition?.calculateScore) {
       const moduleModuleEntries = moduleEntries.filter((e) => e.moduleId === module.id);
-      modulePoints += module.definition.calculateScore(moduleModuleEntries, module.config);
+      modulePoints += module.definition.calculateScore(moduleModuleEntries, module.config, targetDate);
     }
   }
 

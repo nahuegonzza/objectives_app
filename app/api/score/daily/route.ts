@@ -107,6 +107,7 @@ export async function GET(request: Request) {
     } as ActiveModule;
   });
 
-  const score = calculateDailyScore(parsedEntries, parsedEvents, parsedModuleEntries, activeModules);
+  const scoreDate = dateParam || startOfDay.toISOString().slice(0, 10);
+  const score = calculateDailyScore(parsedEntries, parsedEvents, parsedModuleEntries, activeModules, scoreDate);
   return NextResponse.json(score);
 }

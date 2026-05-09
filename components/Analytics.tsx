@@ -213,7 +213,7 @@ export default function Analytics() {
           const moduleDayEntries = filteredModuleEntries.filter((e) =>
             e.date.slice(0, 10) === date && e.moduleId === mod.id
           );
-          modulePoints += mod.definition.calculateScore(moduleDayEntries, mod.config);
+          modulePoints += mod.definition.calculateScore(moduleDayEntries, mod.config, date);
         }
       }
 
