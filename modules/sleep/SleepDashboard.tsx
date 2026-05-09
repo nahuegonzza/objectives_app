@@ -181,13 +181,19 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   const [waketime, setWaketime] = useState('');
   const [naps, setNaps] = useState<SleepNap[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [points, setPoints] = useState(0);
 
   // Usar la fecha proporcionada o hoy por defecto
   const selectedDate = date || getLocalDateString();
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadTodayEntry() {
+      if (!isMounted) return;
+
+      setLoading(true);
       try {
         // Resetear valores antes de cargar
         setBedtime('');
@@ -195,6 +201,8 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
         setNaps([]);
 
         const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=sleep`, { credentials: 'include' });
+        if (!isMounted) return;
+
         const entries = await res.json();
         if (entries && entries.length > 0) {
           const entry = entries[0];
@@ -210,10 +218,17 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       } catch (error) {
         console.error('Error loading sleep entry', error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
+
     loadTodayEntry();
+
+    return () => {
+      isMounted = false;
+    };
   }, [selectedDate]);
 
   const calculateHours = React.useCallback(() => {
@@ -257,6 +272,9 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   }, [config]);
 
   const saveEntry = React.useCallback(async (hours: number) => {
+    if (saving) return; // Prevent multiple saves
+
+    setSaving(true);
     try {
       const res = await fetch('/api/moduleEntries', {
         method: 'POST',
@@ -274,25 +292,44 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       }
     } catch (error) {
       console.error('Error saving sleep data', error);
+    } finally {
+      setSaving(false);
     }
-  }, [bedtime, waketime, naps, module.id, onUpdate, selectedDate]);
+  }, [bedtime, waketime, naps, module.id, onUpdate, selectedDate, saving]);
+
+  const hours = calculateHours();
 
   useEffect(() => {
-    const hours = calculateHours();
-    const pts = calculatePoints(hours);
-    setPoints(pts);
+    // No guardar si está cargando datos o si no hay edición habilitada
+    if (loading || !isEditing) return;
 
     const hasCompleteNap = naps.some((nap) => nap.start && nap.end);
     const hasValidSleepData = (bedtime && waketime) || hasCompleteNap;
 
-    if (isEditing && hasValidSleepData) {
+    // Solo guardar si hay datos válidos y no está guardando actualmente
+    if (hasValidSleepData && !saving) {
       saveEntry(hours);
     }
-  }, [bedtime, waketime, naps, config, isEditing, calculateHours, calculatePoints, saveEntry]);
+  }, [bedtime, waketime, naps, isEditing, loading, saving, hours, saveEntry]);
 
-  const hours = calculateHours();
+  // Calcular puntos cuando cambian las horas o la configuración
+  useEffect(() => {
+    const pts = calculatePoints(hours);
+    setPoints(pts);
+  }, [hours, calculatePoints]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 p-4 shadow-sm">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-2"></div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Cargando datos de sueño...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -314,7 +351,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
                 }
               }}
-              disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
+              disabled={!isEditing || saving || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
               className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
             >
               Agregar Siesta
@@ -328,7 +365,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             <TimePicker
               value={bedtime}
               onChange={setBedtime}
-              disabled={!isEditing}
+              disabled={!isEditing || saving}
             />
           </div>
           <div>
@@ -336,7 +373,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             <TimePicker
               value={waketime}
               onChange={setWaketime}
-              disabled={!isEditing}
+              disabled={!isEditing || saving}
             />
           </div>
         </div>
@@ -350,7 +387,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   <button
                     type="button"
                     onClick={() => setNaps((prev) => prev.filter((item) => item.id !== nap.id))}
-                    disabled={!isEditing}
+                    disabled={!isEditing || saving}
                     className="text-sm text-rose-600 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Eliminar
@@ -362,7 +399,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                     <TimePicker
                       value={nap.start}
                       onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item))}
-                      disabled={!isEditing}
+                      disabled={!isEditing || saving}
                     />
                   </div>
                   <div>
@@ -370,7 +407,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                     <TimePicker
                       value={nap.end}
                       onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item))}
-                      disabled={!isEditing}
+                      disabled={!isEditing || saving}
                     />
                   </div>
                 </div>
