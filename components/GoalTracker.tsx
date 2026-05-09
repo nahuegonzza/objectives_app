@@ -65,6 +65,7 @@ export default function GoalTracker() {
       await Promise.allSettled([
         loadModules(),
         loadData(),
+        loadModuleEntries(),
         loadScoreHistory(),
         loadStreakInfo()
       ]);
@@ -83,6 +84,7 @@ export default function GoalTracker() {
     (async () => {
       await Promise.allSettled([
         loadData(),
+        loadModuleEntries(),
         loadScoreHistory(),
         loadStreakInfo()
       ]);
@@ -165,13 +167,19 @@ export default function GoalTracker() {
 
   async function loadModuleEntries() {
     try {
-      const res = await fetch('/api/moduleEntries', { credentials: 'include' });
+      const res = await fetch(`/api/moduleEntries?date=${selectedDate}`, { credentials: 'include' });
       if (!res.ok) {
         console.error('Failed to fetch moduleEntries');
         return;
       }
       const moduleEntriesData = await res.json();
-      setModuleEntries(moduleEntriesData);
+      // Solo actualizar las entradas para la fecha seleccionada
+      setModuleEntries(prev => {
+        // Filtrar las entradas que no son de la fecha seleccionada
+        const otherEntries = prev.filter(e => getLocalDateStringFromEntry(e.date) !== selectedDate);
+        // Agregar las nuevas entradas de la fecha seleccionada
+        return [...otherEntries, ...moduleEntriesData];
+      });
     } catch (error) {
       console.error('Error loading moduleEntries:', error);
     }
@@ -564,9 +572,34 @@ export default function GoalTracker() {
                       config={module.config}
                       module={module}
                       isEditing={true}
-                      onUpdate={() => {
-                        loadModuleEntries();
-                        markTodayStreak();
+                      onUpdate={async (updatedData?: any) => {
+                        if (updatedData) {
+                          // Si el módulo proporciona datos actualizados, actualizar el estado local
+                          setModuleEntries(prev => {
+                            const existingIndex = prev.findIndex(e =>
+                              e.moduleId === module.id &&
+                              getLocalDateStringFromEntry(e.date) === selectedDate
+                            );
+                            const newEntry = {
+                              id: `temp-${Date.now()}`, // ID temporal
+                              moduleId: module.id,
+                              date: selectedDate + 'T00:00:00.000Z',
+                              data: updatedData,
+                              module: module
+                            };
+                            if (existingIndex >= 0) {
+                              const updated = [...prev];
+                              updated[existingIndex] = { ...updated[existingIndex], data: updatedData };
+                              return updated;
+                            } else {
+                              return [...prev, newEntry];
+                            }
+                          });
+                        } else {
+                          // Si no hay datos actualizados, recargar desde el servidor
+                          await loadModuleEntries();
+                        }
+                        await markTodayStreak();
                       }}
                       date={selectedDate}
                     />

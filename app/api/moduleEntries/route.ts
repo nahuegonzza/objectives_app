@@ -157,3 +157,49 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { user, isServiceRole, serviceRoleAvailable } = await getServerSupabaseUser();
+
+    let userId: string | undefined;
+    if (user?.id) {
+      userId = user.id;
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const url = new URL(request.url);
+    const entryId = url.searchParams.get('id');
+
+    if (!entryId) {
+      return NextResponse.json({ error: 'Entry ID is required' }, { status: 400 });
+    }
+
+    // Verify the entry belongs to the user before deleting
+    const entry = await withRetry(() =>
+      prisma.moduleEntry.findFirst({
+        where: { id: entryId, userId }
+      })
+    );
+
+    if (!entry) {
+      return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
+    }
+
+    await withRetry(() =>
+      prisma.moduleEntry.delete({
+        where: { id: entryId }
+      })
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting module entry:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

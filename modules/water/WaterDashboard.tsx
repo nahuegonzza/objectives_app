@@ -8,9 +8,10 @@ interface WaterDashboardProps {
   module: ActiveModule;
   date?: string;
   isEditing?: boolean;
+  onUpdate?: (data: any) => void;
 }
 
-export default function WaterDashboard({ module, date, isEditing }: WaterDashboardProps) {
+export default function WaterDashboard({ module, date, isEditing, onUpdate }: WaterDashboardProps) {
   const [entries, setEntries] = useState<ModuleEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -57,6 +58,8 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
         // Optimistically update local state
         const newEntry = await res.json();
         setEntries(prev => [...prev, newEntry]);
+        // Notify parent component of the update
+        onUpdate?.({ totalGlasses: totalGlasses + 1 });
       }
     } catch (error) {
       console.error('Error adding glass:', error);
@@ -83,9 +86,19 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
       // For simplicity, remove the last entry. In a real app, you might want to decrement the value
       const entryToRemove = entriesWithValues[entriesWithValues.length - 1];
 
-      // Note: This is a simplified implementation. A proper implementation would need
-      // to either delete the entry or update its value
-      console.log('Remove functionality not fully implemented yet');
+      const res = await fetch(`/api/moduleEntries?id=${entryToRemove.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        // Update local state
+        setEntries(prev => prev.filter(e => e.id !== entryToRemove.id));
+        // Notify parent component of the update
+        onUpdate?.({ totalGlasses: totalGlasses - 1 });
+      } else {
+        throw new Error('Failed to remove glass');
+      }
 
     } catch (error) {
       console.error('Error removing glass:', error);
