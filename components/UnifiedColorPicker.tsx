@@ -182,33 +182,17 @@ export default function UnifiedColorPicker({
 
           {showRgb && (
             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={customHex}
-                  onChange={(event) => setCustomHex(event.target.value)}
-                  className="h-12 w-12 cursor-pointer rounded-full border border-slate-300 p-0 dark:border-slate-600"
-                  aria-label="Seleccionar color RGB"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">Color personalizado</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Elige un color directo desde la paleta.</p>
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-950">
-                  <span className="h-8 w-8 rounded-full border border-slate-300" style={{ backgroundColor: customHex }} />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">{customHex.toUpperCase()}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleSelect(customHex)}
-                  className="rounded-2xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
-                >
-                  Aplicar
-                </button>
-              </div>
+              <input
+                type="color"
+                value={customHex}
+                onChange={(event) => {
+                  const hex = event.target.value;
+                  setCustomHex(hex);
+                  handleSelect(hex);
+                }}
+                className="h-12 w-full cursor-pointer rounded-2xl border border-slate-300 p-0 dark:border-slate-600"
+                aria-label="Seleccionar color RGB"
+              />
             </div>
           )}
         </div>,
