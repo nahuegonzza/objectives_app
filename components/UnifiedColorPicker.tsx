@@ -27,11 +27,11 @@ export default function UnifiedColorPicker({
   labelClassName,
 }: UnifiedColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showRgb, setShowRgb] = useState(false);
   const [customHex, setCustomHex] = useState('#ffffff');
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const colorInputRef = useRef<HTMLInputElement>(null);
   const [overlayStyle, setOverlayStyle] = useState<Record<string, number>>({});
   const selected = useMemo(() => getColorOption(value), [value]);
 
@@ -54,7 +54,6 @@ export default function UnifiedColorPicker({
         return;
       }
       setIsOpen(false);
-      setShowRgb(false);
     };
 
     if (isOpen) {
@@ -72,7 +71,7 @@ export default function UnifiedColorPicker({
     const updatePosition = () => {
       const rect = buttonRef.current!.getBoundingClientRect();
       const popupWidth = 288;
-      const popupHeight = showRgb ? 420 : 216;
+      const popupHeight = 216;
       const margin = 8;
       let top = rect.bottom + margin;
       if (top + popupHeight > window.innerHeight - margin) {
@@ -88,7 +87,7 @@ export default function UnifiedColorPicker({
     };
 
     updatePosition();
-  }, [isOpen, showRgb]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -97,7 +96,7 @@ export default function UnifiedColorPicker({
       if (!buttonRef.current) return;
       const rect = buttonRef.current.getBoundingClientRect();
       const popupWidth = 288;
-      const popupHeight = showRgb ? 420 : 216;
+      const popupHeight = 216;
       const margin = 8;
       let top = rect.bottom + margin;
       if (top + popupHeight > window.innerHeight - margin) {
@@ -119,12 +118,21 @@ export default function UnifiedColorPicker({
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
     };
-  }, [isOpen, showRgb]);
+  }, [isOpen]);
 
   const handleSelect = (color: string) => {
     onChange(color);
     setIsOpen(false);
-    setShowRgb(false);
+  };
+
+  const openColorPicker = () => {
+    if (!colorInputRef.current) return;
+    const input = colorInputRef.current as HTMLInputElement & { showPicker?: () => void };
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+    } else {
+      input.click();
+    }
   };
 
   return (
@@ -172,29 +180,25 @@ export default function UnifiedColorPicker({
             ))}
             <button
               type="button"
-              onClick={() => setShowRgb(true)}
+              onClick={openColorPicker}
               className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-slate-300 bg-slate-100 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700 transition hover:border-slate-400 hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
               aria-label="Color RGB personalizado"
             >
               RGB
             </button>
           </div>
-
-          {showRgb && (
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
-              <input
-                type="color"
-                value={customHex}
-                onChange={(event) => {
-                  const hex = event.target.value;
-                  setCustomHex(hex);
-                  handleSelect(hex);
-                }}
-                className="h-12 w-full cursor-pointer rounded-2xl border border-slate-300 p-0 dark:border-slate-600"
-                aria-label="Seleccionar color RGB"
-              />
-            </div>
-          )}
+          <input
+            ref={colorInputRef}
+            type="color"
+            value={customHex}
+            onChange={(event) => {
+              const hex = event.target.value;
+              setCustomHex(hex);
+              handleSelect(hex);
+            }}
+            className="sr-only"
+            aria-hidden="true"
+          />
         </div>,
         document.body
       )}
