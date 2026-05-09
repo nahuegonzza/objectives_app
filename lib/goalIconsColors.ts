@@ -206,12 +206,7 @@ export const COLOR_OPTIONS = [
 export function getBackgroundColors(colorKey: string | undefined): { light: string; dark: string; lightBorder: string; darkBorder: string } {
   // Handle custom RGB colors
   if (colorKey && isCustomColor(colorKey)) {
-    return {
-      light: colorKey,
-      dark: colorKey,
-      lightBorder: colorKey,
-      darkBorder: colorKey,
-    };
+    return deriveCustomColorVariants(colorKey);
   }
 
   const lightMap: Record<string, string> = {
@@ -356,6 +351,70 @@ export function getLightBackgroundColor(colorKey: string | undefined): string {
   return getBackgroundColors(colorKey).light;
 }
 
+function clampColorValue(value: number) {
+  return Math.min(255, Math.max(0, Math.round(value)));
+}
+
+function parseHexToRgb(hex: string) {
+  const clean = hex.replace('#', '');
+  const result = /^([a-fA-F0-9]{6})$/.exec(clean);
+  if (!result) return null;
+  return {
+    r: parseInt(result[1].slice(0, 2), 16),
+    g: parseInt(result[1].slice(2, 4), 16),
+    b: parseInt(result[1].slice(4, 6), 16),
+  };
+}
+
+function parseRgbString(rgb: string) {
+  const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i);
+  if (!match) return null;
+  return {
+    r: Number(match[1]),
+    g: Number(match[2]),
+    b: Number(match[3]),
+  };
+}
+
+function colorStringToRgb(color: string) {
+  if (color.startsWith('#')) {
+    return parseHexToRgb(color);
+  }
+  return parseRgbString(color);
+}
+
+function adjustRgb(rgb: { r: number; g: number; b: number }, amount: number) {
+  return {
+    r: clampColorValue(rgb.r + amount),
+    g: clampColorValue(rgb.g + amount),
+    b: clampColorValue(rgb.b + amount),
+  };
+}
+
+function deriveCustomColorVariants(colorKey: string) {
+  const rgb = colorStringToRgb(colorKey);
+  if (!rgb) {
+    return {
+      light: colorKey,
+      dark: colorKey,
+      lightBorder: colorKey,
+      darkBorder: colorKey,
+    };
+  }
+
+  const lightRgb = adjustRgb(rgb, 70);
+  const darkRgb = adjustRgb(rgb, -70);
+  const lightBorderRgb = adjustRgb(rgb, 30);
+  const darkBorderRgb = adjustRgb(rgb, -30);
+
+  return {
+    light: rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b),
+    dark: rgbToHex(darkRgb.r, darkRgb.g, darkRgb.b),
+    lightBorder: rgbToHex(lightBorderRgb.r, lightBorderRgb.g, lightBorderRgb.b),
+    darkBorder: rgbToHex(darkBorderRgb.r, darkBorderRgb.g, darkBorderRgb.b),
+  };
+}
+
 // Check if a color is a custom RGB color
 export function isCustomColor(color: string | undefined): boolean {
   if (!color) return false;
@@ -373,11 +432,22 @@ export function getColorOption(colorKey: string | undefined) {
 
   // Custom color
   if (isCustomColor(colorKey)) {
+    const rgb = colorStringToRgb(colorKey);
+    let borderColor = colorKey;
+    if (rgb) {
+      const borderLightRgb = adjustRgb(rgb, 30);
+      const borderDarkRgb = adjustRgb(rgb, -30);
+      const lightVariant = rgbToHex(borderLightRgb.r, borderLightRgb.g, borderLightRgb.b);
+      const darkVariant = rgbToHex(borderDarkRgb.r, borderDarkRgb.g, borderDarkRgb.b);
+      const luminance = 0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b;
+      borderColor = luminance > 180 ? darkVariant : lightVariant;
+    }
+
     return {
       key: colorKey,
       label: 'Custom',
       bgColor: colorKey,
-      borderColor: colorKey,
+      borderColor,
     };
   }
 
