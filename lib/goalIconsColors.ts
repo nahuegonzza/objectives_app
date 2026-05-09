@@ -356,11 +356,11 @@ function clampColorValue(value: number) {
 }
 
 const CUSTOM_COLOR_DELTAS = {
-  border: { r: 22, g: 26, b: 20 },
-  light: { r: 56, g: 59, b: 56 },
-  dark: { r: -40, g: -42, b: -41 },
-  lightBorder: { r: 40, g: 46, b: 40 },
-  darkBorder: { r: -10, g: -7, b: 2 },
+  border: { r: 65, g: 78, b: 60 },
+  light: { r: 168, g: 177, b: 167 },
+  dark: { r: -120, g: -125, b: -122 },
+  lightBorder: { r: 119, g: 138, b: 119 },
+  darkBorder: { r: -28, g: -19, b: 6 },
 };
 
 function adjustRgbBy(rgb: { r: number; g: number; b: number }, delta: { r: number; g: number; b: number }) {
