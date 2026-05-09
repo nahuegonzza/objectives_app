@@ -127,7 +127,7 @@ export interface ModuleDefinition {
   supportedEvents: string[];
   defaultConfig: Record<string, unknown>;
   calculateScore?: (entries: ModuleEntry[], config: Record<string, unknown>, targetDate?: string) => number;
-  Component?: React.ComponentType<{ config: Record<string, unknown>; module: ModuleState; onUpdate?: (data: any) => void; isEditing?: boolean; date?: string }>;
+  Component?: React.ComponentType<{ config: Record<string, unknown>; module: ModuleState; onUpdate?: () => void; isEditing?: boolean; date?: string }>;
   ConfigComponent?: React.ComponentType<{ module: ModuleState; onConfigChange: (config: Record<string, unknown>) => void }>;
   DashboardComponent?: React.ComponentType<{ module: ModuleState; date: string }>;
   HistoryComponent?: React.ComponentType<{ date: string; data: any }>;

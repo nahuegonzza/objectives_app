@@ -6,7 +6,7 @@ import { getLocalDateString } from '@lib/dateHelpers';
 interface SleepDashboardProps {
   config: Record<string, unknown>;
   module: any; // ModuleState
-  onUpdate?: (data: any) => void;
+  onUpdate?: () => void;
   isEditing?: boolean;
   date?: string; // Fecha seleccionada del calendario
 }
@@ -270,7 +270,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       });
 
       if (res.ok) {
-        onUpdate?.({ bedtime, waketime, naps, hours });
+        onUpdate?.();
       }
     } catch (error) {
       console.error('Error saving sleep data', error);

@@ -8,7 +8,7 @@ interface WaterDashboardProps {
   module: ActiveModule;
   date?: string;
   isEditing?: boolean;
-  onUpdate?: (data: any) => void;
+  onUpdate?: () => void;
 }
 
 export default function WaterDashboard({ module, date, isEditing, onUpdate }: WaterDashboardProps) {
@@ -59,7 +59,7 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
         const newEntry = await res.json();
         setEntries(prev => [...prev, newEntry]);
         // Notify parent component of the update
-        onUpdate?.({ totalGlasses: totalGlasses + 1 });
+        onUpdate?.();
       }
     } catch (error) {
       console.error('Error adding glass:', error);
@@ -95,7 +95,7 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
         // Update local state
         setEntries(prev => prev.filter(e => e.id !== entryToRemove.id));
         // Notify parent component of the update
-        onUpdate?.({ totalGlasses: totalGlasses - 1 });
+        onUpdate?.();
       } else {
         throw new Error('Failed to remove glass');
       }

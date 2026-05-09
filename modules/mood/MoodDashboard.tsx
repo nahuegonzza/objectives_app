@@ -15,7 +15,7 @@ interface MoodState {
 interface MoodDashboardProps {
   config: Record<string, unknown>;
   module: any;
-  onUpdate?: (data: any) => void;
+  onUpdate?: () => void;
   isEditing?: boolean;
   date?: string;
 }
@@ -195,7 +195,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
 
       if (res.ok) {
         const mood = states.find(s => s.id === moodId);
-        onUpdate?.({ moodId, mood: mood?.title });
+        onUpdate?.();
       }
     } catch (error) {
       console.error('Error saving mood data', error);

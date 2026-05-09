@@ -11,7 +11,7 @@ import type { AcademicEvent } from './academicHelpers';
 interface AcademicDashboardProps {
   config: Record<string, unknown>;
   module: ModuleState;
-  onUpdate?: (data: any) => void;
+  onUpdate?: () => void;
   isEditing?: boolean;
   date?: string;
 }
@@ -42,7 +42,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
 
   const handleToggleCompleted = async (event: AcademicEvent) => {
     await toggleEventCompleted(event);
-    onUpdate?.({ updated: true });
+    onUpdate?.();
   };
 
   const handleAddEvent = async (event: AcademicEvent) => {
@@ -50,7 +50,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     setShowEventForm(false);
     setMessage('✓ Evento creado');
     setMessageType('success');
-    onUpdate?.({ updated: true });
+    onUpdate?.();
   };
 
   if (loading) {
