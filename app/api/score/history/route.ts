@@ -168,10 +168,10 @@ export async function GET(request: Request) {
     } as ActiveModule;
   });
 
-  const currentScore = calculateDailyScore(todayEntries, todayEvents, todayModuleEntries, activeModules);
-  const previousDayScore = calculateDailyScore(previousDayEntries, previousDayEvents, previousDayModuleEntries, activeModules);
-  const weekScore = calculateDailyScore(weekEntries, weekEvents, weekModuleEntries, activeModules);
-  const monthScore = calculateDailyScore(monthEntries, monthEvents, monthModuleEntries, activeModules);
+  const currentScore = calculateDailyScore(todayEntries, todayEvents, todayModuleEntries, activeModules, formatDate(currentStart));
+  const previousDayScore = calculateDailyScore(previousDayEntries, previousDayEvents, previousDayModuleEntries, activeModules, formatDate(previousDay));
+  const weekScore = calculateDailyScore(weekEntries, weekEvents, weekModuleEntries, activeModules, `${formatDate(weekStart)} - ${formatDate(weekEnd)}`);
+  const monthScore = calculateDailyScore(monthEntries, monthEvents, monthModuleEntries, activeModules, `${formatDate(monthStart)} - ${formatDate(monthEnd)}`);
 
   return NextResponse.json({
     current: { ...currentScore, date: formatDate(currentStart) },

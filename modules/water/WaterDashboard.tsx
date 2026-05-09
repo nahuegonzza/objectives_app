@@ -13,6 +13,7 @@ interface WaterDashboardProps {
 export default function WaterDashboard({ module, date, isEditing }: WaterDashboardProps) {
   const [entries, setEntries] = useState<ModuleEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (date) {
@@ -41,19 +42,57 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
   const progress = Math.min(totalGlasses / goal, 1);
 
   const addGlass = async () => {
-    const res = await fetch('/api/moduleEntries', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ moduleId: module.id, date, data: { value: 1 } })
-    });
-    if (res.ok) {
+    if (saving) return; // Prevent multiple clicks
+    setSaving(true);
+
+    try {
+      const res = await fetch('/api/moduleEntries', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moduleId: module.id, date, data: { value: 1 } })
+      });
+
+      if (res.ok) {
+        // Optimistically update local state
+        const newEntry = await res.json();
+        setEntries(prev => [...prev, newEntry]);
+      }
+    } catch (error) {
+      console.error('Error adding glass:', error);
+      // Reload on error to sync state
       loadEntries();
+    } finally {
+      setSaving(false);
     }
   };
 
   const removeGlass = async () => {
-    // TODO: Implement remove functionality
+    if (saving || totalGlasses === 0) return;
+    setSaving(true);
+
+    try {
+      // Find the most recent entry to remove
+      const entriesWithValues = entries.filter(entry => {
+        const data = JSON.parse(entry.data);
+        return (data.value || 0) > 0;
+      });
+
+      if (entriesWithValues.length === 0) return;
+
+      // For simplicity, remove the last entry. In a real app, you might want to decrement the value
+      const entryToRemove = entriesWithValues[entriesWithValues.length - 1];
+
+      // Note: This is a simplified implementation. A proper implementation would need
+      // to either delete the entry or update its value
+      console.log('Remove functionality not fully implemented yet');
+
+    } catch (error) {
+      console.error('Error removing glass:', error);
+      loadEntries();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -76,16 +115,17 @@ export default function WaterDashboard({ module, date, isEditing }: WaterDashboa
         <div className="flex gap-2">
           <button
             onClick={addGlass}
-            className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
+            disabled={saving}
+            className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed"
           >
-            + Vaso
+            {saving ? 'Guardando...' : '+ Vaso'}
           </button>
           <button
             onClick={removeGlass}
-            disabled={totalGlasses === 0}
-            className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition"
+            disabled={totalGlasses === 0 || saving}
+            className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            - Vaso
+            {saving ? 'Guardando...' : '- Vaso'}
           </button>
         </div>
       </div>

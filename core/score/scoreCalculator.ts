@@ -27,7 +27,7 @@ function scoreEntry(entry: GoalEntryWithGoal): number {
   return 0;
 }
 
-export function calculateDailyScore(entries: GoalEntryWithGoal[], events: Event[], moduleEntries: ModuleEntry[], activeModules: ActiveModule[]): DailyScore {
+export function calculateDailyScore(entries: GoalEntryWithGoal[], events: Event[], moduleEntries: ModuleEntry[], activeModules: ActiveModule[], targetDate?: string): DailyScore {
   const points = entries.reduce((total, entry) => total + scoreEntry(entry), 0);
 
   let modulePoints = 0;
@@ -38,8 +38,10 @@ export function calculateDailyScore(entries: GoalEntryWithGoal[], events: Event[
     }
   }
 
+  const date = targetDate || new Date().toISOString();
+
   return {
-    date: new Date().toISOString(),
+    date,
     points: points + modulePoints,
     note: `Registros: ${entries.length}, Módulos: ${activeModules.length}`
   };

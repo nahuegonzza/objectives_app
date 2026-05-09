@@ -318,7 +318,7 @@ export default function GoalTracker() {
   const goalEntriesMap = useMemo(() => {
     const todayEntries = entries.filter((e) => getLocalDateStringFromEntry(e.date) === selectedDate);
     return new Map(todayEntries.map((entry) => [entry.goalId, entry]));
-  }, [entries, today]);
+  }, [entries, selectedDate]);
 
   const currentEntries = useMemo(
     () => entries.filter((e) => getLocalDateStringFromEntry(e.date) === today),
@@ -329,14 +329,27 @@ export default function GoalTracker() {
     [events, selectedDate]
   );
   const currentModuleEntries = useMemo(
-    () => moduleEntries.filter((e) => getLocalDateStringFromEntry(e.date) === today),
+    () => moduleEntries.filter((e) => getLocalDateStringFromEntry(e.date) === selectedDate),
+    [moduleEntries, selectedDate]
+  );
+
+  const selectedDateEntries = useMemo(
+    () => entries.filter((e) => getLocalDateStringFromEntry(e.date) === selectedDate),
+    [entries, selectedDate]
+  );
+  const selectedDateEvents = useMemo(
+    () => events.filter((e) => getLocalDateStringFromEntry(e.createdAt) === selectedDate),
+    [events, selectedDate]
+  );
+  const selectedDateModuleEntries = useMemo(
+    () => moduleEntries.filter((e) => getLocalDateStringFromEntry(e.date) === selectedDate),
     [moduleEntries, selectedDate]
   );
 
   useEffect(() => {
-    const currentScore = calculateDailyScore(currentEntries, currentEvents, currentModuleEntries, activeModules);
+    const currentScore = calculateDailyScore(selectedDateEntries, selectedDateEvents, selectedDateModuleEntries, activeModules, selectedDate);
     setDailyScore(currentScore);
-  }, [currentEntries, currentEvents, currentModuleEntries, activeModules]);
+  }, [selectedDateEntries, selectedDateEvents, selectedDateModuleEntries, activeModules, selectedDate]);
 
   // Filtrar solo objetivos activos Y que correspondan al día de hoy
   // Usa isGoalActiveOnDate de goalHelpers.ts para mantener consistencia
