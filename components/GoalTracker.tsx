@@ -62,10 +62,12 @@ export default function GoalTracker() {
 
   useEffect(() => {
     (async () => {
-      await loadModules();
-      await loadData();
-      await loadScoreHistory();
-      await loadStreakInfo();
+      await Promise.allSettled([
+        loadModules(),
+        loadData(),
+        loadScoreHistory(),
+        loadStreakInfo()
+      ]);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -79,9 +81,11 @@ export default function GoalTracker() {
 
   useEffect(() => {
     (async () => {
-      await loadData();
-      await loadScoreHistory();
-      await loadStreakInfo();
+      await Promise.allSettled([
+        loadData(),
+        loadScoreHistory(),
+        loadStreakInfo()
+      ]);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
@@ -96,68 +100,29 @@ export default function GoalTracker() {
         fetch('/api/moduleEntries', { credentials: 'include' })
       ]);
 
-      // Check if responses are OK before parsing JSON
-      if (!goalsRes.ok) {
-        const body = await goalsRes.json().catch(() => null);
-        console.error('Failed to fetch goals:', goalsRes.status, goalsRes.statusText, body);
-        setMessage(body?.error || 'Error al cargar objetivos');
-        setMessageType('error');
-        return;
+      const responses = [
+        { name: 'goals', res: goalsRes, defaultError: 'Error al cargar objetivos' },
+        { name: 'entries', res: entriesRes, defaultError: 'Error al cargar registros' },
+        { name: 'events', res: eventsRes, defaultError: 'Error al cargar eventos' },
+        { name: 'moduleEntries', res: moduleEntriesRes, defaultError: 'Error al cargar entradas de módulos' }
+      ];
+
+      for (const item of responses) {
+        if (!item.res.ok) {
+          const body = await item.res.json().catch(() => null);
+          console.error(`Failed to fetch ${item.name}:`, item.res.status, item.res.statusText, body);
+          setMessage(body?.error || item.defaultError);
+          setMessageType('error');
+          return;
+        }
       }
 
-      if (!entriesRes.ok) {
-        const body = await entriesRes.json().catch(() => null);
-        console.error('Failed to fetch entries:', entriesRes.status, entriesRes.statusText, body);
-        setMessage(body?.error || 'Error al cargar registros');
-        setMessageType('error');
-        return;
-      }
-
-      if (!eventsRes.ok) {
-        const body = await eventsRes.json().catch(() => null);
-        console.error('Failed to fetch events:', eventsRes.status, eventsRes.statusText, body);
-        setMessage(body?.error || 'Error al cargar eventos');
-        setMessageType('error');
-        return;
-      }
-
-      const goalsText = await goalsRes.text();
-      const entriesText = await entriesRes.text();
-      const eventsText = await eventsRes.text();
-      const moduleEntriesText = await moduleEntriesRes.text();
-
-      if (!goalsText) {
-        console.error('Empty response from /api/goals');
-        setMessage('Respuesta vacía del servidor (objetivos)');
-        setMessageType('error');
-        return;
-      }
-
-      if (!entriesText) {
-        console.error('Empty response from /api/goalEntries');
-        setMessage('Respuesta vacía del servidor (registros)');
-        setMessageType('error');
-        return;
-      }
-
-      if (!eventsText) {
-        console.error('Empty response from /api/events');
-        setMessage('Respuesta vacía del servidor (eventos)');
-        setMessageType('error');
-        return;
-      }
-
-      if (!moduleEntriesText) {
-        console.error('Empty response from /api/moduleEntries');
-        setMessage('Respuesta vacía del servidor (entradas de módulos)');
-        setMessageType('error');
-        return;
-      }
-
-      const goalsData = JSON.parse(goalsText);
-      const entriesData = JSON.parse(entriesText);
-      const eventsData = JSON.parse(eventsText);
-      const moduleEntriesData = JSON.parse(moduleEntriesText);
+      const [goalsData, entriesData, eventsData, moduleEntriesData] = await Promise.all([
+        goalsRes.json().catch(() => []),
+        entriesRes.json().catch(() => []),
+        eventsRes.json().catch(() => []),
+        moduleEntriesRes.json().catch(() => [])
+      ]);
 
       const activeGoals = goalsData.filter((goal: Goal) => isGoalActiveOnDate(goal, selectedDate));
       setGoals(activeGoals.sort((a: Goal, b: Goal) => (a.order ?? 0) - (b.order ?? 0)));

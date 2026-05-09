@@ -214,9 +214,40 @@ export default function CalendarExplorer() {
     }));
   };
 
+  async function executeWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit: number = 4) {
+    const results: PromiseSettledResult<T>[] = [];
+    const activePromises: Promise<void>[] = [];
+
+    for (const task of tasks) {
+      const taskPromise = task()
+        .then((value) => ({ status: 'fulfilled', value } as const))
+        .catch((reason) => ({ status: 'rejected', reason } as const))
+        .then((result) => {
+          results.push(result);
+        });
+
+      let trackedPromise: Promise<void>;
+      trackedPromise = taskPromise.finally(() => {
+        const index = activePromises.indexOf(trackedPromise);
+        if (index >= 0) {
+          activePromises.splice(index, 1);
+        }
+      });
+
+      activePromises.push(trackedPromise);
+
+      if (activePromises.length >= limit) {
+        await Promise.race(activePromises);
+      }
+    }
+
+    await Promise.all(activePromises);
+    return results;
+  }
+
   const handleSaveGoalEntry = async (goal: Goal) => {
     const edit = dayEdits[goal.id];
-    if (!edit) return;
+    if (!edit) return null;
 
     const payload: any = {
       goalId: goal.id,
@@ -236,20 +267,37 @@ export default function CalendarExplorer() {
       body: JSON.stringify(payload)
     });
 
-    if (!response.ok) return;
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      throw new Error(errorBody?.error || 'Failed to save entry');
+    }
 
     const savedEntry: GoalEntryWithGoal = await response.json();
     setEntries((previous) => {
       const filtered = previous.filter((entry) => !(entry.goalId === goal.id && entry.date.slice(0, 10) === selectedDate));
       return [...filtered, savedEntry];
     });
+
+    return savedEntry;
   };
 
   const handleSaveAllDayEntries = async () => {
-    await Promise.all(visibleGoals.map(handleSaveGoalEntry));
+    const tasks = visibleGoals.map((goal) => () => handleSaveGoalEntry(goal));
+    const results = await executeWithConcurrency(tasks, 4);
+
+    const failures = results.filter((result) => result.status === 'rejected');
+    if (failures.length > 0) {
+      console.error('Some entries failed to save', failures);
+      setMessage('Algunos registros no se pudieron guardar. Intenta nuevamente.');
+      setMessageType('error');
+    } else {
+      setMessage('Registros guardados');
+      setMessageType('success');
+    }
+
     setEditingGoalId(null);
     setDayEdits({});
-    // Reload data to reflect changes
+
     const entriesRes = await fetch('/api/goalEntries', { credentials: 'include' });
     if (entriesRes.ok) {
       const entriesData = await entriesRes.json();

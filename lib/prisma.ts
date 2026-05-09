@@ -89,7 +89,7 @@ function getPrismaClient() {
     connectionTimeoutMillis: 5000, // Reduced from 10s
     query_timeout: 10000, // Reduced from 15s
     idleTimeoutMillis: 10000, // Reduced from 30s (critical!)
-    max: 3, // Reduced from 5
+    max: 5, // Increased slightly for better concurrent updates while keeping pool size low for serverless environments
     min: 0,
     allowExitOnIdle: true,
     statement_timeout: 10000,
@@ -115,12 +115,30 @@ function getPrismaClient() {
 export const prisma = getPrismaClient();
 
 // Función helper para retry automático en caso de errores de conexión
+function isPrismaRetryableError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  const retryablePatterns = [
+    "Can't reach database server",
+    'DatabaseNotReachable',
+    'Connection terminated unexpectedly',
+    'Connection refused',
+    'ECONNRESET',
+    'Connection pool error',
+    'timeout',
+    'Timed out',
+    'Pool timed out',
+    'failed to connect'
+  ];
+
+  return retryablePatterns.some((pattern) => message.includes(pattern));
+}
+
 export async function withRetry<T>(
   operation: () => Promise<T>,
   maxRetries: number = 3,
   delay: number = 500
 ): Promise<T> {
-  let lastError: Error;
+  let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -128,18 +146,17 @@ export async function withRetry<T>(
     } catch (error) {
       lastError = error as Error;
 
-      // Solo retry en errores de conexión
-      if (!lastError.message.includes('Can\'t reach database server') &&
-          !lastError.message.includes('DatabaseNotReachable')) {
+      if (!isPrismaRetryableError(error)) {
         throw error;
       }
 
       if (attempt < maxRetries) {
-        console.log(`[Prisma] Retry attempt ${attempt + 1}/${maxRetries} after connection error`);
-        await new Promise(resolve => setTimeout(resolve, delay * (attempt + 1)));
+        console.log(`[Prisma] Retry attempt ${attempt + 1}/${maxRetries} after connection error`, lastError.message);
+        await new Promise((resolve) => setTimeout(resolve, delay * (attempt + 1)));
+        continue;
       }
     }
   }
 
-  throw lastError!;
+  throw lastError ?? new Error('Unknown Prisma error');
 }

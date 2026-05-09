@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
-import { prisma } from '@lib/prisma';
+import { prisma, withRetry } from '@lib/prisma';
 import { ModuleEntryPayloadSchema } from '@lib/validators';
 
 function normalizeDateToStartOfDay(dateString: string) {
@@ -18,11 +18,10 @@ function normalizeDateToStartOfDay(dateString: string) {
   if (isNaN(year) || isNaN(month) || isNaN(day)) {
     throw new Error('Invalid date components');
   }
-  const date = new Date(year, month - 1, day);
+  const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   if (isNaN(date.getTime())) {
     throw new Error('Invalid date created');
   }
-  date.setHours(0, 0, 0, 0);
   return date;
 }
 
@@ -60,9 +59,9 @@ export async function GET(request: Request) {
   }
 
   if (moduleSlug) {
-    const mod = await prisma.module.findFirst({
-      where: { slug: moduleSlug, userId }
-    });
+    const mod = await withRetry(() =>
+      prisma.module.findFirst({ where: { slug: moduleSlug, userId } })
+    );
     if (mod) {
       whereClause.moduleId = mod.id;
     } else {
@@ -71,11 +70,13 @@ export async function GET(request: Request) {
   }
 
   try {
-    const entries = await prisma.moduleEntry.findMany({
-      where: whereClause,
-      include: { module: true },
-      orderBy: { date: 'desc' }
-    });
+    const entries = await withRetry(() =>
+      prisma.moduleEntry.findMany({
+        where: whereClause,
+        include: { module: true },
+        orderBy: { date: 'desc' }
+      })
+    );
     return NextResponse.json(entries);
   } catch (error) {
     console.error('Error fetching module entries:', error);
@@ -118,35 +119,37 @@ export async function POST(request: Request) {
     const validatedPayload = validationResult.data;
 
     // CRITICAL: Verify module belongs to the authenticated user
-    const moduleRecord = await prisma.module.findUnique({
-      where: { id: validatedPayload.moduleId }
-    });
+    const moduleRecord = await withRetry(() =>
+      prisma.module.findUnique({ where: { id: validatedPayload.moduleId } })
+    );
 
     if (!moduleRecord || moduleRecord.userId !== userId) {
       return NextResponse.json({ error: 'Module not found' }, { status: 404 });
     }
 
-    const normalizedDate = normalizeDateToStartOfDay(validatedPayload.date ?? new Date().toISOString().split('T')[0]);
+    const normalizedDate = normalizeDateToStartOfDay(validatedPayload.date ?? new Date().toISOString().slice(0, 10));
 
-    const entry = await prisma.moduleEntry.upsert({
-      where: {
-        moduleId_date: {
+    const entry = await withRetry(() =>
+      prisma.moduleEntry.upsert({
+        where: {
+          moduleId_date: {
+            moduleId: validatedPayload.moduleId,
+            date: normalizedDate
+          }
+        },
+        update: {
+          data: JSON.stringify(validatedPayload.data),
+          updatedAt: new Date()
+        },
+        create: {
+          userId,
           moduleId: validatedPayload.moduleId,
-          date: normalizedDate
-        }
-      },
-      update: {
-        data: JSON.stringify(validatedPayload.data),
-        updatedAt: new Date()
-      },
-      create: {
-        userId,
-        moduleId: validatedPayload.moduleId,
-        date: normalizedDate,
-        data: JSON.stringify(validatedPayload.data)
-      },
-      include: { module: true }
-    });
+          date: normalizedDate,
+          data: JSON.stringify(validatedPayload.data)
+        },
+        include: { module: true }
+      })
+    );
 
     return NextResponse.json(entry);
   } catch (error) {

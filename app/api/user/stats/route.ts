@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@lib/prisma';
+import { prisma, withRetry } from '@lib/prisma';
 import { getServerSupabaseUser } from '@lib/supabase-server';
 import { parseAcademicData } from '../../../../modules/academic/academicHelpers';
 
@@ -23,10 +23,12 @@ export async function GET() {
     }
 
     // Get all goal entries for this user to calculate total score
-    const allEntries = await prisma.goalEntry.findMany({
-      where: { userId: userId },
-      include: { goal: true }
-    });
+    const allEntries = await withRetry(() =>
+      prisma.goalEntry.findMany({
+        where: { userId: userId },
+        include: { goal: true }
+      })
+    );
 
     // Calculate total score from goal entries
     let totalScore = 0;
@@ -43,10 +45,12 @@ export async function GET() {
     }
 
     // Add module scores
-    const moduleEntries = await prisma.moduleEntry.findMany({
-      where: { userId: userId },
-      include: { module: true }
-    });
+    const moduleEntries = await withRetry(() =>
+      prisma.moduleEntry.findMany({
+        where: { userId: userId },
+        include: { module: true }
+      })
+    );
 
     // Simple module scoring - each module entry counts as 1 point
     // (Modules have their own scoring logic in their definitions)

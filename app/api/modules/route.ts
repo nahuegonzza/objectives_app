@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
-import { prisma } from '@lib/prisma';
+import { prisma, withRetry } from '@lib/prisma';
 import { moduleDefinitions } from '@modules';
 import { parseModuleConfig } from '@lib/modules';
 
@@ -27,35 +27,43 @@ export async function GET() {
 
     const validSlugs = moduleDefinitions.map((moduleDef) => moduleDef.slug);
 
-    for (const moduleDef of moduleDefinitions) {
-      await prisma.module.upsert({
-        where: { userId_slug: { userId, slug: moduleDef.slug } },
-        create: {
-          slug: moduleDef.slug,
-          name: moduleDef.name,
-          description: moduleDef.description,
+    const upsertPromises = moduleDefinitions.map((moduleDef) =>
+      withRetry(() =>
+        prisma.module.upsert({
+          where: { userId_slug: { userId, slug: moduleDef.slug } },
+          create: {
+            slug: moduleDef.slug,
+            name: moduleDef.name,
+            description: moduleDef.description,
+            userId,
+            active: true,
+            config: JSON.stringify(moduleDef.defaultConfig || {})
+          },
+          update: {
+            name: moduleDef.name,
+            description: moduleDef.description
+          }
+        })
+      )
+    );
+
+    await Promise.all(upsertPromises);
+
+    await withRetry(() =>
+      prisma.module.deleteMany({
+        where: {
           userId,
-          active: true,
-          config: JSON.stringify(moduleDef.defaultConfig || {})
-        },
-        update: {
-          name: moduleDef.name,
-          description: moduleDef.description
+          slug: { notIn: validSlugs }
         }
-      });
-    }
+      })
+    );
 
-    await prisma.module.deleteMany({
-      where: {
-        userId,
-        slug: { notIn: validSlugs }
-      }
-    });
-
-    const modules = await prisma.module.findMany({
-      where: { userId },
-      orderBy: [{ order: 'asc' }, { name: 'asc' }]
-    });
+    const modules = await withRetry(() =>
+      prisma.module.findMany({
+        where: { userId },
+        orderBy: [{ order: 'asc' }, { name: 'asc' }]
+      })
+    );
 
     const mapped = modules.map((module) => ({
       ...module,

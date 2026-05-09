@@ -3,7 +3,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
 import { getServerSupabaseUser } from '@lib/supabase-server';
-import { prisma } from '@lib/prisma';
+import { prisma, withRetry } from '@lib/prisma';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
 import { moduleDefinitions } from '@modules';
 import { parseModuleConfig } from '@lib/modules';
@@ -39,10 +39,12 @@ function normalizeGoalType(type: string): GoalType {
 }
 
 async function getEntriesForRange(start: Date, end: Date, userId: string) {
-  const entries = await prisma.goalEntry.findMany({
-    where: { userId, date: { gte: start, lte: end } },
-    include: { goal: true }
-  });
+  const entries = await withRetry(() =>
+    prisma.goalEntry.findMany({
+      where: { userId, date: { gte: start, lte: end } },
+      include: { goal: true }
+    })
+  );
 
   return entries.map((entry) => ({
     ...entry,
@@ -60,9 +62,11 @@ async function getEntriesForRange(start: Date, end: Date, userId: string) {
 }
 
 async function getEventsForRange(start: Date, end: Date, userId: string) {
-  const events = await prisma.event.findMany({
-    where: { userId, createdAt: { gte: start, lte: end } }
-  });
+  const events = await withRetry(() =>
+    prisma.event.findMany({
+      where: { userId, createdAt: { gte: start, lte: end } }
+    })
+  );
 
   return events.map((event) => ({
     ...event,
@@ -72,10 +76,12 @@ async function getEventsForRange(start: Date, end: Date, userId: string) {
 }
 
 async function getModuleEntriesForRange(start: Date, end: Date, userId: string) {
-  const entries = await prisma.moduleEntry.findMany({
-    where: { userId, date: { gte: start, lte: end } },
-    include: { module: true }
-  });
+  const entries = await withRetry(() =>
+    prisma.moduleEntry.findMany({
+      where: { userId, date: { gte: start, lte: end } },
+      include: { module: true }
+    })
+  );
 
   return entries.map((entry) => ({
     ...entry,
@@ -146,9 +152,11 @@ export async function GET(request: Request) {
     getModuleEntriesForRange(monthStart, monthEnd, userId)
   ]);
 
-  const dbModules = await prisma.module.findMany({
-    where: { userId, active: true }
-  });
+  const dbModules = await withRetry(() =>
+    prisma.module.findMany({
+      where: { userId, active: true }
+    })
+  );
 
   const activeModules: ActiveModule[] = dbModules.map((mod) => {
     const definition = moduleDefinitions.find((def) => def.slug === mod.slug);
