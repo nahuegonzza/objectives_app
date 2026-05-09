@@ -355,6 +355,22 @@ function clampColorValue(value: number) {
   return Math.min(255, Math.max(0, Math.round(value)));
 }
 
+const CUSTOM_COLOR_DELTAS = {
+  border: { r: 43, g: 52, b: 40 },
+  light: { r: 100, g: 106, b: 100 },
+  dark: { r: -80, g: -83, b: -81 },
+  lightBorder: { r: 70, g: 84, b: 71 },
+  darkBorder: { r: -19, g: -13, b: 4 },
+};
+
+function adjustRgbBy(rgb: { r: number; g: number; b: number }, delta: { r: number; g: number; b: number }) {
+  return {
+    r: clampColorValue(rgb.r + delta.r),
+    g: clampColorValue(rgb.g + delta.g),
+    b: clampColorValue(rgb.b + delta.b),
+  };
+}
+
 function parseHexToRgb(hex: string) {
   const clean = hex.replace('#', '');
   const result = /^([a-fA-F0-9]{6})$/.exec(clean);
@@ -402,10 +418,10 @@ function deriveCustomColorVariants(colorKey: string) {
     };
   }
 
-  const lightRgb = adjustRgb(rgb, 70);
-  const darkRgb = adjustRgb(rgb, -70);
-  const lightBorderRgb = adjustRgb(rgb, 30);
-  const darkBorderRgb = adjustRgb(rgb, -30);
+  const lightRgb = adjustRgbBy(rgb, CUSTOM_COLOR_DELTAS.light);
+  const darkRgb = adjustRgbBy(rgb, CUSTOM_COLOR_DELTAS.dark);
+  const lightBorderRgb = adjustRgbBy(rgb, CUSTOM_COLOR_DELTAS.lightBorder);
+  const darkBorderRgb = adjustRgbBy(rgb, CUSTOM_COLOR_DELTAS.darkBorder);
 
   return {
     light: rgbToHex(lightRgb.r, lightRgb.g, lightRgb.b),
@@ -435,8 +451,12 @@ export function getColorOption(colorKey: string | undefined) {
     const rgb = colorStringToRgb(colorKey);
     let borderColor = colorKey;
     if (rgb) {
-      const borderLightRgb = adjustRgb(rgb, 30);
-      const borderDarkRgb = adjustRgb(rgb, -30);
+      const borderLightRgb = adjustRgbBy(rgb, CUSTOM_COLOR_DELTAS.border);
+      const borderDarkRgb = adjustRgbBy(rgb, {
+        r: -CUSTOM_COLOR_DELTAS.border.r,
+        g: -CUSTOM_COLOR_DELTAS.border.g,
+        b: -CUSTOM_COLOR_DELTAS.border.b,
+      });
       const lightVariant = rgbToHex(borderLightRgb.r, borderLightRgb.g, borderLightRgb.b);
       const darkVariant = rgbToHex(borderDarkRgb.r, borderDarkRgb.g, borderDarkRgb.b);
       const luminance = 0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b;
