@@ -214,8 +214,8 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
     'slate': '#f1f5f9',
     'gray-light': '#f3f4f6',
     'gray': '#e5e7eb',
-    'gray-dark': '#6b7280',
-    'black': '#1f2937',
+    'gray-dark': '#f3f4f6',
+    'black': '#f9fafb',
     'red': '#fef2f2',
     'coral': '#ffe0e0',
     'orange': '#fff7ed',
@@ -278,8 +278,8 @@ export function getBackgroundColors(colorKey: string | undefined): { light: stri
     'slate': '#cbd5e1',
     'gray-light': '#d1d5db',
     'gray': '#9ca3af',
-    'gray-dark': '#6b7280',
-    'black': '#4b5563',
+    'gray-dark': '#d1d5db',
+    'black': '#e5e7eb',
     'red': '#fee2e2',
     'coral': '#fecaca',
     'orange': '#fed7aa',
@@ -357,9 +357,9 @@ function clampColorValue(value: number) {
 
 const CUSTOM_COLOR_DELTAS = {
   border: { r: 43, g: 52, b: 40 },
-  light: { r: 100, g: 106, b: 100 },
+  light: { r: 112, g: 118, b: 111 },
   dark: { r: -80, g: -83, b: -81 },
-  lightBorder: { r: 70, g: 84, b: 71 },
+  lightBorder: { r: 79, g: 92, b: 79 },
   darkBorder: { r: -19, g: -13, b: 4 },
 };
 
