@@ -182,6 +182,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   const [naps, setNaps] = useState<SleepNap[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [points, setPoints] = useState(0);
 
   // Usar la fecha proporcionada o hoy por defecto
@@ -214,9 +215,15 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             start: nap.start || '',
             end: nap.end || ''
           })) : []);
+          setDirty(false);
+        } else {
+          setDirty(false);
         }
       } catch (error) {
         console.error('Error loading sleep entry', error);
+        if (isMounted) {
+          setDirty(false);
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -288,6 +295,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       });
 
       if (res.ok) {
+        setDirty(false);
         onUpdate?.();
       }
     } catch (error) {
@@ -300,17 +308,16 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   const hours = calculateHours();
 
   useEffect(() => {
-    // No guardar si está cargando datos o si no hay edición habilitada
-    if (loading || !isEditing) return;
+    // No guardar si está cargando datos, no está en edición, no hay cambios o ya está guardando
+    if (loading || !isEditing || !dirty || saving) return;
 
     const hasCompleteNap = naps.some((nap) => nap.start && nap.end);
     const hasValidSleepData = (bedtime && waketime) || hasCompleteNap;
 
-    // Solo guardar si hay datos válidos y no está guardando actualmente
-    if (hasValidSleepData && !saving) {
+    if (hasValidSleepData) {
       saveEntry(hours);
     }
-  }, [bedtime, waketime, naps, isEditing, loading, saving, hours, saveEntry]);
+  }, [bedtime, waketime, naps, isEditing, loading, saving, dirty, hours, saveEntry]);
 
   // Calcular puntos cuando cambian las horas o la configuración
   useEffect(() => {
@@ -348,6 +355,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
               onClick={() => {
                 const lastNap = naps[naps.length - 1];
                 if (!lastNap || (lastNap.start && lastNap.end)) {
+                  setDirty(true);
                   setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
                 }
               }}
@@ -364,7 +372,10 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
             <TimePicker
               value={bedtime}
-              onChange={setBedtime}
+              onChange={(value) => {
+                setDirty(true);
+                setBedtime(value);
+              }}
               disabled={!isEditing || saving}
             />
           </div>
@@ -372,7 +383,10 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
             <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
             <TimePicker
               value={waketime}
-              onChange={setWaketime}
+              onChange={(value) => {
+                setDirty(true);
+                setWaketime(value);
+              }}
               disabled={!isEditing || saving}
             />
           </div>
@@ -386,7 +400,10 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Siesta {index + 1}</h3>
                   <button
                     type="button"
-                    onClick={() => setNaps((prev) => prev.filter((item) => item.id !== nap.id))}
+                    onClick={() => {
+                      setDirty(true);
+                      setNaps((prev) => prev.filter((item) => item.id !== nap.id));
+                    }}
                     disabled={!isEditing || saving}
                     className="text-sm text-rose-600 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
@@ -398,7 +415,10 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                     <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Dormir</p>
                     <TimePicker
                       value={nap.start}
-                      onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item))}
+                      onChange={(value) => {
+                        setDirty(true);
+                        setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item));
+                      }}
                       disabled={!isEditing || saving}
                     />
                   </div>
@@ -406,7 +426,10 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                     <p className="mb-3 text-center text-xs uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Despertar</p>
                     <TimePicker
                       value={nap.end}
-                      onChange={(value) => setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item))}
+                      onChange={(value) => {
+                        setDirty(true);
+                        setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item));
+                      }}
                       disabled={!isEditing || saving}
                     />
                   </div>
