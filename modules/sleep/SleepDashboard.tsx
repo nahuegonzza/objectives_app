@@ -184,6 +184,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [points, setPoints] = useState(0);
+  const saveTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Usar la fecha proporcionada o hoy por defecto
   const selectedDate = date || getLocalDateString();
@@ -308,15 +309,27 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   const hours = calculateHours();
 
   useEffect(() => {
-    // No guardar si está cargando datos, no está en edición, no hay cambios o ya está guardando
-    if (loading || !isEditing || !dirty || saving) return;
+    if (loading || !isEditing || !dirty) return;
 
     const hasCompleteNap = naps.some((nap) => nap.start && nap.end);
     const hasValidSleepData = (bedtime && waketime) || hasCompleteNap;
+    if (!hasValidSleepData) return;
 
-    if (hasValidSleepData) {
-      saveEntry(hours);
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      if (!saving) {
+        saveEntry(hours);
+      }
+    }, 600);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [bedtime, waketime, naps, isEditing, loading, saving, dirty, hours, saveEntry]);
 
   // Calcular puntos cuando cambian las horas o la configuración
@@ -359,7 +372,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
                 }
               }}
-              disabled={!isEditing || saving || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
+              disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
               className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
             >
               Agregar Siesta
@@ -376,7 +389,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                 setDirty(true);
                 setBedtime(value);
               }}
-              disabled={!isEditing || saving}
+              disabled={!isEditing}
             />
           </div>
           <div>
@@ -387,7 +400,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                 setDirty(true);
                 setWaketime(value);
               }}
-              disabled={!isEditing || saving}
+              disabled={!isEditing}
             />
           </div>
         </div>
@@ -419,7 +432,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                         setDirty(true);
                         setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, start: value } : item));
                       }}
-                      disabled={!isEditing || saving}
+                      disabled={!isEditing}
                     />
                   </div>
                   <div>
@@ -430,7 +443,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                         setDirty(true);
                         setNaps((prev) => prev.map((item) => item.id === nap.id ? { ...item, end: value } : item));
                       }}
-                      disabled={!isEditing || saving}
+                      disabled={!isEditing}
                     />
                   </div>
                 </div>
