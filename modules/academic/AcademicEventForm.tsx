@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
 import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority } from './academicHelpers';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface ValidationModalProps {
   open: boolean;
@@ -59,6 +60,53 @@ export function AcademicEventForm({
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(getLocalDateString());
   const [showValidationModal, setShowValidationModal] = useState(false);
+  const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
+
+  // Función para detectar si hay cambios pendientes
+  const hasUnsavedChanges = () => {
+    const defaultSubjectId = subjects.length > 0 ? subjects[0].id : '';
+
+    if (initialEvent) {
+      // Modo edición: comparar con valores iniciales
+      return (
+        eventType !== initialEvent.type ||
+        examType !== (initialEvent.examType || 'parcial') ||
+        priority !== (initialEvent.priority || 'media') ||
+        subjectId !== initialEvent.subjectId ||
+        title !== initialEvent.title ||
+        description !== initialEvent.description ||
+        date !== initialEvent.date.slice(0, 10)
+      );
+    } else {
+      // Modo creación: comparar con valores por defecto
+      return (
+        eventType !== 'task' ||
+        examType !== 'parcial' ||
+        priority !== 'media' ||
+        subjectId !== defaultSubjectId ||
+        title !== '' ||
+        description !== '' ||
+        date !== getLocalDateString()
+      );
+    }
+  };
+
+  const handleClose = () => {
+    if (hasUnsavedChanges()) {
+      setShowUnsavedChangesModal(true);
+    } else {
+      onClose();
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    setShowUnsavedChangesModal(false);
+    onClose();
+  };
+
+  const handleKeepEditing = () => {
+    setShowUnsavedChangesModal(false);
+  };
 
   useEffect(() => {
     if (initialEvent) {
@@ -79,6 +127,7 @@ export function AcademicEventForm({
       setDate(getLocalDateString());
     }
     setShowValidationModal(false);
+    setShowUnsavedChangesModal(false);
   }, [initialEvent, isOpen, subjects]);
 
   const handleSave = async () => {
@@ -113,7 +162,7 @@ export function AcademicEventForm({
             {initialEvent ? 'Editar Evento' : 'Nuevo Evento'}
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             ✕
@@ -255,7 +304,7 @@ export function AcademicEventForm({
         <div className="mt-8 flex justify-end gap-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             Cancelar
@@ -276,6 +325,14 @@ export function AcademicEventForm({
         title="Datos obligatorios"
         description="Por favor completa la materia y el título antes de guardar el evento."
         onClose={() => setShowValidationModal(false)}
+      />
+
+      <UnsavedChangesModal
+        open={showUnsavedChangesModal}
+        title="Cambios sin guardar"
+        description="Tienes cambios sin guardar en este evento. Si cierras ahora, perderás los cambios no guardados."
+        onKeepEditing={handleKeepEditing}
+        onDiscard={handleDiscardChanges}
       />
     </div>
   );
