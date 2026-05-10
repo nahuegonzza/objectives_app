@@ -260,7 +260,9 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
               className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all ${
                 selectedMood === state.id
                   ? 'ring-2 ring-offset-2 dark:ring-offset-slate-900'
-                  : 'opacity-70 hover:opacity-100'
+                  : isEditing
+                    ? 'opacity-70 hover:opacity-100'
+                    : 'opacity-70'
               } ${isEditing ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               style={{
                 backgroundColor: getBackgroundColor(normalizeColor(state.color)),

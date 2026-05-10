@@ -29,7 +29,25 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, isEditing 
     : `${event.priority ? `Prioridad ${event.priority}` : 'Tarea'}`;
 
   const borderColor = subject?.color ?? (event.type === 'exam' ? 'border-orange-400' : 'border-emerald-400');
-  const textColor = event.type === 'exam' ? 'text-orange-700 dark:text-orange-300' : 'text-emerald-700 dark:text-emerald-300';
+  const priorityTextColor = event.type === 'task'
+    ? event.priority === 'alta'
+      ? 'text-rose-700 dark:text-rose-300'
+      : event.priority === 'media'
+        ? 'text-amber-700 dark:text-amber-300'
+        : event.priority === 'baja'
+          ? 'text-yellow-700 dark:text-yellow-300'
+          : 'text-slate-700 dark:text-slate-300'
+    : 'text-orange-700 dark:text-orange-300';
+
+  const badgeBgColor = event.type === 'task'
+    ? event.priority === 'alta'
+      ? 'bg-rose-100 dark:bg-rose-950'
+      : event.priority === 'media'
+        ? 'bg-amber-100 dark:bg-amber-950'
+        : event.priority === 'baja'
+          ? 'bg-yellow-100 dark:bg-yellow-950'
+          : 'bg-slate-100 dark:bg-slate-900'
+    : 'bg-slate-100 dark:bg-slate-900';
 
   return (
     <div className={`rounded-3xl border-2 ${borderColor} bg-white p-4 shadow-sm dark:bg-slate-950`}>
@@ -66,7 +84,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, isEditing 
       <div className="mt-4 space-y-3">
         <div className="flex items-center justify-between gap-3">
           <p className="text-base font-semibold text-slate-900 dark:text-white">{event.title}</p>
-          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${textColor} bg-slate-100 dark:bg-slate-900`}>{badgeText}</span>
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${priorityTextColor} ${badgeBgColor}`}>{badgeText}</span>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-400">{event.description || 'Sin descripción'}</p>
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
-import { parseAcademicData, DEFAULT_ACADEMIC_DATA, getLatestAcademicSubjects, AcademicSubject, AcademicEvent } from './academicHelpers';
+import { parseAcademicData, DEFAULT_ACADEMIC_DATA, getLatestAcademicSubjects, AcademicSubject, AcademicEvent, AcademicTaskPriority } from './academicHelpers';
 import type { ModuleEntry } from '@types';
 
 interface UseAcademicModuleResult {
@@ -34,6 +34,34 @@ export function useAcademicModule(
 
   const todayKey = selectedDate.slice(0, 10);
 
+  const getPriorityWeight = (priority?: AcademicTaskPriority) => {
+    switch (priority) {
+      case 'alta':
+        return 0;
+      case 'media':
+        return 1;
+      case 'baja':
+        return 2;
+      default:
+        return 3;
+    }
+  };
+
+  const sortAcademicEvents = (events: AcademicEvent[]) => {
+    return [...events].sort((a, b) => {
+      const dateA = new Date(a.date.slice(0, 10)).getTime();
+      const dateB = new Date(b.date.slice(0, 10)).getTime();
+      if (dateA !== dateB) return dateA - dateB;
+
+      if (a.type === 'task' && b.type === 'task') {
+        const priorityDiff = getPriorityWeight(a.priority) - getPriorityWeight(b.priority);
+        if (priorityDiff !== 0) return priorityDiff;
+      }
+
+      return a.title.localeCompare(b.title);
+    });
+  };
+
   useEffect(() => {
     async function loadEntries() {
       setLoading(true);
@@ -64,7 +92,7 @@ export function useAcademicModule(
     const subjectSource = getLatestAcademicSubjects(allEntries, todayKey);
     setSubjects(subjectSource);
     if (currentEntry) {
-      setTodayEvents(parseAcademicData(currentEntry.data).events);
+      setTodayEvents(sortAcademicEvents(parseAcademicData(currentEntry.data).events));
     } else {
       setTodayEvents([]);
     }
@@ -76,12 +104,12 @@ export function useAcademicModule(
 
   const upcomingEvents = useMemo(() => {
     const today = new Date(todayKey);
-    return allEvents
-      .filter((event) => {
+    return sortAcademicEvents(
+      allEvents.filter((event) => {
         const eventDate = new Date(event.date.slice(0, 10));
         return eventDate > today;
       })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    );
   }, [allEvents, todayKey]);
 
   const loadEntries = async () => {
