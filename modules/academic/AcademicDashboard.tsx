@@ -7,6 +7,7 @@ import { useAcademicModule } from './useAcademicModule';
 import { AcademicTodayCard } from './AcademicTodayCard';
 import { AcademicEventForm } from './AcademicEventForm';
 import type { AcademicEvent } from './academicHelpers';
+import { academicModule } from './module';
 
 interface AcademicDashboardProps {
   config: Record<string, unknown>;
@@ -25,6 +26,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     todayEvents,
     upcomingEvents,
     pastEvents,
+    moduleEntries,
     toggleEventCompleted,
     addEvent,
     discardEvent,
@@ -35,13 +37,14 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   const [showUpcomingEvents, setShowUpcomingEvents] = useState(true);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [dailyScore, setDailyScore] = useState(0);
 
   useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(''), 3000);
-      return () => clearTimeout(timer);
+    if (moduleEntries.length > 0 && academicModule.calculateScore) {
+      const score = academicModule.calculateScore(moduleEntries, config, selectedDate);
+      setDailyScore(score);
     }
-  }, [message]);
+  }, [moduleEntries, config, selectedDate]);
 
   const handleToggleCompleted = async (event: AcademicEvent) => {
     await toggleEventCompleted(event);
@@ -102,7 +105,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
           </button>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Hoy</p>
             <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{todayEvents.length}</p>
@@ -117,6 +120,11 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Materias</p>
             <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{subjects.length}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400">Materias configuradas</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Puntos</p>
+            <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{dailyScore.toFixed(1)}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Puntos del día</p>
           </div>
         </div>
       </div>

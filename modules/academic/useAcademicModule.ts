@@ -13,6 +13,7 @@ interface UseAcademicModuleResult {
   upcomingEvents: AcademicEvent[];
   pastEvents: AcademicEvent[];
   allEvents: AcademicEvent[];
+  moduleEntries: ModuleEntry[];
   isSaving: boolean;
   saveSubjects: (updatedSubjects: AcademicSubject[]) => Promise<void>;
   addEvent: (event: AcademicEvent) => Promise<void>;
@@ -219,6 +220,7 @@ export function useAcademicModule(
     upcomingEvents,
     pastEvents,
     allEvents,
+    moduleEntries: allEntries,
     isSaving,
     saveSubjects,
     addEvent,

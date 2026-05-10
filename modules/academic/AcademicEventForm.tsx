@@ -4,6 +4,36 @@ import { useEffect, useState } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
 import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority } from './academicHelpers';
 
+interface ValidationModalProps {
+  open: boolean;
+  title?: string;
+  description?: string;
+  onClose: () => void;
+}
+
+function ValidationModal({ open, title = 'Datos obligatorios', description = 'Por favor completa todos los campos requeridos.', onClose }: ValidationModalProps) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
+      <div className="w-full max-w-md rounded-[28px] bg-white dark:bg-slate-900 p-6 shadow-2xl shadow-slate-900/20">
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{title}</h3>
+        <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</p>
+
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+          >
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface AcademicEventFormProps {
   subjects: AcademicSubject[];
   event?: AcademicEvent;
@@ -28,6 +58,7 @@ export function AcademicEventForm({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(getLocalDateString());
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   useEffect(() => {
     if (initialEvent) {
@@ -47,11 +78,12 @@ export function AcademicEventForm({
       setDescription('');
       setDate(getLocalDateString());
     }
+    setShowValidationModal(false);
   }, [initialEvent, isOpen, subjects]);
 
   const handleSave = async () => {
     if (!subjectId || !title) {
-      alert('Por favor completa materia y título');
+      setShowValidationModal(true);
       return;
     }
 
@@ -238,6 +270,13 @@ export function AcademicEventForm({
           </button>
         </div>
       </div>
+
+      <ValidationModal
+        open={showValidationModal}
+        title="Datos obligatorios"
+        description="Por favor completa la materia y el título antes de guardar el evento."
+        onClose={() => setShowValidationModal(false)}
+      />
     </div>
   );
 }
