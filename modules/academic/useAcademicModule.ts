@@ -11,11 +11,13 @@ interface UseAcademicModuleResult {
   subjects: AcademicSubject[];
   todayEvents: AcademicEvent[];
   upcomingEvents: AcademicEvent[];
+  pastEvents: AcademicEvent[];
   allEvents: AcademicEvent[];
   isSaving: boolean;
   saveSubjects: (updatedSubjects: AcademicSubject[]) => Promise<void>;
   addEvent: (event: AcademicEvent) => Promise<void>;
   toggleEventCompleted: (event: AcademicEvent) => Promise<void>;
+  discardEvent: (event: AcademicEvent) => Promise<void>;
   deleteSubject: (subjectId: string) => Promise<void>;
 }
 
@@ -112,6 +114,16 @@ export function useAcademicModule(
     );
   }, [allEvents, todayKey]);
 
+  const pastEvents = useMemo(() => {
+    const today = new Date(todayKey);
+    return sortAcademicEvents(
+      allEvents.filter((event) => {
+        const eventDate = new Date(event.date.slice(0, 10));
+        return eventDate < today && !event.completed;
+      })
+    );
+  }, [allEvents, todayKey]);
+
   const loadEntries = async () => {
     setLoading(true);
     setError(null);
@@ -182,6 +194,14 @@ export function useAcademicModule(
     await saveEntry(entryDate, existingData.subjects, updatedEvents);
   };
 
+  const discardEvent = async (event: AcademicEvent) => {
+    const entryDate = event.date.slice(0, 10);
+    const targetEntry = allEntries.find((entry) => entry.date.slice(0, 10) === entryDate);
+    const existingData = targetEntry ? parseAcademicData(targetEntry.data) : DEFAULT_ACADEMIC_DATA;
+    const updatedEvents = existingData.events.filter((currentEvent) => currentEvent.id !== event.id);
+    await saveEntry(entryDate, existingData.subjects, updatedEvents);
+  };
+
   const deleteSubject = async (subjectId: string) => {
     const currentEntry = allEntries.find((entry) => entry.date.slice(0, 10) === todayKey);
     const existingData = currentEntry ? parseAcademicData(currentEntry.data) : DEFAULT_ACADEMIC_DATA;
@@ -197,11 +217,13 @@ export function useAcademicModule(
     subjects,
     todayEvents,
     upcomingEvents,
+    pastEvents,
     allEvents,
     isSaving,
     saveSubjects,
     addEvent,
     toggleEventCompleted,
+    discardEvent,
     deleteSubject
   };
 }

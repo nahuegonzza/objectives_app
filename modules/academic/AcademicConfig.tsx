@@ -30,19 +30,19 @@ export function AcademicConfig({
   
   // Configuración de scoring
   const [examPointsPartial, setExamPointsPartial] = useState(
-    ((config?.examPoints as any)?.parcial ?? 5).toString()
+    ((config?.examPoints as any)?.parcial ?? 2).toString()
   );
   const [examPointsFinal, setExamPointsFinal] = useState(
-    ((config?.examPoints as any)?.final ?? 8).toString()
+    ((config?.examPoints as any)?.final ?? 4).toString()
   );
   const [examPointsRecuperatorio, setExamPointsRecuperatorio] = useState(
-    ((config?.examPoints as any)?.recuperatorio ?? 6).toString()
+    ((config?.examPoints as any)?.recuperatorio ?? 3).toString()
   );
   const [taskPointsAlta, setTaskPointsAlta] = useState(
-    ((config?.taskPoints as any)?.alta ?? 4).toString()
+    ((config?.taskPoints as any)?.alta ?? 2).toString()
   );
   const [taskPointsMedia, setTaskPointsMedia] = useState(
-    ((config?.taskPoints as any)?.media ?? 2).toString()
+    ((config?.taskPoints as any)?.media ?? 1.5).toString()
   );
   const [taskPointsBaja, setTaskPointsBaja] = useState(
     ((config?.taskPoints as any)?.baja ?? 1).toString()
