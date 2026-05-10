@@ -77,6 +77,8 @@ export default function RegisterPage() {
       checkData = await checkRes.json();
     } catch (error) {
       console.error('Error checking username:', error);
+      setUsernameAvailable(false);
+      setUsernameSuggestions([]);
       setStatus('Error verificando nombre de usuario');
       setStatusType('error');
       setLoading(false);
@@ -84,12 +86,14 @@ export default function RegisterPage() {
     }
 
     if (!checkData?.available) {
+      setUsernameAvailable(false);
       setStatus('Este nombre de usuario ya está en uso');
       setUsernameSuggestions(checkData?.suggestions || []);
       setStatusType('error');
       setLoading(false);
       return;
     }
+    setUsernameAvailable(true);
     setUsernameSuggestions([]);
 
     if (password !== confirmPassword) {
