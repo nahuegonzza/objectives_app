@@ -33,9 +33,9 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, isEditing 
     ? event.priority === 'alta'
       ? 'text-rose-700 dark:text-rose-300'
       : event.priority === 'media'
-        ? 'text-amber-700 dark:text-amber-300'
+        ? 'text-orange-700 dark:text-orange-300'
         : event.priority === 'baja'
-          ? 'text-yellow-700 dark:text-yellow-300'
+          ? 'text-yellow-800 dark:text-yellow-300'
           : 'text-slate-700 dark:text-slate-300'
     : 'text-orange-700 dark:text-orange-300';
 
@@ -43,7 +43,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, isEditing 
     ? event.priority === 'alta'
       ? 'bg-rose-100 dark:bg-rose-950'
       : event.priority === 'media'
-        ? 'bg-amber-100 dark:bg-amber-950'
+        ? 'bg-orange-100 dark:bg-orange-950'
         : event.priority === 'baja'
           ? 'bg-yellow-100 dark:bg-yellow-950'
           : 'bg-slate-100 dark:bg-slate-900'
