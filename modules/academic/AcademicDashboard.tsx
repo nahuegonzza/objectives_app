@@ -56,7 +56,6 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     setShowEventForm(false);
     setMessage('✓ Evento creado');
     setMessageType('success');
-    onUpdate?.();
   };
 
   if (loading) {

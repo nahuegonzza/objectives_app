@@ -161,7 +161,11 @@ export function useAcademicModule(
         throw new Error(json?.error || 'Error guardando los datos académicos');
       }
 
-      await loadEntries();
+      const savedEntry: ModuleEntry = await result.json();
+      setAllEntries((previous) => {
+        const filtered = previous.filter((entry) => entry.id !== savedEntry.id);
+        return [...filtered, savedEntry].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error inesperado');
     } finally {
