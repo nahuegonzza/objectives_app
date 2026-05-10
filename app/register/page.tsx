@@ -29,6 +29,7 @@ export default function RegisterPage() {
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [loading, setLoading] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [usernameSuggestions, setUsernameSuggestions] = useState<string[]>([]);
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -75,10 +76,12 @@ export default function RegisterPage() {
       const checkData = await checkRes.json();
       if (!checkData.available) {
         setStatus('Este nombre de usuario ya está en uso');
+        setUsernameSuggestions(checkData.suggestions || []);
         setStatusType('error');
         setLoading(false);
         return;
       }
+      setUsernameSuggestions([]);
     } catch (error) {
       console.error('Error checking username:', error);
     }
@@ -146,12 +149,14 @@ export default function RegisterPage() {
   const checkUsernameAvailability = async (usernameValue: string) => {
     if (!usernameValue.trim()) {
       setUsernameAvailable(null);
+      setUsernameSuggestions([]);
       return;
     }
 
     const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
     if (!usernameRegex.test(usernameValue.trim())) {
       setUsernameAvailable(false);
+      setUsernameSuggestions([]);
       return;
     }
 
@@ -160,12 +165,15 @@ export default function RegisterPage() {
       if (res.ok) {
         const data = await res.json();
         setUsernameAvailable(data.available);
+        setUsernameSuggestions(data.suggestions || []);
       } else {
         setUsernameAvailable(false);
+        setUsernameSuggestions([]);
       }
     } catch (error) {
       console.error('Error checking username:', error);
       setUsernameAvailable(false);
+      setUsernameSuggestions([]);
     }
   };
 
@@ -253,6 +261,7 @@ export default function RegisterPage() {
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
+                  setUsernameSuggestions([]);
                   checkUsernameAvailability(e.target.value);
                 }}
               />
@@ -264,6 +273,27 @@ export default function RegisterPage() {
                   {usernameAvailable === false && (
                     <span className="text-red-400">✗ Nombre de usuario no disponible</span>
                   )}
+                </div>
+              )}
+              {usernameAvailable === false && usernameSuggestions.length > 0 && (
+                <div className="mt-2 rounded-md border border-slate-700 bg-slate-950/80 p-3 text-sm text-slate-200">
+                  <p className="mb-2 text-slate-400">Usuarios sugeridos:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {usernameSuggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => {
+                          setUsername(suggestion);
+                          setUsernameSuggestions([]);
+                          checkUsernameAvailability(suggestion);
+                        }}
+                        className="rounded-full border border-slate-600 px-3 py-1 text-slate-200 hover:border-emerald-400 hover:text-emerald-300"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

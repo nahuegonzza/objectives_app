@@ -223,7 +223,12 @@ export default function SettingsPage() {
     }
 
     try {
-      const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(usernameValue.trim())}`);
+      const currentUsernameParam = user?.username
+        ? `&currentUsername=${encodeURIComponent(user.username)}`
+        : '';
+      const res = await fetch(
+        `/api/auth/check-username?username=${encodeURIComponent(usernameValue.trim())}${currentUsernameParam}`
+      );
       if (res.ok) {
         const data = await res.json();
         setUsernameAvailable(data.available);
@@ -265,7 +270,12 @@ export default function SettingsPage() {
         return;
       }
 
-      if (usernameAvailable === false) {
+      const normalizedUsername = profileForm.username.trim();
+      const isSameAsCurrent = user?.username
+        ? normalizedUsername.toLowerCase() === user.username.toLowerCase()
+        : false;
+
+      if (usernameAvailable === false && !isSameAsCurrent) {
         setMessage('Este nombre de usuario no está disponible');
         setMessageType('error');
         return;
