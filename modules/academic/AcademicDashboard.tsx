@@ -48,7 +48,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
 
   const handleToggleCompleted = async (event: AcademicEvent) => {
     await toggleEventCompleted(event);
-    onUpdate?.();
+    // No need to call onUpdate() anymore since state is updated optimistically
   };
 
   const handleAddEvent = async (event: AcademicEvent) => {

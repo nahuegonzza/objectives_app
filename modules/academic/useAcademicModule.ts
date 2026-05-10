@@ -186,13 +186,31 @@ export function useAcademicModule(
   };
 
   const toggleEventCompleted = async (event: AcademicEvent) => {
+    // Optimistic update
     const entryDate = event.date.slice(0, 10);
     const targetEntry = allEntries.find((entry) => entry.date.slice(0, 10) === entryDate);
     const existingData = targetEntry ? parseAcademicData(targetEntry.data) : DEFAULT_ACADEMIC_DATA;
+
+    // Update local state immediately
     const updatedEvents = existingData.events.map((currentEvent) =>
       currentEvent.id === event.id ? { ...currentEvent, completed: !currentEvent.completed } : currentEvent
     );
-    await saveEntry(entryDate, existingData.subjects, updatedEvents);
+
+    // Update local state
+    const updatedEntries = allEntries.map(entry =>
+      entry.date.slice(0, 10) === entryDate
+        ? { ...entry, data: { subjects: existingData.subjects, events: updatedEvents } }
+        : entry
+    );
+    setAllEntries(updatedEntries);
+
+    try {
+      await saveEntry(entryDate, existingData.subjects, updatedEvents);
+    } catch (err) {
+      // Revert on error
+      setAllEntries(allEntries);
+      setError(err instanceof Error ? err.message : 'Error inesperado');
+    }
   };
 
   const discardEvent = async (event: AcademicEvent) => {
