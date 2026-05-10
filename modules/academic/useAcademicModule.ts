@@ -199,7 +199,7 @@ export function useAcademicModule(
     // Update local state
     const updatedEntries = allEntries.map(entry =>
       entry.date.slice(0, 10) === entryDate
-        ? { ...entry, data: { subjects: existingData.subjects, events: updatedEvents } }
+        ? { ...entry, data: JSON.stringify({ subjects: existingData.subjects, events: updatedEvents }) }
         : entry
     );
     setAllEntries(updatedEntries);

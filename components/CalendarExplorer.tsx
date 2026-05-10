@@ -605,36 +605,6 @@ export default function CalendarExplorer() {
                 )}
               </div>
 
-              <div className="space-y-4">
-                {orderedModules.map((module) => {
-                  const Component = module.definition?.Component;
-                  if (!Component) return null;
-
-                  const isCollapsed = moduleCollapseStates[module.slug] ?? false;
-
-                  return (
-                    <div key={module.id} className="space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleModuleCollapse(module.slug)}
-                        className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                      >
-                        <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                        {module.name}
-                      </button>
-                      {!isCollapsed && (
-                        <Component
-                          config={module.config}
-                          module={module}
-                          isEditing={isEditingDay}
-                          date={selectedDate}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
               <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <button
@@ -698,67 +668,22 @@ export default function CalendarExplorer() {
                               </div>
                               {isEditingDay ? (
                                 <div className="space-y-2">
-                                  {goal.type === 'BOOLEAN' ? (
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
-                                        className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                      >
-                                        Sí
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
-                                        className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                      >
-                                        No
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const current = Number(editValues?.valueFloat ?? 0);
-                                          const next = Math.max(0, current - 1);
-                                          handleEntryChange(goal.id, { valueFloat: next });
-                                        }}
-                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
-                                        title="Disminuir"
-                                      >
-                                        −
-                                      </button>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value={editValues?.valueFloat ?? ''}
-                                        onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
-                                        onWheel={(event) => {
-                                          event.preventDefault();
-                                          const current = Number(editValues?.valueFloat ?? 0);
-                                          const next = current + (event.deltaY < 0 ? 1 : -1);
-                                          handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
-                                        }}
-                                        className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                                        placeholder="0"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const current = Number(editValues?.valueFloat ?? 0);
-                                          const next = current + 1;
-                                          handleEntryChange(goal.id, { valueFloat: next });
-                                        }}
-                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
-                                        title="Aumentar"
-                                      >
-                                        +
-                                      </button>
-                                      <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
-                                    </div>
-                                  )}
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
+                                      className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
+                                    >
+                                      Sí
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
+                                      className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
+                                    >
+                                      No
+                                    </button>
+                                  </div>
                                 </div>
                               ) : null}
                             </div>
@@ -817,67 +742,48 @@ export default function CalendarExplorer() {
                               </div>
                               {isEditingDay ? (
                                 <div className="space-y-2">
-                                  {goal.type === 'BOOLEAN' ? (
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
-                                        className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                      >
-                                        Sí
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
-                                        className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                      >
-                                        No
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const current = Number(editValues?.valueFloat ?? 0);
-                                          const next = Math.max(0, current - 1);
-                                          handleEntryChange(goal.id, { valueFloat: next });
-                                        }}
-                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
-                                        title="Disminuir"
-                                      >
-                                        −
-                                      </button>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value={editValues?.valueFloat ?? ''}
-                                        onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
-                                        onWheel={(event) => {
-                                          event.preventDefault();
-                                          const current = Number(editValues?.valueFloat ?? 0);
-                                          const next = current + (event.deltaY < 0 ? 1 : -1);
-                                          handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
-                                        }}
-                                        className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                                        placeholder="0"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const current = Number(editValues?.valueFloat ?? 0);
-                                          const next = current + 1;
-                                          handleEntryChange(goal.id, { valueFloat: next });
-                                        }}
-                                        className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
-                                        title="Aumentar"
-                                      >
-                                        +
-                                      </button>
-                                      <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
-                                    </div>
-                                  )}
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const current = Number(editValues?.valueFloat ?? 0);
+                                        const next = Math.max(0, current - 1);
+                                        handleEntryChange(goal.id, { valueFloat: next });
+                                      }}
+                                      className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
+                                      title="Disminuir"
+                                    >
+                                      −
+                                    </button>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="1"
+                                      value={editValues?.valueFloat ?? ''}
+                                      onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
+                                      onWheel={(event) => {
+                                        event.preventDefault();
+                                        const current = Number(editValues?.valueFloat ?? 0);
+                                        const next = current + (event.deltaY < 0 ? 1 : -1);
+                                        handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
+                                      }}
+                                      className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                      placeholder="0"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const current = Number(editValues?.valueFloat ?? 0);
+                                        const next = current + 1;
+                                        handleEntryChange(goal.id, { valueFloat: next });
+                                      }}
+                                      className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
+                                      title="Aumentar"
+                                    >
+                                      +
+                                    </button>
+                                    <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
+                                  </div>
                                 </div>
                               ) : null}
                             </div>
@@ -894,6 +800,36 @@ export default function CalendarExplorer() {
                     )}
                   </div>
                 )}
+              </div>
+
+              <div className="space-y-4">
+                {orderedModules.map((module) => {
+                  const Component = module.definition?.Component;
+                  if (!Component) return null;
+
+                  const isCollapsed = moduleCollapseStates[module.slug] ?? false;
+
+                  return (
+                    <div key={module.id} className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleModuleCollapse(module.slug)}
+                        className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                      >
+                        <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                        {module.name}
+                      </button>
+                      {!isCollapsed && (
+                        <Component
+                          config={module.config}
+                          module={module}
+                          isEditing={isEditingDay}
+                          date={selectedDate}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
