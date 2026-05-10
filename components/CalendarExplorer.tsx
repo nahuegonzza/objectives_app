@@ -606,246 +606,251 @@ export default function CalendarExplorer() {
               </div>
 
               <div className="space-y-4">
-                {/* Renderizar objetivos como primer módulo */}
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => setGoalsCollapsed(!goalsCollapsed)}
-                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                  >
-                    <span className={`transform transition-transform ${goalsCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                    Objetivos
-                  </button>
-                  {!goalsCollapsed && (
-                    <div className="space-y-4">
-                      {getOrderedBooleanGoals().length > 0 && (
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => setHabitsCollapsed(!habitsCollapsed)}
-                            className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                          >
-                            <span className={`transform transition-transform ${habitsCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                            Hábitos
-                          </button>
-                          {!habitsCollapsed && (
-                            <div className="space-y-2">
-                              {getOrderedBooleanGoals().map((goal) => {
-                                const entry = entriesByGoalId.get(goal.id);
-                                const colors = getBackgroundColors(goal.color);
-                                const editValues = dayEdits[goal.id];
-                                const hasEdit = isEditingDay && Boolean(editValues);
-                                return (
-                                  <div 
-                                    key={goal.id} 
-                                    className={`flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all ${
-                                      isEditingDay ? 'hover:shadow-md cursor-pointer' : ''
-                                    } [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]`}
-                                    style={{
-                                      '--bg-light': colors.light,
-                                      '--border-light': colors.lightBorder,
-                                      '--bg-dark': colors.dark,
-                                      '--border-dark': colors.darkBorder,
-                                    } as React.CSSProperties & Record<string, string>}
-                                  >
-                                    <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
-                                      <span className="text-lg flex-shrink-0">{getGoalIcon(goal.icon)}</span>
-                                      <div className="min-w-0 flex-1 flex items-center">
-                                        <div className="flex-1">
-                                          <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
-                                            {goal.title}
-                                          </h3>
-                                          <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
-                                            {entry ? (
-                                              goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
-                                            ) : (
-                                              'No registrado'
-                                            )}
-                                          </p>
-                                        </div>
-                                        {!isEditingDay && (
-                                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                                            <span className="text-xs font-semibold text-slate-900 dark:text-white">
-                                              {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
-                                            </span>
-                                            <span className="inline-flex h-2 w-2 rounded-full bg-current" />
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                    {isEditingDay ? (
-                                      <div className="space-y-2">
-                                        <div className="flex items-center gap-1">
-                                          <button
-                                            type="button"
-                                            onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
-                                            className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                          >
-                                            Sí
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
-                                            className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
-                                          >
-                                            No
-                                          </button>
-                                        </div>
-                                      </div>
-                                    ) : null}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {getOrderedNumericGoals().length > 0 && (
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => setMetricsCollapsed(!metricsCollapsed)}
-                            className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                          >
-                            <span className={`transform transition-transform ${metricsCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                            Métricas
-                          </button>
-                          {!metricsCollapsed && (
-                            <div className="space-y-2">
-                              {getOrderedNumericGoals().map((goal) => {
-                                const entry = entriesByGoalId.get(goal.id);
-                                const colors = getBackgroundColors(goal.color);
-                                const editValues = dayEdits[goal.id];
-                                const hasEdit = isEditingDay && Boolean(editValues);
-                                return (
-                                  <div 
-                                    key={goal.id} 
-                                    className={`flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all ${
-                                      isEditingDay ? 'hover:shadow-md cursor-pointer' : ''
-                                    } [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]`}
-                                    style={{
-                                      '--bg-light': colors.light,
-                                      '--border-light': colors.lightBorder,
-                                      '--bg-dark': colors.dark,
-                                      '--border-dark': colors.darkBorder,
-                                    } as React.CSSProperties & Record<string, string>}
-                                  >
-                                    <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
-                                      <span className="text-lg flex-shrink-0">{getGoalIcon(goal.icon)}</span>
-                                      <div className="min-w-0 flex-1 flex items-center">
-                                        <div className="flex-1">
-                                          <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
-                                            {goal.title}
-                                          </h3>
-                                          <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
-                                            {entry ? (
-                                              goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
-                                            ) : (
-                                              'No registrado'
-                                            )}
-                                          </p>
-                                        </div>
-                                        {!isEditingDay && (
-                                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                                            <span className="text-xs font-semibold text-slate-900 dark:text-white">
-                                              {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
-                                            </span>
-                                            <span className="inline-flex h-2 w-2 rounded-full bg-current" />
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                    {isEditingDay ? (
-                                      <div className="space-y-2">
-                                        <div className="flex items-center gap-1">
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              const current = Number(editValues?.valueFloat ?? 0);
-                                              const next = Math.max(0, current - 1);
-                                              handleEntryChange(goal.id, { valueFloat: next });
-                                            }}
-                                            className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
-                                            title="Disminuir"
-                                          >
-                                            −
-                                          </button>
-                                          <input
-                                            type="number"
-                                            min="0"
-                                            step="1"
-                                            value={editValues?.valueFloat ?? ''}
-                                            onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
-                                            onWheel={(event) => {
-                                              event.preventDefault();
-                                              const current = Number(editValues?.valueFloat ?? 0);
-                                              const next = current + (event.deltaY < 0 ? 1 : -1);
-                                              handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
-                                            }}
-                                            className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                                            placeholder="0"
-                                          />
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              const current = Number(editValues?.valueFloat ?? 0);
-                                              const next = current + 1;
-                                              handleEntryChange(goal.id, { valueFloat: next });
-                                            }}
-                                            className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
-                                            title="Aumentar"
-                                          >
-                                            +
-                                          </button>
-                                          <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
-                                        </div>
-                                      </div>
-                                    ) : null}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {visibleGoals.length === 0 && (
-                        <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-                          <p className="text-sm">No hay objetivos para este día</p>
-                          <p className="text-xs mt-1">Crea objetivos en la página de Objetivos</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
                 {orderedModules.map((module) => {
                   const Component = module.definition?.Component;
-                  if (!Component) return null;
 
-                  const isCollapsed = moduleCollapseStates[module.slug] ?? false;
+                  if (module.slug === 'goals') {
+                    // Renderizar los objetivos aquí en el orden correcto
+                    return (
+                      <div key={module.id} className="space-y-2">
+                        <button
+                          type="button"
+                          onClick={() => setGoalsCollapsed(!goalsCollapsed)}
+                          className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                        >
+                          <span className={`transform transition-transform ${goalsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                          {module.name}
+                        </button>
+                        {!goalsCollapsed && (
+                          <div className="space-y-4">
+                            {getOrderedBooleanGoals().length > 0 && (
+                              <div className="space-y-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setHabitsCollapsed(!habitsCollapsed)}
+                                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                                >
+                                  <span className={`transform transition-transform ${habitsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                                  Hábitos
+                                </button>
+                                {!habitsCollapsed && (
+                                  <div className="space-y-2">
+                                    {getOrderedBooleanGoals().map((goal) => {
+                                      const entry = entriesByGoalId.get(goal.id);
+                                      const colors = getBackgroundColors(goal.color);
+                                      const editValues = dayEdits[goal.id];
+                                      const hasEdit = isEditingDay && Boolean(editValues);
+                                      return (
+                                        <div 
+                                          key={goal.id} 
+                                          className={`flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all ${
+                                            isEditingDay ? 'hover:shadow-md cursor-pointer' : ''
+                                          } [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]`}
+                                          style={{
+                                            '--bg-light': colors.light,
+                                            '--border-light': colors.lightBorder,
+                                            '--bg-dark': colors.dark,
+                                            '--border-dark': colors.darkBorder,
+                                          } as React.CSSProperties & Record<string, string>}
+                                        >
+                                          <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                                            <span className="text-lg flex-shrink-0">{getGoalIcon(goal.icon)}</span>
+                                            <div className="min-w-0 flex-1 flex items-center">
+                                              <div className="flex-1">
+                                                <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
+                                                  {goal.title}
+                                                </h3>
+                                                <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
+                                                  {entry ? (
+                                                    goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
+                                                  ) : (
+                                                    'No registrado'
+                                                  )}
+                                                </p>
+                                              </div>
+                                              {!isEditingDay && (
+                                                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                                  <span className="text-xs font-semibold text-slate-900 dark:text-white">
+                                                    {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
+                                                  </span>
+                                                  <span className="inline-flex h-2 w-2 rounded-full bg-current" />
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                          {isEditingDay ? (
+                                            <div className="space-y-2">
+                                              <div className="flex items-center gap-1">
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleEntryChange(goal.id, { valueBoolean: true })}
+                                                  className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
+                                                >
+                                                  Sí
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleEntryChange(goal.id, { valueBoolean: false })}
+                                                  className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${editValues?.valueBoolean === false ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-200'}`}
+                                                >
+                                                  No
+                                                </button>
+                                              </div>
+                                            </div>
+                                          ) : null}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
-                  return (
-                    <div key={module.id} className="space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleModuleCollapse(module.slug)}
-                        className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                      >
-                        <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
-                        {module.name}
-                      </button>
-                      {!isCollapsed && (
-                        <Component
-                          config={module.config}
-                          module={module}
-                          isEditing={isEditingDay}
-                          date={selectedDate}
-                        />
-                      )}
-                    </div>
-                  );
+                            {getOrderedNumericGoals().length > 0 && (
+                              <div className="space-y-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setMetricsCollapsed(!metricsCollapsed)}
+                                  className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                                >
+                                  <span className={`transform transition-transform ${metricsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                                  Métricas
+                                </button>
+                                {!metricsCollapsed && (
+                                  <div className="space-y-2">
+                                    {getOrderedNumericGoals().map((goal) => {
+                                      const entry = entriesByGoalId.get(goal.id);
+                                      const colors = getBackgroundColors(goal.color);
+                                      const editValues = dayEdits[goal.id];
+                                      const hasEdit = isEditingDay && Boolean(editValues);
+                                      return (
+                                        <div 
+                                          key={goal.id} 
+                                          className={`flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all ${
+                                            isEditingDay ? 'hover:shadow-md cursor-pointer' : ''
+                                          } [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]`}
+                                          style={{
+                                            '--bg-light': colors.light,
+                                            '--border-light': colors.lightBorder,
+                                            '--bg-dark': colors.dark,
+                                            '--border-dark': colors.darkBorder,
+                                          } as React.CSSProperties & Record<string, string>}
+                                        >
+                                          <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                                            <span className="text-lg flex-shrink-0">{getGoalIcon(goal.icon)}</span>
+                                            <div className="min-w-0 flex-1 flex items-center">
+                                              <div className="flex-1">
+                                                <h3 className="font-medium text-sm truncate text-slate-900 dark:text-white">
+                                                  {goal.title}
+                                                </h3>
+                                                <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
+                                                  {entry ? (
+                                                    goal.type === 'BOOLEAN' ? (entry.valueBoolean ? '✓ Completado' : '✗ Pendiente') : `${entry.valueFloat} unidades`
+                                                  ) : (
+                                                    'No registrado'
+                                                  )}
+                                                </p>
+                                              </div>
+                                              {!isEditingDay && (
+                                                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                                  <span className="text-xs font-semibold text-slate-900 dark:text-white">
+                                                    {entry ? getEntryPoints(entry).toFixed(1) : '0'} pts
+                                                  </span>
+                                                  <span className="inline-flex h-2 w-2 rounded-full bg-current" />
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                          {isEditingDay ? (
+                                            <div className="space-y-2">
+                                              <div className="flex items-center gap-1">
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const current = Number(editValues?.valueFloat ?? 0);
+                                                    const next = Math.max(0, current - 1);
+                                                    handleEntryChange(goal.id, { valueFloat: next });
+                                                  }}
+                                                  className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
+                                                  title="Disminuir"
+                                                >
+                                                  −
+                                                </button>
+                                                <input
+                                                  type="number"
+                                                  min="0"
+                                                  step="1"
+                                                  value={editValues?.valueFloat ?? ''}
+                                                  onChange={(event) => handleEntryChange(goal.id, { valueFloat: Number(event.target.value) })}
+                                                  onWheel={(event) => {
+                                                    event.preventDefault();
+                                                    const current = Number(editValues?.valueFloat ?? 0);
+                                                    const next = current + (event.deltaY < 0 ? 1 : -1);
+                                                    handleEntryChange(goal.id, { valueFloat: Math.max(0, next) });
+                                                  }}
+                                                  className="flex h-6 w-8 items-center justify-center rounded border border-slate-300 bg-white text-center text-xs font-medium text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                                                  placeholder="0"
+                                                />
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const current = Number(editValues?.valueFloat ?? 0);
+                                                    const next = current + 1;
+                                                    handleEntryChange(goal.id, { valueFloat: next });
+                                                  }}
+                                                  className="flex h-6 w-6 items-center justify-center rounded border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition text-xs"
+                                                  title="Aumentar"
+                                                >
+                                                  +
+                                                </button>
+                                                <span className="text-xs text-slate-600 dark:text-slate-300 ml-1">unidades</span>
+                                              </div>
+                                            </div>
+                                          ) : null}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {visibleGoals.length === 0 && (
+                              <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                                <p className="text-sm">No hay objetivos para este día</p>
+                                <p className="text-xs mt-1">Crea objetivos en la página de Objetivos</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  } else if (!Component) {
+                    return null;
+                  } else {
+                    const isCollapsed = moduleCollapseStates[module.slug] ?? false;
+
+                    return (
+                      <div key={module.id} className="space-y-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleModuleCollapse(module.slug)}
+                          className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                        >
+                          <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                          {module.name}
+                        </button>
+                        {!isCollapsed && (
+                          <Component
+                            config={module.config}
+                            module={module}
+                            isEditing={isEditingDay}
+                            date={selectedDate}
+                          />
+                        )}
+                      </div>
+                    );
+                  }
                 })}
               </div>
             </div>
