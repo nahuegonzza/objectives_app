@@ -503,7 +503,7 @@ export default function GoalTracker() {
                             onClick={() => setHabitsCollapsed(!habitsCollapsed)}
                             className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                           >
-                            <span className={`transform transition-transform ${habitsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                            <span className={`transform transition-transform ${habitsCollapsed ? '' : 'rotate-90'}`}>▶</span>
                             Hábitos
                           </button>
                           {!habitsCollapsed && (
@@ -529,7 +529,7 @@ export default function GoalTracker() {
                             onClick={() => setMetricsCollapsed(!metricsCollapsed)}
                             className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                           >
-                            <span className={`transform transition-transform ${metricsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                            <span className={`transform transition-transform ${metricsCollapsed ? '' : 'rotate-90'}`}>▶</span>
                             Métricas
                           </button>
                           {!metricsCollapsed && (
@@ -564,7 +564,7 @@ export default function GoalTracker() {
                     onClick={() => toggleModuleCollapse(module.slug)}
                     className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
                   >
-                    <span className={`transform transition-transform ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
+                    <span className={`transform transition-transform ${isCollapsed ? '' : 'rotate-90'}`}>▶</span>
                     {module.name}
                   </button>
                   {!isCollapsed && (
