@@ -59,6 +59,7 @@ export function AcademicEventForm({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(getLocalDateString());
+  const [completed, setCompleted] = useState(false);
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
 
@@ -75,7 +76,8 @@ export function AcademicEventForm({
         subjectId !== initialEvent.subjectId ||
         title !== initialEvent.title ||
         description !== initialEvent.description ||
-        date !== initialEvent.date.slice(0, 10)
+        date !== initialEvent.date.slice(0, 10) ||
+        completed !== initialEvent.completed
       );
     } else {
       // Modo creación: comparar con valores por defecto
@@ -86,7 +88,8 @@ export function AcademicEventForm({
         subjectId !== defaultSubjectId ||
         title !== '' ||
         description !== '' ||
-        date !== getLocalDateString()
+        date !== getLocalDateString() ||
+        completed !== false
       );
     }
   };
@@ -117,6 +120,7 @@ export function AcademicEventForm({
       setTitle(initialEvent.title);
       setDescription(initialEvent.description);
       setDate(initialEvent.date.slice(0, 10));
+      setCompleted(initialEvent.completed);
     } else {
       setEventType('task');
       setExamType('parcial');
@@ -125,6 +129,7 @@ export function AcademicEventForm({
       setTitle('');
       setDescription('');
       setDate(getLocalDateString());
+      setCompleted(false);
     }
     setShowValidationModal(false);
     setShowUnsavedChangesModal(false);
@@ -142,7 +147,7 @@ export function AcademicEventForm({
       title,
       description,
       date: date,
-      completed: initialEvent?.completed || false,
+      completed: completed,
       type: eventType,
       ...(eventType === 'exam' ? { examType } : { priority }),
     };
@@ -298,6 +303,22 @@ export function AcademicEventForm({
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900 resize-none"
               />
             </div>
+
+            {/* Checkbox de completado (solo para tareas) */}
+            {eventType === 'task' && (
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="completed"
+                  checked={completed}
+                  onChange={(e) => setCompleted(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 dark:border-slate-600 dark:bg-slate-950 dark:focus:ring-emerald-400"
+                />
+                <label htmlFor="completed" className="text-sm text-slate-700 dark:text-slate-300">
+                  Marcar como completada
+                </label>
+              </div>
+            )}
           </div>
         )}
 

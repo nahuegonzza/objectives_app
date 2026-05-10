@@ -211,7 +211,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                               onClick={() => toggleEventCompleted(event)}
                               className="ml-3 rounded-lg bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
                             >
-                              ✔️
+                              ✓
                             </button>
                           )}
                         </div>
@@ -243,14 +243,14 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                                 onClick={() => toggleEventCompleted(event)}
                                 className="rounded-lg bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
                               >
-                                ✔️
+                                ✓
                               </button>
                             )}
                             <button
                               onClick={() => discardEvent(event)}
                               className="rounded-lg bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
                             >
-                              ✖️
+                              X
                             </button>
                           </div>
                         </div>

@@ -87,10 +87,6 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, isEditing 
           <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${priorityTextColor} ${badgeBgColor}`}>{badgeText}</span>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-400">{event.description || 'Sin descripción'}</p>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span className="rounded-full border border-slate-200 px-2 py-1 dark:border-slate-700">{event.date}</span>
-          {subject?.semester ? <span className="rounded-full border border-slate-200 px-2 py-1 dark:border-slate-700">{subject.semester}</span> : null}
-        </div>
       </div>
     </div>
   );
