@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Reorder, useDragControls } from 'framer-motion';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface MoodState {
   id: string;
@@ -174,6 +175,9 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [draggingStateId, setDraggingStateId] = useState<string | null>(null);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const initialStates = useMemo(() => ((config.states as MoodState[]) || defaultStates).map((state) => ({ ...state })), [config.states]);
+  const isDirty = JSON.stringify(states) !== JSON.stringify(initialStates);
   const emojiButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const emojiOverlayRef = useRef<HTMLDivElement | null>(null);
   const [emojiOverlayStyle, setEmojiOverlayStyle] = useState<Record<string, number>>({});
@@ -314,7 +318,16 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             Configurar Estados
           </h2>
-          <button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button
+            onClick={() => {
+              if (!isDirty) {
+                onClose();
+                return;
+              }
+              setShowUnsavedDialog(true);
+            }}
+            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
             ✕
           </button>
         </div>
@@ -366,7 +379,13 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
 
         <div className="mt-8 flex gap-3">
           <button
-            onClick={onClose}
+            onClick={() => {
+              if (!isDirty) {
+                onClose();
+                return;
+              }
+              setShowUnsavedDialog(true);
+            }}
             className="flex-1 rounded-xl bg-slate-100 py-3.5 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
           >
             Cancelar
@@ -385,6 +404,15 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
             {error}
           </div>
         )}
+
+        <UnsavedChangesModal
+          open={showUnsavedDialog}
+          onKeepEditing={() => setShowUnsavedDialog(false)}
+          onDiscard={() => {
+            setShowUnsavedDialog(false);
+            onClose();
+          }}
+        />
       </div>
     </div>
   );

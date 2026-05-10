@@ -6,6 +6,7 @@ import type { Goal, GoalPayload } from '@types';
 import { ICON_OPTIONS, getGoalIcon } from '@lib/goalIconsColors';
 import NumberInput from '@components/NumberInput';
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface GoalFormProps {
   initialData?: Partial<Goal>;
@@ -68,6 +69,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   const [status, setStatus] = useState<string>('');
   const [statusType, setStatusType] = useState<'success' | 'error'>('success');
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
   const iconButtonRef = useRef<HTMLButtonElement>(null);
   const iconOverlayRef = useRef<HTMLDivElement>(null);
@@ -368,9 +370,11 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
           <button
             type="button"
             onClick={() => {
-              if (!isDirty || window.confirm('Hay cambios sin guardar. ¿Deseas salir sin guardar?')) {
+              if (!isDirty) {
                 onCancel();
+                return;
               }
+              setShowUnsavedDialog(true);
             }}
             className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:w-auto"
           >
@@ -390,6 +394,15 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
           {status}
         </p>
       )}
+
+      <UnsavedChangesModal
+        open={showUnsavedDialog}
+        onKeepEditing={() => setShowUnsavedDialog(false)}
+        onDiscard={() => {
+          setShowUnsavedDialog(false);
+          onCancel?.();
+        }}
+      />
     </form>
   );
 }

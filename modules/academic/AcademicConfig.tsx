@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getLocalDateString } from "@lib/dateHelpers";
 import type { AcademicSubject } from "./academicHelpers";
 import { useAcademicModule } from "./useAcademicModule";
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface AcademicConfigProps {
   config?: Record<string, unknown>;
@@ -25,6 +26,7 @@ export function AcademicConfig({
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"subjects" | "scoring">("subjects");
   const [error, setError] = useState('');
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   
   // Configuración de scoring
   const [examPointsPartial, setExamPointsPartial] = useState(
@@ -45,6 +47,34 @@ export function AcademicConfig({
   const [taskPointsBaja, setTaskPointsBaja] = useState(
     ((config?.taskPoints as any)?.baja ?? 1).toString()
   );
+
+  const initialSubjects = useMemo(
+    () => academicModule.subjects ?? subjects,
+    [academicModule.subjects, subjects]
+  );
+
+  const initialScoring = useMemo(
+    () => ({
+      examPointsPartial: ((config?.examPoints as any)?.parcial ?? 5).toString(),
+      examPointsFinal: ((config?.examPoints as any)?.final ?? 8).toString(),
+      examPointsRecuperatorio: ((config?.examPoints as any)?.recuperatorio ?? 6).toString(),
+      taskPointsAlta: ((config?.taskPoints as any)?.alta ?? 4).toString(),
+      taskPointsMedia: ((config?.taskPoints as any)?.media ?? 2).toString(),
+      taskPointsBaja: ((config?.taskPoints as any)?.baja ?? 1).toString(),
+    }),
+    [config]
+  );
+
+  const isDirty =
+    JSON.stringify(subjects) !== JSON.stringify(initialSubjects) ||
+    JSON.stringify({
+      examPointsPartial,
+      examPointsFinal,
+      examPointsRecuperatorio,
+      taskPointsAlta,
+      taskPointsMedia,
+      taskPointsBaja,
+    }) !== JSON.stringify(initialScoring);
 
   // Cargar materias desde moduleEntries si moduleId está disponible
   const todayDate = getLocalDateString();
@@ -139,7 +169,13 @@ export function AcademicConfig({
             Configurar Gestión Universitaria
           </h2>
           <button
-            onClick={onClose}
+            onClick={() => {
+              if (!isDirty) {
+                onClose?.();
+                return;
+              }
+              setShowUnsavedDialog(true);
+            }}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             ✕
@@ -362,7 +398,13 @@ export function AcademicConfig({
         <div className="mt-8 flex justify-end gap-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {
+              if (!isDirty) {
+                onClose?.();
+                return;
+              }
+              setShowUnsavedDialog(true);
+            }}
             className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             Cancelar
@@ -381,6 +423,15 @@ export function AcademicConfig({
             {error}
           </div>
         )}
+
+        <UnsavedChangesModal
+          open={showUnsavedDialog}
+          onKeepEditing={() => setShowUnsavedDialog(false)}
+          onDiscard={() => {
+            setShowUnsavedDialog(false);
+            onClose?.();
+          }}
+        />
       </div>
     </div>
   );

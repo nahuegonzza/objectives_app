@@ -1,8 +1,9 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Goal } from '@types';
 import GoalForm from '@components/GoalForm';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface GoalEditModalProps {
   goal: Goal | null;
@@ -13,8 +14,17 @@ interface GoalEditModalProps {
 
 export function GoalEditModal({ goal, onSave, onSuccess, onClose }: GoalEditModalProps) {
   const [isDirty, setIsDirty] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
   if (!goal) return null;
+
+  const handleClose = () => {
+    if (!isDirty) {
+      onClose();
+      return;
+    }
+    setShowUnsavedDialog(true);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
@@ -27,11 +37,7 @@ export function GoalEditModal({ goal, onSave, onSuccess, onClose }: GoalEditModa
           </div>
           <button
             type="button"
-            onClick={() => {
-              if (!isDirty || window.confirm('Hay cambios sin guardar. ¿Deseas cerrar sin guardar?')) {
-                onClose();
-              }
-            }}
+            onClick={handleClose}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             ✕
@@ -55,6 +61,15 @@ export function GoalEditModal({ goal, onSave, onSuccess, onClose }: GoalEditModa
           onSuccess={onSuccess}
           onCancel={onClose}
           onDirtyChange={setIsDirty}
+        />
+
+        <UnsavedChangesModal
+          open={showUnsavedDialog}
+          onKeepEditing={() => setShowUnsavedDialog(false)}
+          onDiscard={() => {
+            setShowUnsavedDialog(false);
+            onClose();
+          }}
         />
 
       </div>

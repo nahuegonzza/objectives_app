@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import GoalForm from '@components/GoalForm';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface GoalCreateModalProps {
   onClose: () => void;
@@ -10,6 +11,15 @@ interface GoalCreateModalProps {
 
 export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreateModalProps) {
   const [isDirty, setIsDirty] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+
+  const handleClose = () => {
+    if (!isDirty) {
+      onClose();
+      return;
+    }
+    setShowUnsavedDialog(true);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
@@ -21,11 +31,7 @@ export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreate
           </div>
           <button
             type="button"
-            onClick={() => {
-              if (!isDirty || window.confirm('Hay cambios sin guardar. ¿Deseas cerrar sin guardar?')) {
-                onClose();
-              }
-            }}
+            onClick={handleClose}
             className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             ✕
@@ -58,6 +64,14 @@ export default function GoalCreateModal({ onClose, onCreateSuccess }: GoalCreate
           onDirtyChange={setIsDirty}
         />
 
+        <UnsavedChangesModal
+          open={showUnsavedDialog}
+          onKeepEditing={() => setShowUnsavedDialog(false)}
+          onDiscard={() => {
+            setShowUnsavedDialog(false);
+            onClose();
+          }}
+        />
       </div>
     </div>
   );

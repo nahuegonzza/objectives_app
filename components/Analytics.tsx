@@ -362,24 +362,23 @@ export default function Analytics() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">Total</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalPoints.toFixed(1)}</p>
         </div>
-        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">Promedio diario</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white">{averagePoints.toFixed(1)}</p>
         </div>
-        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">Máximo</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white">{maxPoints.toFixed(1)}</p>
         </div>
-        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">Vs período anterior</p>
           <p className={`text-2xl font-bold ${periodDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-            {periodDiff >= 0 ? '+' : ''}{periodDiff.toFixed(1)}
+            {periodDiff.toFixed(1)}
           </p>
-          <p className="text-xs text-slate-500">{periodDirection}</p>
         </div>
       </div>
 

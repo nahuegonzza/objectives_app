@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Reorder, useDragControls } from 'framer-motion';
 import type { Module } from '@types';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 // Iconos para cada módulo
 const moduleIcons: Record<string, string> = {
@@ -99,7 +100,9 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const orderedItemsRef = useRef<ModuleOrderItem[]>([]);
+  const initialOrderRef = useRef<string[]>([]);
 
   useEffect(() => {
     // Initialize items from modules
@@ -112,6 +115,9 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
 
     setOrderedItems(items);
     orderedItemsRef.current = items;
+    if (initialOrderRef.current.length === 0 && items.length > 0) {
+      initialOrderRef.current = items.map((item) => item.id);
+    }
   }, [modules]);
 
   useEffect(() => {
@@ -137,6 +143,18 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
   function handleDragEnd() {
     setDraggingItemId(null);
   }
+
+  const isDirty =
+    JSON.stringify(orderedItems.map((item) => item.id)) !==
+    JSON.stringify(initialOrderRef.current);
+
+  const handleClose = () => {
+    if (!isDirty) {
+      onClose();
+      return;
+    }
+    setShowUnsavedDialog(true);
+  };
 
   async function persistOrderedModules() {
     setSaving(true);
@@ -184,7 +202,7 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
               </p>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-2xl leading-none"
             >
               ✕
@@ -227,7 +245,7 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
         {/* Footer */}
         <div className="border-t border-slate-200 dark:border-slate-700 p-6 flex gap-3">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             disabled={saving}
             className="flex-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition disabled:opacity-50"
           >
@@ -242,6 +260,13 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
           </button>
         </div>
       </div>
-    </div>
+      <UnsavedChangesModal
+        open={showUnsavedDialog}
+        onKeepEditing={() => setShowUnsavedDialog(false)}
+        onDiscard={() => {
+          setShowUnsavedDialog(false);
+          onClose();
+        }}
+      />    </div>
   );
 }

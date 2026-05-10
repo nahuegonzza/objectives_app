@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface SleepConfigProps {
   config: Record<string, unknown>;
@@ -16,6 +17,19 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
   const [penaltyPerHour, setPenaltyPerHour] = useState(config.penaltyPerHour as number || 1);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+
+  const initialConfig = useMemo(
+    () => ({
+      idealHours: config.idealHours as number || 8,
+      maxPoints: config.maxPoints as number || 2,
+      toleranceMinutes: config.toleranceMinutes as number || 30,
+      penaltyMode: config.penaltyMode as string || 'automatic',
+      penaltyPerHour: config.penaltyPerHour as number || 1,
+    }),
+    [config]
+  );
+  const isDirty = JSON.stringify({ idealHours, maxPoints, toleranceMinutes, penaltyMode, penaltyPerHour }) !== JSON.stringify(initialConfig);
 
   const handleSave = async () => {
     setSaving(true);
@@ -50,7 +64,13 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
             <span>🌙</span>
             Configurar Sueño
           </h2>
-          <button onClick={onClose} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => {
+            if (!isDirty) {
+              onClose();
+              return;
+            }
+            setShowUnsavedDialog(true);
+          }} className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
             ✕
           </button>
         </div>
@@ -230,7 +250,13 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
 
         <div className="mt-8 flex gap-3">
           <button
-            onClick={onClose}
+            onClick={() => {
+              if (!isDirty) {
+                onClose();
+                return;
+              }
+              setShowUnsavedDialog(true);
+            }}
             className="flex-1 rounded-xl bg-slate-100 py-3.5 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
           >
             Cancelar
@@ -249,6 +275,15 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
             {error}
           </div>
         )}
+
+        <UnsavedChangesModal
+          open={showUnsavedDialog}
+          onKeepEditing={() => setShowUnsavedDialog(false)}
+          onDiscard={() => {
+            setShowUnsavedDialog(false);
+            onClose();
+          }}
+        />
       </div>
     </div>
   );
