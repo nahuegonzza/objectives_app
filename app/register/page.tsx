@@ -64,27 +64,33 @@ export default function RegisterPage() {
     }
 
     // Check username availability
+    let checkData: any = null;
     try {
       const checkRes = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username.trim())}`);
       if (!checkRes.ok) {
-        const errorData = await checkRes.json();
-        setStatus(errorData.error || 'Error verificando nombre de usuario');
+        const errorData = await checkRes.json().catch(() => null);
+        setStatus(errorData?.error || 'Error verificando nombre de usuario');
         setStatusType('error');
         setLoading(false);
         return;
       }
-      const checkData = await checkRes.json();
-      if (!checkData.available) {
-        setStatus('Este nombre de usuario ya está en uso');
-        setUsernameSuggestions(checkData.suggestions || []);
-        setStatusType('error');
-        setLoading(false);
-        return;
-      }
-      setUsernameSuggestions([]);
+      checkData = await checkRes.json();
     } catch (error) {
       console.error('Error checking username:', error);
+      setStatus('Error verificando nombre de usuario');
+      setStatusType('error');
+      setLoading(false);
+      return;
     }
+
+    if (!checkData?.available) {
+      setStatus('Este nombre de usuario ya está en uso');
+      setUsernameSuggestions(checkData?.suggestions || []);
+      setStatusType('error');
+      setLoading(false);
+      return;
+    }
+    setUsernameSuggestions([]);
 
     if (password !== confirmPassword) {
       setStatus('Las contraseñas no coinciden');
