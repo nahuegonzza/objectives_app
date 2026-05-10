@@ -188,9 +188,49 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
     setStates(states.map(s => s.id === id ? { ...s, [field]: updatedValue } : s));
   };
 
-  const handleDeleteState = (id: string) => {
+  const handleDeleteState = async (id: string) => {
     if (states.length <= 1) return;
     setError('');
+    
+    // Primero obtener todas las entradas del módulo mood
+    try {
+      const res = await fetch('/api/moduleEntries?module=mood', { credentials: 'include' });
+      if (res.ok) {
+        const entries = await res.json();
+        
+        // Filtrar entradas que usan el estado que se va a borrar
+        const entriesToUpdate = entries.filter((entry: any) => {
+          try {
+            const data = JSON.parse(entry.data);
+            return data.moodId === id;
+          } catch {
+            return false;
+          }
+        });
+        
+        // Actualizar cada entrada para quitar el estado seleccionado
+        const updatePromises = entriesToUpdate.map((entry: any) =>
+          fetch('/api/moduleEntries', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              moduleId: entry.moduleId,
+              date: entry.date.slice(0, 10), // Solo la fecha YYYY-MM-DD
+              data: {} // Objeto vacío para quitar el estado seleccionado
+            })
+          })
+        );
+        
+        // Esperar a que todas las actualizaciones se completen
+        await Promise.all(updatePromises);
+      }
+    } catch (error) {
+      console.error('Error updating entries when deleting state:', error);
+      // No fallar la operación si hay error actualizando entradas
+    }
+    
+    // Finalmente, quitar el estado del array local
     setStates(states.filter(s => s.id !== id));
   };
 

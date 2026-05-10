@@ -180,7 +180,7 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
     }
   }, [selectedMood, states]);
 
-  const saveEntry = async (moodId: string) => {
+  const saveEntry = async (moodId: string | null) => {
     try {
       const res = await fetch('/api/moduleEntries', {
         method: 'POST',
@@ -189,12 +189,12 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
         body: JSON.stringify({
           moduleId: module.id,
           date: selectedDate,
-          data: { moodId }
+          data: moodId ? { moodId } : {}
         })
       });
 
       if (res.ok) {
-        const mood = states.find(s => s.id === moodId);
+        const mood = moodId ? states.find(s => s.id === moodId) : null;
         onUpdate?.();
       }
     } catch (error) {
@@ -204,10 +204,19 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
 
   const handleMoodSelect = (moodId: string) => {
     if (!isEditing) return;
-    setSelectedMood(moodId);
-    saveEntry(moodId);
-    setMessage('✓ Estado del día actualizado');
-    setMessageType('success');
+    
+    // Si el estado ya está seleccionado, deseleccionarlo
+    if (selectedMood === moodId) {
+      setSelectedMood(null);
+      saveEntry(null);
+      setMessage('✓ Estado deseleccionado');
+      setMessageType('success');
+    } else {
+      setSelectedMood(moodId);
+      saveEntry(moodId);
+      setMessage('✓ Estado del día actualizado');
+      setMessageType('success');
+    }
   };
 
   if (loading) return <div>Loading...</div>;
