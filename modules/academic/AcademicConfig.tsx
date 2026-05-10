@@ -48,6 +48,15 @@ export function AcademicConfig({
     ((config?.taskPoints as any)?.baja ?? 1).toString()
   );
 
+  // Cargar materias desde moduleEntries si moduleId está disponible
+  const todayDate = getLocalDateString();
+  const academicModule = useAcademicModule(
+    moduleId || "",
+    "academic",
+    todayDate,
+    config || {}
+  );
+
   const initialSubjects = useMemo(
     () => academicModule.subjects ?? subjects,
     [academicModule.subjects, subjects]
@@ -75,15 +84,6 @@ export function AcademicConfig({
       taskPointsMedia,
       taskPointsBaja,
     }) !== JSON.stringify(initialScoring);
-
-  // Cargar materias desde moduleEntries si moduleId está disponible
-  const todayDate = getLocalDateString();
-  const academicModule = useAcademicModule(
-    moduleId || "",
-    "academic",
-    todayDate,
-    config || {}
-  );
 
   useEffect(() => {
     if (academicModule.subjects && academicModule.subjects.length > 0) {
