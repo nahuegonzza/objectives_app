@@ -181,10 +181,11 @@ export default function UnifiedColorPicker({
             <button
               type="button"
               onClick={openColorPicker}
-              className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-slate-300 bg-slate-100 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700 transition hover:border-slate-400 hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
-              aria-label="Color RGB personalizado"
+              className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-slate-300 bg-gradient-to-br from-rose-400 via-amber-300 to-sky-500 shadow-sm transition hover:border-slate-400 hover:shadow-md dark:border-slate-700"
+              aria-label="Color personalizado"
             >
-              RGB
+              <span className="sr-only">Personalizado</span>
+              <span className="h-7 w-7 rounded-full bg-[linear-gradient(135deg,rgba(236,72,153,1),rgba(251,191,36,1),rgba(59,130,246,1))] shadow-inner" />
             </button>
           </div>
           <input
