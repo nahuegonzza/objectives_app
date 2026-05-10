@@ -88,7 +88,12 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
           </div>
           <button
             onClick={() => setShowEventForm(true)}
-            className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
+            disabled={!isEditing}
+            className={`inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition ${
+              isEditing
+                ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20'
+                : 'bg-slate-400 cursor-not-allowed shadow-slate-400/20'
+            }`}
           >
             + Agregar evento
           </button>
@@ -126,7 +131,13 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
           <div className="mt-5 space-y-4 flex-1">
             {todayEvents.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-                No hay exámenes ni tareas para hoy. <button onClick={() => setShowEventForm(true)} className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">Agrega uno</button>
+                No hay exámenes ni tareas para hoy. {
+                  isEditing ? (
+                    <button onClick={() => setShowEventForm(true)} className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">Agrega uno</button>
+                  ) : (
+                    <span className="text-slate-400 dark:text-slate-500">Activa "Editar día" para agregar eventos</span>
+                  )
+                }
               </div>
             ) : (
               todayEvents.map((event) => {
@@ -137,6 +148,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                     event={event}
                     subject={subject}
                     onToggleComplete={handleToggleCompleted}
+                    isEditing={isEditing}
                   />
                 );
               })

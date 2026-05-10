@@ -6,9 +6,10 @@ interface AcademicTodayCardProps {
   event: AcademicEvent;
   subject: AcademicSubject | undefined;
   onToggleComplete: (event: AcademicEvent) => Promise<void>;
+  isEditing?: boolean;
 }
 
-export function AcademicTodayCard({ event, subject, onToggleComplete }: AcademicTodayCardProps) {
+export function AcademicTodayCard({ event, subject, onToggleComplete, isEditing = false }: AcademicTodayCardProps) {
   const icon = event.type === 'exam' ? (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M6 4h12v16H6z" />
@@ -46,9 +47,16 @@ export function AcademicTodayCard({ event, subject, onToggleComplete }: Academic
           <span>Listo</span>
           <button
             type="button"
-            onClick={() => onToggleComplete(event)}
+            onClick={() => isEditing && onToggleComplete(event)}
+            disabled={!isEditing}
             aria-pressed={event.completed}
-            className={`relative h-7 w-14 rounded-full transition-colors ${event.completed ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+            className={`relative h-7 w-14 rounded-full transition-colors ${
+              event.completed
+                ? 'bg-emerald-500'
+                : isEditing
+                  ? 'bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600'
+                  : 'bg-slate-200 dark:bg-slate-800 cursor-not-allowed'
+            }`}
           >
             <span className={`absolute left-1 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-white shadow transition-transform ${event.completed ? 'translate-x-7' : 'translate-x-0'}`} />
           </button>

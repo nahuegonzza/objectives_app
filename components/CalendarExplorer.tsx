@@ -661,7 +661,9 @@ export default function CalendarExplorer() {
                           return (
                             <div 
                               key={goal.id} 
-                              className="flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]"
+                              className={`flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all ${
+                                isEditingDay ? 'hover:shadow-md cursor-pointer' : ''
+                              } [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]`}
                               style={{
                                 '--bg-light': colors.light,
                                 '--border-light': colors.lightBorder,
@@ -778,7 +780,9 @@ export default function CalendarExplorer() {
                           return (
                             <div 
                               key={goal.id} 
-                              className="flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]"
+                              className={`flex flex-col gap-2 rounded-xl border px-3 py-2 transition-all ${
+                                isEditingDay ? 'hover:shadow-md cursor-pointer' : ''
+                              } [background-color:var(--bg-light)] [border-color:var(--border-light)] dark:[background-color:var(--bg-dark)] dark:[border-color:var(--border-dark)]`}
                               style={{
                                 '--bg-light': colors.light,
                                 '--border-light': colors.lightBorder,
