@@ -178,11 +178,14 @@ export default function AcademicOverview() {
   useEffect(() => {
     async function loadAcademicModuleId() {
       try {
-        const res = await fetch('/api/modules?slug=academic', { credentials: 'include' });
+        const res = await fetch('/api/modules', { credentials: 'include' });
         if (res.ok) {
           const modules = await res.json();
-          if (modules.length > 0) {
-            setAcademicModuleId(modules[0].id);
+          const academicModule = Array.isArray(modules)
+            ? modules.find((module: any) => module?.slug === 'academic')
+            : null;
+          if (academicModule?.id) {
+            setAcademicModuleId(academicModule.id);
           }
         }
       } catch (err) {
