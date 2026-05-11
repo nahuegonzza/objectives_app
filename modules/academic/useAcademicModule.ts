@@ -37,16 +37,28 @@ export function useAcademicModule(
 
   const todayKey = selectedDate.slice(0, 10);
 
-  const getPriorityWeight = (priority?: AcademicTaskPriority) => {
-    switch (priority) {
-      case 'alta':
-        return 0;
-      case 'media':
-        return 1;
-      case 'baja':
-        return 2;
-      default:
-        return 3;
+  const getEventWeight = (event: AcademicEvent) => {
+    if (event.type === 'exam') {
+      switch (event.examType) {
+        case 'final':
+          return 0;
+        case 'recuperatorio':
+          return 1;
+        case 'parcial':
+        default:
+          return 2;
+      }
+    } else {
+      // task
+      switch (event.priority) {
+        case 'alta':
+          return 3;
+        case 'media':
+          return 4;
+        case 'baja':
+        default:
+          return 5;
+      }
     }
   };
 
@@ -56,10 +68,9 @@ export function useAcademicModule(
       const dateB = new Date(b.date.slice(0, 10)).getTime();
       if (dateA !== dateB) return dateA - dateB;
 
-      if (a.type === 'task' && b.type === 'task') {
-        const priorityDiff = getPriorityWeight(a.priority) - getPriorityWeight(b.priority);
-        if (priorityDiff !== 0) return priorityDiff;
-      }
+      const weightA = getEventWeight(a);
+      const weightB = getEventWeight(b);
+      if (weightA !== weightB) return weightA - weightB;
 
       return a.title.localeCompare(b.title);
     });

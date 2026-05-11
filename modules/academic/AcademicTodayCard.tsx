@@ -80,13 +80,12 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
           >
             <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${event.completed ? 'translate-x-5' : 'translate-x-0'}`} />
           </button>
-          <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Listo</span>
         </div>
       </div>
 
       {/* Descripción */}
       <div className="mt-4">
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 break-words">
           {event.description || 'Sin descripción adicional'}
         </p>
       </div>
