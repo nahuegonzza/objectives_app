@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
 import { useAcademicModule } from './useAcademicModule';
+import { AcademicConfig } from './AcademicConfig';
 import type { ModuleEntry } from '@types';
 
 type GroupByOption = 'none' | 'date' | 'subject';
@@ -94,6 +95,8 @@ export default function AcademicOverview() {
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
   const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule('', 'academic', '', {});
 
@@ -239,12 +242,12 @@ export default function AcademicOverview() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/academic/config"
+            <button
+              onClick={() => setShowConfigModal(true)}
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <Image src="/navbar_icons/settings_icon.png" alt="Configuración" width={20} height={20} unoptimized />
-            </Link>
+            </button>
             <Link
               href="/"
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -284,103 +287,6 @@ export default function AcademicOverview() {
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">Materias</p>
                 <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{summary.subjects}</p>
                 <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Materias únicas</p>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-              <div className="grid gap-4">
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
-                  <input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Título, descripción o materia"
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
-                  <select
-                    value={groupBy}
-                    onChange={(event) => setGroupBy(event.target.value as GroupByOption)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="none">Sin orden</option>
-                    <option value="date">Agrupar por fecha</option>
-                    <option value="subject">Agrupar por materia</option>
-                  </select>
-                </label>
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Orden</span>
-                  <select
-                    value={sortBy}
-                    onChange={(event) => setSortBy(event.target.value as SortOption)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="default">Sin orden</option>
-                    <option value="dateAsc">Fecha ascendente</option>
-                    <option value="dateDesc">Fecha descendente</option>
-                    <option value="subject">Materia</option>
-                    <option value="priority">Prioridad / examen</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="mt-4 grid gap-4">
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <input
-                      type="date"
-                      value={dateFrom}
-                      onChange={(event) => setDateFrom(event.target.value)}
-                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                    />
-                    <input
-                      type="date"
-                      value={dateTo}
-                      onChange={(event) => setDateTo(event.target.value)}
-                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                    />
-                  </div>
-                </label>
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
-                  <select
-                    value={eventTypeFilter}
-                    onChange={(event) => setEventTypeFilter(event.target.value as EventTypeFilter)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="all">Todos</option>
-                    <option value="exam">Exámenes</option>
-                    <option value="task">Tareas</option>
-                  </select>
-                </label>
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Estado</span>
-                  <select
-                    value={statusFilter}
-                    onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="all">Todos</option>
-                    <option value="pending">Pendientes</option>
-                    <option value="completed">Completados</option>
-                  </select>
-                </label>
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materia</span>
-                  <select
-                    value={subjectFilter}
-                    onChange={(event) => setSubjectFilter(event.target.value)}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="all">Todas</option>
-                    {subjects.map((subject) => (
-                      <option key={subject.id} value={subject.id}>{subject.name}</option>
-                    ))}
-                  </select>
-                </label>
               </div>
             </div>
           </section>
@@ -426,6 +332,103 @@ export default function AcademicOverview() {
               </div>
             </div>
           </aside>
+        </div>
+
+        <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
+          <div className="grid gap-4">
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Título, descripción o materia"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
+              <select
+                value={groupBy}
+                onChange={(event) => setGroupBy(event.target.value as GroupByOption)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="none">Sin orden</option>
+                <option value="date">Agrupar por fecha</option>
+                <option value="subject">Agrupar por materia</option>
+              </select>
+            </label>
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Orden</span>
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value as SortOption)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="default">Sin orden</option>
+                <option value="dateAsc">Fecha ascendente</option>
+                <option value="dateDesc">Fecha descendente</option>
+                <option value="subject">Materia</option>
+                <option value="priority">Prioridad / examen</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="mt-4 grid gap-4">
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(event) => setDateFrom(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                />
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(event) => setDateTo(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                />
+              </div>
+            </label>
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
+              <select
+                value={eventTypeFilter}
+                onChange={(event) => setEventTypeFilter(event.target.value as EventTypeFilter)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="all">Todos</option>
+                <option value="exam">Exámenes</option>
+                <option value="task">Tareas</option>
+              </select>
+            </label>
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Estado</span>
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="all">Todos</option>
+                <option value="pending">Pendientes</option>
+                <option value="completed">Completados</option>
+              </select>
+            </label>
+            <label className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materia</span>
+              <select
+                value={subjectFilter}
+                onChange={(event) => setSubjectFilter(event.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="all">Todas</option>
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>{subject.name}</option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
 
         <div className="mt-6">
@@ -492,11 +495,22 @@ export default function AcademicOverview() {
               {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
                 <section key={groupLabel} className="space-y-4">
                   <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">{groupLabel}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{groupItems.length} evento(s)</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-base font-semibold text-slate-900 dark:text-white">{groupLabel}</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{groupItems.length} evento(s)</p>
+                      </div>
+                      <button
+                        onClick={() => setCollapsedGroups(prev => ({ ...prev, [groupLabel]: !prev[groupLabel] }))}
+                        className="rounded-lg p-2 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
+                      >
+                        {collapsedGroups[groupLabel] ? '▼' : '▲'}
+                      </button>
+                    </div>
                   </div>
-                  <div className="space-y-4">
-                    {groupItems.map((event) => (
+                  {!collapsedGroups[groupLabel] && (
+                    <div className="space-y-4">
+                      {groupItems.map((event) => (
                       <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                           <div className="min-w-0 flex-1">
@@ -540,12 +554,27 @@ export default function AcademicOverview() {
                       </article>
                     ))}
                   </div>
+                  )}
                 </section>
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {showConfigModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-slate-950">
+            <AcademicConfig
+              config={{}}
+              moduleId=""
+              moduleName="academic"
+              onSave={async () => true}
+              onClose={() => setShowConfigModal(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
