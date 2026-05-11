@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
+import { useAcademicModule } from './useAcademicModule';
 import type { ModuleEntry } from '@types';
 
 type GroupByOption = 'none' | 'date' | 'subject';
@@ -44,7 +45,11 @@ const getEventWeight = (event: AcademicEvent) => {
 };
 
 const getExamLabel = (event: AcademicEvent) => {
-  if (event.type !== 'exam') return 'Tarea';
+  if (event.type !== 'exam') {
+    const priority = event.priority ?? 'media';
+    const priorityCap = priority.charAt(0).toUpperCase() + priority.slice(1);
+    return `Tarea - Prioridad ${priorityCap}`;
+  }
   return event.examType === 'final'
     ? 'Final'
     : event.examType === 'recuperatorio'
@@ -53,7 +58,7 @@ const getExamLabel = (event: AcademicEvent) => {
 };
 
 const getExamBadgeStyle = (event: AcademicEvent) => {
-  if (event.type !== 'exam') return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200';
+  if (event.type !== 'exam') return getTaskBadgeStyle(event.priority);
   switch (event.examType) {
     case 'final':
       return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300';
@@ -65,18 +70,32 @@ const getExamBadgeStyle = (event: AcademicEvent) => {
   }
 };
 
+const getTaskBadgeStyle = (priority?: string) => {
+  switch (priority) {
+    case 'alta':
+      return 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300';
+    case 'media':
+      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300';
+    case 'baja':
+    default:
+      return 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300';
+  }
+};
+
 export default function AcademicOverview() {
   const [entries, setEntries] = useState<ModuleEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [groupBy, setGroupBy] = useState<GroupByOption>('none');
-  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [sortBy, setSortBy] = useState<SortOption>('priority');
   const [eventTypeFilter, setEventTypeFilter] = useState<EventTypeFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+
+  const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule('', 'academic', '', {});
 
   const getWeekBounds = () => {
     const today = new Date();
@@ -238,38 +257,38 @@ export default function AcademicOverview() {
         <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
           <section className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos</p>
-                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{summary.total}</p>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Tareas y exámenes</p>
+              <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-5 dark:from-emerald-950/50 dark:to-emerald-900/50 dark:border-emerald-700">
+                <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Eventos</p>
+                <p className="mt-3 text-3xl font-semibold text-emerald-900 dark:text-emerald-100">{summary.total}</p>
+                <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Tareas y exámenes</p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Exámenes</p>
-                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{summary.exams}</p>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Programados</p>
+              <div className="rounded-3xl bg-gradient-to-br from-sky-50 to-sky-100 border border-sky-200 p-5 dark:from-sky-950/50 dark:to-sky-900/50 dark:border-sky-700">
+                <p className="text-xs uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">Exámenes</p>
+                <p className="mt-3 text-3xl font-semibold text-sky-900 dark:text-sky-100">{summary.exams}</p>
+                <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">Programados</p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tareas</p>
-                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{summary.tasks}</p>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pendientes y completadas</p>
+              <div className="rounded-3xl bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 p-5 dark:from-amber-950/50 dark:to-amber-900/50 dark:border-amber-700">
+                <p className="text-xs uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">Tareas</p>
+                <p className="mt-3 text-3xl font-semibold text-amber-900 dark:text-amber-100">{summary.tasks}</p>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">Pendientes y completadas</p>
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr]">
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Completados</p>
-                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{summary.completed}</p>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Eventos resueltos</p>
+              <div className="rounded-3xl bg-gradient-to-br from-violet-50 to-violet-100 border border-violet-200 p-5 dark:from-violet-950/50 dark:to-violet-900/50 dark:border-violet-700">
+                <p className="text-xs uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400">Completados</p>
+                <p className="mt-3 text-3xl font-semibold text-violet-900 dark:text-violet-100">{summary.completed}</p>
+                <p className="mt-1 text-sm text-violet-700 dark:text-violet-300">Eventos resueltos</p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materias</p>
-                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{summary.subjects}</p>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Materias únicas</p>
+              <div className="rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-5 dark:from-slate-950/50 dark:to-slate-900/50 dark:border-slate-700">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">Materias</p>
+                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{summary.subjects}</p>
+                <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Materias únicas</p>
               </div>
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4">
                 <label className="space-y-2">
                   <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
                   <input
@@ -307,7 +326,7 @@ export default function AcademicOverview() {
                 </label>
               </div>
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="mt-4 grid gap-4">
                 <label className="space-y-2">
                   <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -429,7 +448,7 @@ export default function AcademicOverview() {
               {groupBy === 'none' && filteredEvents.map((event) => (
                 <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2 text-sm">
                         <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
                           {getExamLabel(event)}
@@ -443,12 +462,28 @@ export default function AcademicOverview() {
                       <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                     </div>
                     <div className="flex flex-col gap-3 sm:items-end">
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 truncate max-w-32">
                         {event.subject?.name || 'Sin materia'}
                       </span>
                       <span className="text-xs text-slate-500 dark:text-slate-400">
-                        {event.type === 'task' ? `Prioridad ${event.priority ?? 'media'}` : `Examen ${event.examType ?? 'parcial'}`}
+                        {event.type === 'exam' ? `Examen ${event.examType ?? 'parcial'}` : ''}
                       </span>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {/* handle edit */}}
+                          className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {/* handle delete */}}
+                          className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -464,7 +499,7 @@ export default function AcademicOverview() {
                     {groupItems.map((event) => (
                       <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2 text-sm">
                               <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
                                 {getExamLabel(event)}
@@ -478,12 +513,28 @@ export default function AcademicOverview() {
                             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                           </div>
                           <div className="flex flex-col gap-3 sm:items-end">
-                            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 truncate max-w-32">
                               {event.subject?.name || 'Sin materia'}
                             </span>
                             <span className="text-xs text-slate-500 dark:text-slate-400">
-                              {event.type === 'task' ? `Prioridad ${event.priority ?? 'media'}` : `Examen ${event.examType ?? 'parcial'}`}
+                              {event.type === 'exam' ? `Examen ${event.examType ?? 'parcial'}` : ''}
                             </span>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {/* handle edit */}}
+                                className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {/* handle delete */}}
+                                className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                              >
+                                🗑️
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </article>
