@@ -184,8 +184,24 @@ export function useAcademicModule(
     const entryDate = event.date.slice(0, 10) || getLocalDateString();
     const targetEntry = allEntries.find((entry) => entry.date.slice(0, 10) === entryDate);
     const existingData = targetEntry ? parseAcademicData(targetEntry.data) : DEFAULT_ACADEMIC_DATA;
-    const nextEvents = [...existingData.events, event];
+    const eventExistsInTarget = existingData.events.some((currentEvent) => currentEvent.id === event.id);
+
+    const nextEvents = eventExistsInTarget
+      ? existingData.events.map((currentEvent) => (currentEvent.id === event.id ? event : currentEvent))
+      : [...existingData.events, event];
+
     const subjectsToSave = existingData.subjects.length ? existingData.subjects : subjects;
+
+    const originalEntry = allEntries.find((entry) =>
+      parseAcademicData(entry.data).events.some((currentEvent) => currentEvent.id === event.id)
+    );
+
+    if (originalEntry && originalEntry.date.slice(0, 10) !== entryDate) {
+      const originalData = parseAcademicData(originalEntry.data);
+      const updatedOriginalEvents = originalData.events.filter((currentEvent) => currentEvent.id !== event.id);
+      await saveEntry(originalEntry.date.slice(0, 10), originalData.subjects, updatedOriginalEvents);
+    }
+
     await saveEntry(entryDate, subjectsToSave, nextEvents);
   };
 

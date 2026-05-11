@@ -34,6 +34,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   } = useAcademicModule(module.id, module.slug, selectedDate, config);
 
   const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
   const [showUpcomingEvents, setShowUpcomingEvents] = useState(true);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
@@ -51,10 +52,26 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     // No need to call onUpdate() anymore since state is updated optimistically
   };
 
-  const handleAddEvent = async (event: AcademicEvent) => {
+  const handleSaveEvent = async (event: AcademicEvent) => {
     await addEvent(event);
+    setEditingEvent(null);
     setShowEventForm(false);
-    setMessage('✓ Evento creado');
+    setMessage('✓ Evento guardado');
+    setMessageType('success');
+  };
+
+  const handleEditEvent = (event: AcademicEvent) => {
+    setEditingEvent(event);
+    setShowEventForm(true);
+  };
+
+  const handleDeleteEvent = async (event: AcademicEvent) => {
+    if (!window.confirm('¿Eliminar este evento?')) {
+      return;
+    }
+
+    await discardEvent(event);
+    setMessage('✓ Evento eliminado');
     setMessageType('success');
   };
 
@@ -70,9 +87,13 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     <section className="space-y-6">
       <AcademicEventForm
         subjects={subjects}
+        event={editingEvent ?? undefined}
         isOpen={showEventForm}
-        onClose={() => setShowEventForm(false)}
-        onSave={handleAddEvent}
+        onClose={() => {
+          setShowEventForm(false);
+          setEditingEvent(null);
+        }}
+        onSave={handleSaveEvent}
         isSaving={isSaving}
       />
 
@@ -92,7 +113,10 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
             <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">Agrega materias, planifica exámenes y marca entregas completadas para que el score global capture tu progreso.</p>
           </div>
           <button
-            onClick={() => setShowEventForm(true)}
+            onClick={() => {
+              setEditingEvent(null);
+              setShowEventForm(true);
+            }}
             disabled={!isEditing}
             className={`inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition ${
               isEditing
@@ -143,7 +167,10 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
               <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
                 No hay exámenes ni tareas para hoy. {
                   isEditing ? (
-                    <button onClick={() => setShowEventForm(true)} className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">Agrega uno</button>
+                    <button onClick={() => {
+                      setEditingEvent(null);
+                      setShowEventForm(true);
+                    }} className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">Agrega uno</button>
                   ) : (
                     <span className="text-slate-400 dark:text-slate-500">Activa "Editar día" para agregar eventos</span>
                   )
@@ -158,6 +185,8 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                     event={event}
                     subject={subject}
                     onToggleComplete={handleToggleCompleted}
+                    onEdit={handleEditEvent}
+                    onDelete={handleDeleteEvent}
                     isEditing={isEditing}
                   />
                 );
