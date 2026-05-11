@@ -96,6 +96,7 @@ export default function AcademicOverview() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [academicModuleId, setAcademicModuleId] = useState<string>('');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
   const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule('', 'academic', '', {});
@@ -115,9 +116,21 @@ export default function AcademicOverview() {
   };
 
   useEffect(() => {
-    const { from, to } = getWeekBounds();
-    setDateFrom(from);
-    setDateTo(to);
+    async function loadAcademicModuleId() {
+      try {
+        const res = await fetch('/api/modules?slug=academic', { credentials: 'include' });
+        if (res.ok) {
+          const modules = await res.json();
+          if (modules.length > 0) {
+            setAcademicModuleId(modules[0].id);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading academic module ID:', err);
+      }
+    }
+
+    loadAcademicModuleId();
   }, []);
 
   useEffect(() => {
@@ -334,8 +347,8 @@ export default function AcademicOverview() {
           </aside>
         </div>
 
-        <div className="mt-6 p-4">
-          <div className="grid gap-3">
+        <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+          <div className="grid grid-cols-3 gap-3">
             <label className="space-y-1">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
               <input
@@ -373,7 +386,7 @@ export default function AcademicOverview() {
             </label>
           </div>
 
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid grid-cols-4 gap-3">
             <label className="space-y-1">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -494,7 +507,7 @@ export default function AcademicOverview() {
 
               {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
                 <section key={groupLabel} className="space-y-4">
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                  <div className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-base font-semibold text-slate-900 dark:text-white">{groupLabel}</h3>
@@ -567,7 +580,7 @@ export default function AcademicOverview() {
           <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-slate-950">
             <AcademicConfig
               config={{}}
-              moduleId=""
+              moduleId={academicModuleId}
               moduleName="academic"
               onSave={async () => true}
               onClose={() => setShowConfigModal(false)}
