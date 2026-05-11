@@ -221,7 +221,7 @@ export default function AcademicOverview() {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/settings/modules"
+              href="/academic/config"
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <Image src="/navbar_icons/settings_icon.png" alt="Configuración" width={20} height={20} unoptimized />
@@ -309,6 +309,23 @@ export default function AcademicOverview() {
 
               <div className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(event) => setDateFrom(event.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                    />
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(event) => setDateTo(event.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                    />
+                  </div>
+                </label>
+                <label className="space-y-2">
                   <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
                   <select
                     value={eventTypeFilter}
@@ -353,21 +370,21 @@ export default function AcademicOverview() {
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
               <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
               <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Eventos totales</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.total}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
+                  <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
+                  <span className="font-semibold">{summary.total}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Exámenes</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.exams}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
+                  <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
+                  <span className="font-semibold">{summary.exams}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Tareas</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.tasks}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
+                  <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
+                  <span className="font-semibold">{summary.tasks}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Completados</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.completed}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
+                  <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
+                  <span className="font-semibold">{summary.completed}</span>
                 </div>
               </div>
             </div>
