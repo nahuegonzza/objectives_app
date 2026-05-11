@@ -30,8 +30,21 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
     ? `${event.examType ?? 'Parcial'}`
     : `${event.priority ? `Prioridad ${event.priority}` : 'Tarea'}`;
 
-  const borderColor = subject?.color ?? (event.type === 'exam' ? 'border-orange-400' : 'border-emerald-400');
-  
+  const examColors = {
+    final: {
+      badge: 'text-emerald-700 bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300',
+      border: 'border-emerald-400'
+    },
+    recuperatorio: {
+      badge: 'text-violet-700 bg-violet-100 dark:bg-violet-950/40 dark:text-violet-300',
+      border: 'border-violet-400'
+    },
+    parcial: {
+      badge: 'text-sky-700 bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300',
+      border: 'border-sky-400'
+    }
+  };
+
   const priorityColors = {
     alta: 'text-rose-600 bg-rose-50 dark:bg-rose-950/30 dark:text-rose-400',
     media: 'text-orange-600 bg-orange-50 dark:bg-orange-950/30 dark:text-orange-400',
@@ -39,9 +52,13 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
     default: 'text-slate-600 bg-slate-50 dark:bg-slate-900 dark:text-slate-400'
   };
 
-  const currentPriorityStyle = event.type === 'task' 
+  const currentPriorityStyle = event.type === 'task'
     ? (priorityColors[event.priority as keyof typeof priorityColors] || priorityColors.default)
-    : priorityColors.media;
+    : examColors[(event.examType ?? 'parcial') as keyof typeof examColors].badge;
+
+  const borderColor = subject?.color ?? (event.type === 'exam'
+    ? examColors[(event.examType ?? 'parcial') as keyof typeof examColors].border
+    : 'border-emerald-400');
 
   return (
     <div className={`group relative overflow-hidden rounded-3xl border-2 ${borderColor} bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-slate-950`}>

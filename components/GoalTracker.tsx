@@ -8,6 +8,7 @@ import { calculateDailyScore } from '@core/score/scoreCalculator';
 import CompactGoalItem from '@components/CompactGoalItem';
 import { moduleDefinitions } from '../modules';
 import { parseModuleConfig } from '../lib/modules';
+import Link from 'next/link';
 import Image from 'next/image';
 import type { ActiveModule } from '../lib/modules';
 
@@ -559,14 +560,24 @@ export default function GoalTracker() {
 
               return (
                 <div key={module.id} className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => toggleModuleCollapse(module.slug)}
-                    className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                  >
-                    <span className={`transform transition-transform ${isCollapsed ? '' : 'rotate-90'}`}>▶</span>
-                    {module.name}
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleModuleCollapse(module.slug)}
+                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                    >
+                      <span className={`transform transition-transform ${isCollapsed ? '' : 'rotate-90'}`}>▶</span>
+                      {module.name}
+                    </button>
+                    {module.slug === 'academic' && (
+                      <Link
+                        href="/academic"
+                        className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300 dark:hover:bg-emerald-900"
+                      >
+                        Ver todo
+                      </Link>
+                    )}
+                  </div>
                   {!isCollapsed && (
                     <Component
                       config={module.config}
