@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
 import type { ModuleEntry } from '@types';
@@ -79,6 +80,36 @@ export default function AcademicOverview() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [groupCollapseStates, setGroupCollapseStates] = useState<Record<string, boolean>>({});
+
+  const getWeekBounds = () => {
+    const today = new Date();
+    const weekday = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((weekday + 6) % 7));
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const pad = (value: number) => String(value).padStart(2, '0');
+    const formatKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+    return { from: formatKey(monday), to: formatKey(sunday) };
+  };
+
+  useEffect(() => {
+    const { from, to } = getWeekBounds();
+    setDateFrom(from);
+    setDateTo(to);
+  }, []);
+
+  const toggleGroup = (label: string) => {
+    setGroupCollapseStates((current) => ({
+      ...current,
+      [label]: !current[label]
+    }));
+  };
 
   useEffect(() => {
     async function loadAcademicEntries() {
@@ -132,6 +163,8 @@ export default function AcademicOverview() {
         if (statusFilter === 'completed' && !event.completed) return false;
         if (statusFilter === 'pending' && event.completed) return false;
         if (subjectFilter !== 'all' && event.subjectId !== subjectFilter) return false;
+        if (dateFrom && event.sourceDate < dateFrom) return false;
+        if (dateTo && event.sourceDate > dateTo) return false;
         if (search.trim()) {
           const needle = search.trim().toLowerCase();
           return [event.title, event.description, event.subject?.name].some((value) =>
@@ -200,6 +233,12 @@ export default function AcademicOverview() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/settings/modules"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              <Image src="/navbar_icons/settings_icon.png" alt="Configuración" width={20} height={20} unoptimized />
+            </Link>
             <Link
               href="/"
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -283,6 +322,23 @@ export default function AcademicOverview() {
 
               <div className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(event) => setDateFrom(event.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                    />
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(event) => setDateTo(event.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                    />
+                  </div>
+                </label>
+                <label className="space-y-2">
                   <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
                   <select
                     value={eventTypeFilter}
@@ -327,21 +383,21 @@ export default function AcademicOverview() {
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
               <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
               <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Eventos totales</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.total}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
+                  <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
+                  <span className="font-semibold">{summary.total}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Exámenes</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.exams}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
+                  <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
+                  <span className="font-semibold">{summary.exams}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Tareas</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.tasks}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
+                  <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
+                  <span className="font-semibold">{summary.tasks}</span>
                 </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-white p-4 dark:bg-slate-900">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Completados</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{summary.completed}</span>
+                <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
+                  <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
+                  <span className="font-semibold">{summary.completed}</span>
                 </div>
               </div>
             </div>
@@ -384,7 +440,7 @@ export default function AcademicOverview() {
           ) : (
             <div className="space-y-6">
               {groupBy === 'none' && filteredEvents.map((event) => (
-                <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -397,7 +453,7 @@ export default function AcademicOverview() {
                         </span>
                       </div>
                       <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white truncate">{event.title}</h2>
-                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-3 break-words">{event.description || 'Sin descripción'}</p>
+                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                     </div>
                     <div className="flex flex-col gap-3 sm:items-end">
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
@@ -411,15 +467,27 @@ export default function AcademicOverview() {
                 </article>
               ))}
 
-              {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
-                <section key={groupLabel} className="space-y-4">
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">{groupLabel}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{groupItems.length} evento(s)</p>
-                  </div>
-                  <div className="space-y-4">
-                    {groupItems.map((event) => (
-                      <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-950">
+              {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => {
+                const isCollapsed = groupCollapseStates[groupLabel] ?? false;
+                return (
+                  <section key={groupLabel} className="space-y-4">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(groupLabel)}
+                      className="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:hover:border-slate-600"
+                    >
+                      <div>
+                        <h3 className="text-base font-semibold text-slate-900 dark:text-white">{groupLabel}</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{groupItems.length} evento(s)</p>
+                      </div>
+                      <span className={`text-sm font-semibold text-slate-700 dark:text-slate-300 transition-transform ${isCollapsed ? '' : 'rotate-90'}`}>
+                        ▶
+                      </span>
+                    </button>
+                    {!isCollapsed && (
+                      <div className="space-y-4">
+                        {groupItems.map((event) => (
+                          <article key={`${event.id}-${event.sourceDate}`} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -432,7 +500,7 @@ export default function AcademicOverview() {
                               </span>
                             </div>
                             <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white truncate">{event.title}</h2>
-                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-3 break-words">{event.description || 'Sin descripción'}</p>
+                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                           </div>
                           <div className="flex flex-col gap-3 sm:items-end">
                             <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
