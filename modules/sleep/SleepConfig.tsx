@@ -61,7 +61,6 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
         
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span>🌙</span>
             Configurar Sueño
           </h2>
           <button onClick={() => {

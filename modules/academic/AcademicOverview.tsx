@@ -508,18 +508,13 @@ export default function AcademicOverview() {
               {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
                 <section key={groupLabel} className="space-y-4">
                   <div className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-white">{groupLabel}</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{groupItems.length} evento(s)</p>
-                      </div>
-                      <button
-                        onClick={() => setCollapsedGroups(prev => ({ ...prev, [groupLabel]: !prev[groupLabel] }))}
-                        className="rounded-lg p-2 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700"
-                      >
-                        {collapsedGroups[groupLabel] ? '▼' : '▲'}
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => setCollapsedGroups(prev => ({ ...prev, [groupLabel]: !prev[groupLabel] }))}
+                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                    >
+                      <span className={`transform transition-transform ${collapsedGroups[groupLabel] ? '' : 'rotate-90'}`}>▶</span>
+                      {groupLabel}
+                    </button>
                   </div>
                   {!collapsedGroups[groupLabel] && (
                     <div className="space-y-4">
@@ -536,15 +531,12 @@ export default function AcademicOverview() {
                                 {event.completed ? 'Completado' : 'Pendiente'}
                               </span>
                             </div>
-                            <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white truncate">{event.title}</h2>
+                            <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white">{event.title}</h2>
                             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                           </div>
                           <div className="flex flex-col gap-3 sm:items-end">
                             <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300 truncate max-w-32">
                               {event.subject?.name || 'Sin materia'}
-                            </span>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
-                              {event.type === 'exam' ? `Examen ${event.examType ?? 'parcial'}` : ''}
                             </span>
                             <div className="flex gap-2">
                               <button
