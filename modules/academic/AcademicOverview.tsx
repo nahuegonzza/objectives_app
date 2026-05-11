@@ -541,14 +541,20 @@ export default function AcademicOverview() {
                             <div className="flex gap-2">
                               <button
                                 type="button"
-                                onClick={() => {/* handle edit */}}
+                                onClick={() => alert('Editar no implementado aún')}
                                 className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                               >
                                 ✏️
                               </button>
                               <button
                                 type="button"
-                                onClick={() => {/* handle delete */}}
+                                onClick={async () => {
+                                  if (confirm('¿Eliminar este evento?')) {
+                                    await discardEvent(event);
+                                    // Recargar datos
+                                    window.location.reload();
+                                  }
+                                }}
                                 className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                               >
                                 🗑️
