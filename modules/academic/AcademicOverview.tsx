@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getLocalDateString } from '@lib/dateHelpers';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
+import { AcademicEventForm } from './AcademicEventForm';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicConfig } from './AcademicConfig';
 import type { ModuleEntry } from '@types';
@@ -98,8 +100,66 @@ export default function AcademicOverview() {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [academicModuleId, setAcademicModuleId] = useState<string>('');
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
 
-  const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule('', 'academic', '', {});
+  const todayString = getLocalDateString();
+  const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule(academicModuleId, 'academic', todayString, {});
+
+  const loadAcademicEntries = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/moduleEntries?module=academic', { credentials: 'include' });
+      if (!res.ok) {
+        throw new Error('No se pudieron cargar los datos académicos');
+      }
+
+      const data: ModuleEntry[] = await res.json();
+      setEntries(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error inesperado');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!academicModuleId) return;
+    loadAcademicEntries();
+  }, [academicModuleId]);
+
+  const handleOpenNewEvent = () => {
+    setEditingEvent(null);
+    setShowEventForm(true);
+  };
+
+  const handleEditEvent = (event: AcademicEvent) => {
+    setEditingEvent(event);
+    setShowEventForm(true);
+  };
+
+  const handleSaveEvent = async (event: AcademicEvent) => {
+    await addEvent(event);
+    await loadAcademicEntries();
+    setEditingEvent(null);
+    setShowEventForm(false);
+  };
+
+  const handleDeleteEvent = async (event: AcademicEvent) => {
+    if (!confirm('¿Eliminar este evento?')) {
+      return;
+    }
+
+    await discardEvent(event);
+    await loadAcademicEntries();
+  };
+
+  const handleToggleReady = async (event: AcademicEvent) => {
+    await toggleEventCompleted(event);
+    await loadAcademicEntries();
+  };
 
   const getWeekBounds = () => {
     const today = new Date();
@@ -131,29 +191,6 @@ export default function AcademicOverview() {
     }
 
     loadAcademicModuleId();
-  }, []);
-
-  useEffect(() => {
-    async function loadAcademicEntries() {
-      setLoading(true);
-      setError('');
-
-      try {
-        const res = await fetch('/api/moduleEntries?module=academic', { credentials: 'include' });
-        if (!res.ok) {
-          throw new Error('No se pudieron cargar los datos académicos');
-        }
-
-        const data: ModuleEntry[] = await res.json();
-        setEntries(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error inesperado');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadAcademicEntries();
   }, []);
 
   const subjects = useMemo<AcademicSubject[]>(() => {
@@ -255,6 +292,12 @@ export default function AcademicOverview() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <button
+              onClick={handleOpenNewEvent}
+              className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-900"
+            >
+              + Nuevo evento
+            </button>
             <button
               onClick={() => setShowConfigModal(true)}
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -487,14 +530,21 @@ export default function AcademicOverview() {
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          onClick={() => {/* handle edit */}}
+                          onClick={() => handleToggleReady(event)}
+                          className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                        >
+                          {event.completed ? 'Deshacer' : 'Listo'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleEditEvent(event)}
                           className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                         >
                           ✏️
                         </button>
                         <button
                           type="button"
-                          onClick={() => {/* handle delete */}}
+                          onClick={() => handleDeleteEvent(event)}
                           className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                         >
                           🗑️
@@ -541,20 +591,21 @@ export default function AcademicOverview() {
                             <div className="flex gap-2">
                               <button
                                 type="button"
-                                onClick={() => alert('Editar no implementado aún')}
+                                onClick={() => handleToggleReady(event)}
+                                className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                              >
+                                {event.completed ? 'Deshacer' : 'Listo'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleEditEvent(event)}
                                 className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                               >
                                 ✏️
                               </button>
                               <button
                                 type="button"
-                                onClick={async () => {
-                                  if (confirm('¿Eliminar este evento?')) {
-                                    await discardEvent(event);
-                                    // Recargar datos
-                                    window.location.reload();
-                                  }
-                                }}
+                                onClick={() => handleDeleteEvent(event)}
                                 className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                               >
                                 🗑️
@@ -572,6 +623,17 @@ export default function AcademicOverview() {
           )}
         </div>
       </div>
+
+      <AcademicEventForm
+        subjects={subjects}
+        event={editingEvent ?? undefined}
+        isOpen={showEventForm}
+        onClose={() => {
+          setShowEventForm(false);
+          setEditingEvent(null);
+        }}
+        onSave={handleSaveEvent}
+      />
 
       {showConfigModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
