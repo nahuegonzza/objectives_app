@@ -142,7 +142,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Estadísticas */}
-            <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-500 dark:to-emerald-700 rounded-2xl p-6 shadow-md text-white">
                 <p className="text-4xl font-bold">{stats.goalsCompleted}</p>
                 <p className="text-sm mt-2 text-emerald-100">Objetivos</p>
