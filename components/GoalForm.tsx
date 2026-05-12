@@ -174,6 +174,10 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+      await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    }
     setStatus('Guardando objetivo...');
     setStatusType('success');
 

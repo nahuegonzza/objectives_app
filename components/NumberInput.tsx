@@ -52,12 +52,22 @@ export default function NumberInput({
     setInternalValue(value != null ? String(value) : '');
   };
 
+  const handleChange = (raw: string) => {
+    setInternalValue(raw);
+    const normalized = raw.trim().replace(',', '.');
+    const parsed = Number(normalized);
+    const isValidNumber = normalized !== '' && !Number.isNaN(parsed) && !normalized.endsWith('.') && !normalized.endsWith(',');
+    if (isValidNumber) {
+      onCommit(parsed);
+    }
+  };
+
   return (
     <input
       type="number"
       inputMode="decimal"
       value={internalValue}
-      onChange={(event) => setInternalValue(event.target.value)}
+      onChange={(event) => handleChange(event.target.value)}
       onFocus={() => setIsFocused(true)}
       onBlur={(event) => {
         setIsFocused(false);
