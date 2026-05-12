@@ -24,7 +24,11 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
     }
 
     const { goalId } = params;
-    const payload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
+    const rawPayload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
+    const payload = {
+      ...rawPayload,
+      type: rawPayload.type === 'HABIT' ? 'BOOLEAN' : rawPayload.type === 'OBJECTIVE' ? 'NUMERIC' : rawPayload.type,
+    };
 
     // Validate input
     const validationResult = GoalPatchSchema.safeParse(payload);

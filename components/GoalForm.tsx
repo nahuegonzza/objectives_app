@@ -34,13 +34,19 @@ const initialState: GoalFormData = {
   weekDays: []
 };
 
+function normalizeGoalType(type?: string): GoalFormData['type'] {
+  if (type === 'HABIT' || type === 'BOOLEAN') return 'BOOLEAN';
+  if (type === 'OBJECTIVE' || type === 'NUMERIC') return 'NUMERIC';
+  return initialState.type;
+}
+
 function normalizeInitialData(data?: Partial<Goal>): GoalFormData {
   if (!data) return initialState;
 
   return {
     title: data.title ?? initialState.title,
     description: data.description ?? initialState.description,
-    type: data.type ?? initialState.type,
+    type: normalizeGoalType(data.type),
     icon: data.icon ?? initialState.icon,
     color: data.color ?? initialState.color,
     order: data.order ?? initialState.order,
