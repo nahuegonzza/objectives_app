@@ -176,7 +176,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
     event.preventDefault();
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
-      await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     }
     setStatus('Guardando objetivo...');
     setStatusType('success');
