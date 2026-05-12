@@ -23,6 +23,8 @@ interface TimePickerProps {
   disabled?: boolean;
 }
 
+const DEFAULT_TIME = '00:00';
+
 const formatTime = (hours: number, minutes: number) => `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 
 const parseTime = (value: string) => {
@@ -177,8 +179,8 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
 };
 
 export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, onUpdate, isEditing = false, date }) => {
-  const [bedtime, setBedtime] = useState('');
-  const [waketime, setWaketime] = useState('');
+  const [bedtime, setBedtime] = useState(DEFAULT_TIME);
+  const [waketime, setWaketime] = useState(DEFAULT_TIME);
   const [naps, setNaps] = useState<SleepNap[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -198,8 +200,8 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
       setLoading(true);
       try {
         // Resetear valores antes de cargar
-        setBedtime('');
-        setWaketime('');
+        setBedtime(DEFAULT_TIME);
+        setWaketime(DEFAULT_TIME);
         setNaps([]);
 
         const res = await fetch(`/api/moduleEntries?date=${selectedDate}&module=sleep`, { credentials: 'include' });
@@ -209,8 +211,8 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
         if (entries && entries.length > 0) {
           const entry = entries[0];
           const data = JSON.parse(entry.data);
-          setBedtime(data.bedtime || '');
-          setWaketime(data.waketime || '');
+          setBedtime(data.bedtime || DEFAULT_TIME);
+          setWaketime(data.waketime || DEFAULT_TIME);
           setNaps(Array.isArray(data.naps) ? data.naps.map((nap: any, index: number) => ({
             id: nap.id || `nap-${index}`,
             start: nap.start || '',
@@ -240,24 +242,45 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   }, [selectedDate]);
 
   const calculateHours = React.useCallback(() => {
-    let totalHours = 0;
+    const intervals: Array<{ start: number; end: number }> = [];
+
+    const buildInterval = (startValue: string, endValue: string) => {
+      const start = new Date(`1970-01-01T${startValue}:00`);
+      const end = new Date(`1970-01-01T${endValue}:00`);
+      if (end < start) {
+        end.setDate(end.getDate() + 1);
+      }
+      return { start: start.getTime(), end: end.getTime() };
+    };
 
     if (bedtime && waketime) {
-      const bed = new Date(`1970-01-01T${bedtime}:00`);
-      const wake = new Date(`1970-01-01T${waketime}:00`);
-      if (wake < bed) wake.setDate(wake.getDate() + 1); // next day
-      totalHours += (wake.getTime() - bed.getTime()) / (1000 * 60 * 60);
+      intervals.push(buildInterval(bedtime, waketime));
     }
 
     for (const nap of naps) {
       if (!nap.start || !nap.end) continue;
-      const napStart = new Date(`1970-01-01T${nap.start}:00`);
-      const napEnd = new Date(`1970-01-01T${nap.end}:00`);
-      const end = napEnd < napStart ? new Date(napEnd.setDate(napEnd.getDate() + 1)) : napEnd;
-      totalHours += (end.getTime() - napStart.getTime()) / (1000 * 60 * 60);
+      intervals.push(buildInterval(nap.start, nap.end));
     }
 
-    return totalHours;
+    if (intervals.length === 0) return 0;
+
+    const merged = intervals
+      .sort((a, b) => a.start - b.start)
+      .reduce<Array<{ start: number; end: number }>>((mergedList, current) => {
+        if (mergedList.length === 0) {
+          return [current];
+        }
+
+        const last = mergedList[mergedList.length - 1];
+        if (current.start <= last.end) {
+          last.end = Math.max(last.end, current.end);
+          return mergedList;
+        }
+
+        return [...mergedList, current];
+      }, []);
+
+    return merged.reduce((sum, interval) => sum + (interval.end - interval.start) / (1000 * 60 * 60), 0);
   }, [bedtime, waketime, naps]);
 
   const calculatePoints = React.useCallback((hours: number) => {
