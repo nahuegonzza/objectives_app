@@ -25,9 +25,10 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
 
     const { goalId } = params;
     const rawPayload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
+    const rawType = typeof rawPayload.type === 'string' ? rawPayload.type : undefined;
     const payload = {
       ...rawPayload,
-      type: rawPayload.type === 'HABIT' ? 'BOOLEAN' : rawPayload.type === 'OBJECTIVE' ? 'NUMERIC' : rawPayload.type,
+      type: rawType === 'HABIT' ? 'BOOLEAN' : rawType === 'OBJECTIVE' ? 'NUMERIC' : rawType,
     };
 
     // Validate input
