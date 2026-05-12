@@ -119,7 +119,7 @@ export default function ProfilePage() {
         <Navigation />
 
         <div className="mb-12">
-          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-emerald-600 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">Perfil Social</h1>
+          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-emerald-600 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">Perfil</h1>
           <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estadísticas y conexiones.</p>
         </div>
 
@@ -127,7 +127,7 @@ export default function ProfilePage() {
           {/* Información Personal y Estadísticas */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Card Principal - Info Personal */}
-            <div className="lg:col-span-1 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-3xl p-8 shadow-lg text-white">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
               <div className="text-center">
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
                   <span className="text-4xl">👤</span>
