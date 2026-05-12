@@ -71,6 +71,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
+  const formRef = useRef<HTMLFormElement>(null);
   const iconButtonRef = useRef<HTMLButtonElement>(null);
   const iconOverlayRef = useRef<HTMLDivElement>(null);
   const [iconOverlayStyle, setIconOverlayStyle] = useState<Record<string, number>>({});
@@ -174,9 +175,9 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    if (formRef.current) {
+      formRef.current.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input, textarea, select').forEach((input) => input.blur());
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
     setStatus('Guardando objetivo...');
     setStatusType('success');
@@ -204,7 +205,7 @@ export default function GoalForm({ initialData, submitLabel = 'Guardar objetivo'
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form ref={formRef} className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Nombre</label>

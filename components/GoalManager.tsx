@@ -214,16 +214,14 @@ export default function GoalManager() {
 
       setStatusMessage('Objetivo actualizado correctamente');
       setStatusType('success');
-      loadGoals(); // Reload goals to reflect changes
+      await loadGoals(); // Reload goals to reflect changes
+      setShowEditModal(false);
+      setEditingGoal(null);
     } catch (error) {
       console.error('Error updating goal:', error);
       setStatusMessage(error instanceof Error ? `Error actualizando objetivo: ${error.message}` : 'Error actualizando objetivo');
       setStatusType('error');
-    } finally {
-      setShowEditModal(false);
-      setEditingGoal(null);
-    }
-  }
+    }  }
 
   async function handleDeleteGoal(goalId: string) {
     try {
