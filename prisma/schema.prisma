@@ -28,6 +28,28 @@ model User {
   streakDays StreakDay[]
   accounts  Account[]
   sessions  Session[]
+  sentFriendRequests     FriendRequest[] @relation("sentFriendRequests")
+  receivedFriendRequests FriendRequest[] @relation("receivedFriendRequests")
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+model FriendRequest {
+  id         String              @id @default(uuid())
+  sender     User                @relation("sentFriendRequests", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User                @relation("receivedFriendRequests", fields: [receiverId], references: [id])
+  receiverId String
+  status     FriendRequestStatus @default(PENDING)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@unique([senderId, receiverId])
 }
 
 model Goal {

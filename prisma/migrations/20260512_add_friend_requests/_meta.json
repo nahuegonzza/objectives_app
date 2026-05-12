@@ -1,0 +1,15 @@
+{
+  "name": "add_friend_requests",
+  "description": "Add FriendRequest model for social features",
+  "steps": [
+    {
+      "stepType": "CreateEnum",
+      "enumName": "FriendRequestStatus"
+    },
+    {
+      "stepType": "CreateTable",
+      "tableName": "FriendRequest"
+    }
+  ],
+  "version": "5.16.0"
+}
