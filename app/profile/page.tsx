@@ -114,8 +114,8 @@ export default function ProfilePage() {
   }, [session, streakInfo.today]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 text-slate-900 dark:text-white px-4 py-6 md:px-10">
-      <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 text-slate-900 dark:text-white px-4 py-6 md:px-10 pb-24 sm:pb-0">
+      <div className="mx-auto max-w-4xl">
         <Navigation />
 
         <div className="mb-12">
@@ -127,7 +127,7 @@ export default function ProfilePage() {
           {/* Información Personal y Estadísticas */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Card Principal - Info Personal */}
-            <div className="lg:col-span-1 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-3xl p-8 shadow-lg text-white">
+            <div className="lg:col-span-1 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-3xl p-8 shadow-lg text-white">
               <div className="text-center">
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
                   <span className="text-4xl">👤</span>
@@ -169,7 +169,6 @@ export default function ProfilePage() {
               {/* Búsqueda de Amigos */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-3xl">🔍</span>
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Buscar Amigos</h2>
                 </div>
                 <FriendSearchPanel />
@@ -178,7 +177,6 @@ export default function ProfilePage() {
               {/* Solicitudes Pendientes */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-3xl">📬</span>
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Solicitudes Entrantes</h2>
                 </div>
                 <PendingRequestsPanel />
@@ -188,7 +186,6 @@ export default function ProfilePage() {
             {/* Columna Derecha - Lista de Amigos */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl">👥</span>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Tus Amigos</h2>
               </div>
               <FriendsListPanel />
@@ -293,7 +290,7 @@ function FriendSearchPanel() {
         <button
           type="button"
           onClick={handleSearch}
-          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-600 hover:to-blue-700 disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-60"
           disabled={loading}
         >
           Buscar
