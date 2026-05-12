@@ -119,7 +119,7 @@ export default function ProfilePage() {
         <Navigation />
 
         <div className="mb-12">
-          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-emerald-600 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">Perfil</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Perfil</h1>
           <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estadísticas y conexiones.</p>
         </div>
 
@@ -134,7 +134,6 @@ export default function ProfilePage() {
                 </div>
                 <h2 className="text-3xl font-bold mb-1">{loading ? 'Cargando...' : getDisplayName(userData, loading, session)}</h2>
                 <p className="text-blue-100 text-sm">@{userData?.username || 'sin_usuario'}</p>
-                <p className="text-blue-100 text-xs mt-2">{userData?.email || 'No disponible'}</p>
                 {calculateAge(userData?.birthDate) !== null && (
                   <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} años</p>
                 )}
