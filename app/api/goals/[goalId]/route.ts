@@ -3,9 +3,16 @@ export const runtime = "nodejs";
 
 import { NextResponse } from 'next/server';
 import { prisma, withRetry } from '@lib/prisma';
-import type { GoalPayload } from '@types';
+import type { GoalPayload, GoalType } from '@types';
 import { getServerSupabaseUser } from '@lib/supabase-server';
 import { GoalPatchSchema, type ValidatedGoalPatch } from '@lib/validators';
+
+function normalizeLegacyGoalType(type: unknown): GoalType | undefined {
+  if (type === 'HABIT') return 'BOOLEAN';
+  if (type === 'OBJECTIVE') return 'NUMERIC';
+  if (type === 'BOOLEAN' || type === 'NUMERIC') return type;
+  return undefined;
+}
 
 export async function PATCH(request: Request, { params }: { params: { goalId: string } }) {
   try {
@@ -25,10 +32,9 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
 
     const { goalId } = params;
     const rawPayload = (await request.json()) as Partial<GoalPayload> & { isActive?: boolean };
-    const rawType = typeof rawPayload.type === 'string' ? rawPayload.type : undefined;
     const payload = {
       ...rawPayload,
-      type: rawType === 'HABIT' ? 'BOOLEAN' : rawType === 'OBJECTIVE' ? 'NUMERIC' : rawType,
+      type: normalizeLegacyGoalType((rawPayload as unknown as Record<string, unknown>).type),
     };
 
     // Validate input
