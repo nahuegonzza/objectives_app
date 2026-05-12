@@ -142,7 +142,7 @@ export default function ProfilePage() {
 
             {/* Estadísticas */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-500 dark:to-emerald-700 rounded-2xl p-6 shadow-md text-white">
+              <div className="bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700 rounded-2xl p-6 shadow-md text-white">
                 <p className="text-4xl font-bold">{stats.goalsCompleted}</p>
                 <p className="text-sm mt-2 text-emerald-100">Objetivos</p>
               </div>
@@ -150,7 +150,7 @@ export default function ProfilePage() {
                 <p className="text-4xl font-bold">{stats.totalScore}</p>
                 <p className="text-sm mt-2 text-blue-100">Puntos</p>
               </div>
-              <div className="bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700 rounded-2xl p-6 shadow-md text-white">
+              <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-500 dark:to-emerald-700 rounded-2xl p-6 shadow-md text-white">
                 <p className="text-4xl font-bold">{streakInfo.currentStreak}</p>
                 <p className="text-sm mt-2 text-orange-100">Racha Actual</p>
               </div>
