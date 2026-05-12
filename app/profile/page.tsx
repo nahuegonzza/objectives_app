@@ -24,7 +24,6 @@ interface FriendRequestData {
 function getDisplayName(user: any, loading: boolean, session: any) {
   if (loading) return 'Cargando...';
   if (!user) return 'Usuario';
-
   const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
   if (fullName) return fullName;
   if (user.name) return user.name;
@@ -33,9 +32,7 @@ function getDisplayName(user: any, loading: boolean, session: any) {
 
 function calculateAge(birthDate?: string | Date | null) {
   if (!birthDate) return null;
-  const date = typeof birthDate === 'string'
-    ? new Date(birthDate + 'T12:00:00')
-    : new Date(birthDate);
+  const date = typeof birthDate === 'string' ? new Date(birthDate + 'T12:00:00') : new Date(birthDate);
   if (isNaN(date.getTime())) return null;
   const today = new Date();
   let age = today.getFullYear() - date.getFullYear();
@@ -54,15 +51,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!session?.user) return;
-
     async function loadUser() {
       setLoading(true);
       try {
         const res = await fetch('/api/user', { credentials: 'include' });
-        if (!res.ok) {
-          const errorBody = await res.json().catch(() => ({ error: 'Error desconocido' }));
-          throw new Error(errorBody.error || res.statusText);
-        }
+        if (!res.ok) throw new Error('Error loading user');
         const data = await res.json();
         setUserData(data);
       } catch (error) {
@@ -82,33 +75,26 @@ export default function ProfilePage() {
         setLoading(false);
       }
     }
-
     loadUser();
   }, [session]);
 
   useEffect(() => {
     if (!session?.user) return;
-
     async function loadStats() {
       try {
         const res = await fetch('/api/user/stats', { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
-        setStats({
-          goalsCompleted: data.goalsCompleted || 0,
-          totalScore: data.totalScore || 0,
-        });
+        setStats({ goalsCompleted: data.goalsCompleted || 0, totalScore: data.totalScore || 0 });
       } catch (error) {
         console.error('Error loading user stats:', error);
       }
     }
-
     loadStats();
   }, [session]);
 
   useEffect(() => {
     if (!session?.user) return;
-
     async function loadStreakInfo() {
       try {
         const res = await fetch(`/api/streaks?date=${streakInfo.today}`, { credentials: 'include' });
@@ -124,97 +110,116 @@ export default function ProfilePage() {
         console.error('Error loading profile streak info:', error);
       }
     }
-
     loadStreakInfo();
   }, [session, streakInfo.today]);
 
   return (
-    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
-      <div className="mx-auto max-w-4xl">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 text-slate-900 dark:text-white px-4 py-6 md:px-10">
+      <div className="mx-auto max-w-7xl">
         <Navigation />
 
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight">Perfil</h1>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">Un vistazo a tu perfil social y estadísticas.</p>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-emerald-600 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">Perfil Social</h1>
+          <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estadísticas y conexiones.</p>
         </div>
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Información Personal</h2>
-              {loading ? (
-                <div className="space-y-2">
-                  <p className="text-slate-600 dark:text-slate-400">Cargando información del perfil...</p>
+        <div className="space-y-8">
+          {/* Información Personal y Estadísticas */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Card Principal - Info Personal */}
+            <div className="lg:col-span-1 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-3xl p-8 shadow-lg text-white">
+              <div className="text-center">
+                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                  <span className="text-4xl">👤</span>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Nombre:</span> {getDisplayName(userData, loading, session)}
-                  </p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Email:</span> {userData?.email || session?.user?.email || 'No disponible'}
-                  </p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Usuario:</span> {userData?.username || 'No establecido'}
-                  </p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Fecha de nacimiento:</span> {userData?.birthDate ? new Date(userData.birthDate).toISOString().slice(0, 10).split('-').reverse().join('/') : 'No registrada'}
-                  </p>
-                  {calculateAge(userData?.birthDate) !== null && (
-                    <p className="text-slate-600 dark:text-slate-400">
-                      <span className="font-medium">Edad:</span> {calculateAge(userData?.birthDate)} años
-                    </p>
-                  )}
-                  <p className="text-slate-600 dark:text-slate-400">
-                    <span className="font-medium">Miembro desde:</span> {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES') : 'No disponible'}
-                  </p>
-                </div>
-              )}
+                <h2 className="text-3xl font-bold mb-1">{loading ? 'Cargando...' : getDisplayName(userData, loading, session)}</h2>
+                <p className="text-blue-100 text-sm">@{userData?.username || 'sin_usuario'}</p>
+                <p className="text-blue-100 text-xs mt-2">{userData?.email || 'No disponible'}</p>
+                {calculateAge(userData?.birthDate) !== null && (
+                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} años</p>
+                )}
+              </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Estadísticas</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.goalsCompleted}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Objetivos Completados</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalScore}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Puntuación Total</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{streakInfo.currentStreak}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Racha Actual</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{streakInfo.longestStreak}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Mejor Racha</p>
-                </div>
+            {/* Estadísticas */}
+            <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-500 dark:to-emerald-700 rounded-2xl p-6 shadow-md text-white">
+                <p className="text-4xl font-bold">{stats.goalsCompleted}</p>
+                <p className="text-sm mt-2 text-emerald-100">Objetivos</p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700 rounded-2xl p-6 shadow-md text-white">
+                <p className="text-4xl font-bold">{stats.totalScore}</p>
+                <p className="text-sm mt-2 text-blue-100">Puntos</p>
+              </div>
+              <div className="bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700 rounded-2xl p-6 shadow-md text-white">
+                <p className="text-4xl font-bold">{streakInfo.currentStreak}</p>
+                <p className="text-sm mt-2 text-orange-100">Racha Actual</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-400 to-purple-600 dark:from-purple-500 dark:to-purple-700 rounded-2xl p-6 shadow-md text-white">
+                <p className="text-4xl font-bold">{streakInfo.longestStreak}</p>
+                <p className="text-sm mt-2 text-purple-100">Mejor Racha</p>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Buscar amigos</h2>
-                <p className="text-slate-500 dark:text-slate-400 mb-4">Busca por nombre de usuario y envía solicitudes de amistad.</p>
+          {/* Sección Social - Grid de 2 columnas */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Columna Izquierda - Búsqueda y Solicitudes */}
+            <div className="space-y-6">
+              {/* Búsqueda de Amigos */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-3xl">🔍</span>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Buscar Amigos</h2>
+                </div>
                 <FriendSearchPanel />
               </div>
 
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Solicitudes pendientes</h2>
+              {/* Solicitudes Pendientes */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-3xl">📬</span>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Solicitudes Entrantes</h2>
+                </div>
                 <PendingRequestsPanel />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Tus amigos</h2>
+            {/* Columna Derecha - Lista de Amigos */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-3xl">👥</span>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Tus Amigos</h2>
+              </div>
               <FriendsListPanel />
             </div>
+          </div>
+
+          {/* Info Personal Expandida */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Información Personal</h2>
+            {loading ? (
+              <p className="text-slate-600 dark:text-slate-400">Cargando información...</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700">
+                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wide">Nombre</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{getDisplayName(userData, loading, session)}</p>
+                </div>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-800 dark:to-slate-700">
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide">Email</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1 break-all">{userData?.email || 'No disponible'}</p>
+                </div>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-slate-800 dark:to-slate-700">
+                  <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide">Nacimiento</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{userData?.birthDate ? new Date(userData.birthDate).toISOString().slice(0, 10).split('-').reverse().join('/') : 'No registrada'}</p>
+                </div>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 dark:from-slate-800 dark:to-slate-700">
+                  <p className="text-xs font-semibold text-orange-600 dark:text-orange-300 uppercase tracking-wide">Miembro desde</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' }) : 'No disponible'}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -231,26 +236,21 @@ function FriendSearchPanel() {
   const handleSearch = async () => {
     setMessage('');
     setResults([]);
-
     if (!searchTerm.trim() || searchTerm.trim().length < 2) {
-      setMessage('Ingresa al menos 2 caracteres para buscar.');
+      setMessage('Ingresa al menos 2 caracteres.');
       return;
     }
-
     setLoading(true);
     try {
       const response = await fetch(`/api/user/search?query=${encodeURIComponent(searchTerm.trim())}`, { credentials: 'include' });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data?.error || 'Error al buscar usuarios');
+        setMessage(data?.error || 'Error al buscar');
       } else {
         setResults(data.users || []);
-        if (!data.users?.length) {
-          setMessage('No se encontraron usuarios con ese nombre.');
-        }
+        if (!data.users?.length) setMessage('No se encontraron usuarios.');
       }
     } catch (error) {
-      console.error('Error buscando usuario:', error);
       setMessage('Error al buscar usuario.');
     } finally {
       setLoading(false);
@@ -260,7 +260,6 @@ function FriendSearchPanel() {
   const sendRequest = async (username: string) => {
     setMessage('');
     setLoading(true);
-
     try {
       const response = await fetch('/api/user/friend-requests', {
         method: 'POST',
@@ -270,13 +269,12 @@ function FriendSearchPanel() {
       });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data?.error || 'Error al enviar solicitud');
+        setMessage(data?.error || 'Error al enviar');
       } else {
-        setMessage('Solicitud enviada correctamente.');
+        setMessage('✅ Solicitud enviada.');
         setResults(results.filter((item) => item.username !== username));
       }
     } catch (error) {
-      console.error('Error enviando solicitud:', error);
       setMessage('Error al enviar solicitud.');
     } finally {
       setLoading(false);
@@ -285,44 +283,40 @@ function FriendSearchPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="friend-search" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Nombre de usuario</label>
-        <div className="flex gap-2">
-          <input
-            id="friend-search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-slate-500 dark:focus:ring-slate-700"
-            placeholder="Buscar por username"
-          />
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={loading}
-          >
-            Buscar
-          </button>
-        </div>
+      <div className="flex gap-2">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-900"
+          placeholder="Escribe el username..."
+        />
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-600 hover:to-blue-700 disabled:opacity-60"
+          disabled={loading}
+        >
+          Buscar
+        </button>
       </div>
 
-      {message && <p className="text-sm text-amber-600 dark:text-amber-400">{message}</p>}
+      {message && <p className={`text-sm font-medium ${message.startsWith('✅') ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{message}</p>}
 
       {results.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-2 max-h-64 overflow-y-auto">
           {results.map((result) => (
-            <div key={result.id} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+            <div key={result.id} className="flex items-center justify-between rounded-xl bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 p-4 border border-slate-200 dark:border-slate-600">
               <div>
-                <p className="font-medium text-slate-900 dark:text-white">{result.displayName}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">@{result.username}</p>
+                <p className="font-semibold text-slate-900 dark:text-white">{result.displayName}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">@{result.username}</p>
               </div>
               <button
                 type="button"
-                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                className="rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:from-emerald-600 hover:to-emerald-700"
                 onClick={() => sendRequest(result.username)}
                 disabled={loading}
               >
-                Enviar
+                Agregar
               </button>
             </div>
           ))}
@@ -343,12 +337,11 @@ function PendingRequestsPanel() {
       const response = await fetch('/api/user/friend-requests', { credentials: 'include' });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data?.error || 'Error al cargar solicitudes');
+        setMessage(data?.error || 'Error al cargar');
       } else {
         setRequests(data.incomingRequests || []);
       }
     } catch (error) {
-      console.error('Error cargando solicitudes:', error);
       setMessage('Error al cargar solicitudes.');
     } finally {
       setLoading(false);
@@ -362,7 +355,6 @@ function PendingRequestsPanel() {
   const updateRequest = async (requestId: string, action: 'accept' | 'decline') => {
     setMessage('');
     setLoading(true);
-
     try {
       const response = await fetch('/api/user/friend-requests', {
         method: 'PATCH',
@@ -372,14 +364,13 @@ function PendingRequestsPanel() {
       });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data?.error || 'Error al actualizar solicitud');
+        setMessage(data?.error || 'Error al actualizar');
       } else {
         setRequests((prev) => prev.filter((item) => item.id !== requestId));
-        setMessage(action === 'accept' ? 'Solicitud aceptada.' : 'Solicitud rechazada.');
+        setMessage(action === 'accept' ? '✅ Aceptado.' : '❌ Rechazado.');
       }
     } catch (error) {
-      console.error('Error actualizando solicitud:', error);
-      setMessage('Error al actualizar solicitud.');
+      setMessage('Error al actualizar.');
     } finally {
       setLoading(false);
     }
@@ -387,20 +378,20 @@ function PendingRequestsPanel() {
 
   return (
     <div className="space-y-4">
-      {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando solicitudes...</p>}
-      {message && <p className="text-sm text-emerald-600 dark:text-emerald-400">{message}</p>}
+      {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando...</p>}
+      {message && <p className={`text-sm font-medium ${message.startsWith('✅') ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{message}</p>}
       {requests.length === 0 && !loading ? (
-        <p className="text-slate-600 dark:text-slate-400">No tienes solicitudes entrantes pendientes.</p>
+        <p className="text-slate-600 dark:text-slate-400 text-center py-6">No hay solicitudes pendientes</p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-96 overflow-y-auto">
           {requests.map((request) => (
-            <div key={request.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
-              <p className="font-medium text-slate-900 dark:text-white">{request.sender.displayName}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">@{request.sender.username}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
+            <div key={request.id} className="rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-700 p-4 border-2 border-amber-200 dark:border-slate-600">
+              <p className="font-semibold text-slate-900 dark:text-white">{request.sender.displayName}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">@{request.sender.username}</p>
+              <div className="mt-3 flex gap-2">
                 <button
                   type="button"
-                  className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                  className="flex-1 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:from-emerald-600 hover:to-emerald-700"
                   onClick={() => updateRequest(request.id, 'accept')}
                   disabled={loading}
                 >
@@ -408,7 +399,7 @@ function PendingRequestsPanel() {
                 </button>
                 <button
                   type="button"
-                  className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
+                  className="flex-1 rounded-lg border-2 border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-900 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
                   onClick={() => updateRequest(request.id, 'decline')}
                   disabled={loading}
                 >
@@ -434,12 +425,11 @@ function FriendsListPanel() {
       const response = await fetch('/api/user/friend-requests', { credentials: 'include' });
       const data = await response.json();
       if (!response.ok) {
-        setMessage(data?.error || 'Error al cargar amigos');
+        setMessage(data?.error || 'Error al cargar');
       } else {
         setFriends(data.friends || []);
       }
     } catch (error) {
-      console.error('Error cargando amigos:', error);
       setMessage('Error al cargar amigos.');
     } finally {
       setLoading(false);
@@ -452,16 +442,16 @@ function FriendsListPanel() {
 
   return (
     <div className="space-y-4">
-      {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando amigos...</p>}
+      {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando...</p>}
       {message && <p className="text-sm text-amber-600 dark:text-amber-400">{message}</p>}
       {friends.length === 0 && !loading ? (
-        <p className="text-slate-600 dark:text-slate-400">Aún no tienes amigos aceptados. Envía una solicitud para comenzar a construir tu red.</p>
+        <p className="text-slate-600 dark:text-slate-400 text-center py-8">Aún no tienes amigos. ¡Comienza a conectar!</p>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
           {friends.map((friend) => (
-            <div key={friend.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
-              <p className="font-medium text-slate-900 dark:text-white">{friend.displayName}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">@{friend.username}</p>
+            <div key={friend.id} className="rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 p-4 border-2 border-emerald-200 dark:border-slate-600 hover:shadow-md transition">
+              <p className="font-semibold text-slate-900 dark:text-white">{friend.displayName}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">@{friend.username}</p>
             </div>
           ))}
         </div>

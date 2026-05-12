@@ -139,6 +139,13 @@ export async function POST(request: Request) {
       if (existingRequest.status === 'ACCEPTED') {
         return NextResponse.json({ error: 'Ya son amigos' }, { status: 409 });
       }
+      // Allow resending if previous request was DECLINED or CANCELLED
+      if (existingRequest.status === 'DECLINED' || existingRequest.status === 'CANCELLED') {
+        // Delete the old request and create a new one
+        await prisma.friendRequest.delete({
+          where: { id: existingRequest.id },
+        });
+      }
     }
 
     await prisma.friendRequest.create({
