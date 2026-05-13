@@ -2,6 +2,35 @@
 
 import type { AcademicEvent, AcademicSubject } from './academicHelpers';
 
+const normalizeHex = (hex: string) => {
+  let cleaned = hex.trim().replace('#', '');
+  if (cleaned.length === 3) {
+    cleaned = cleaned.split('').map((char) => char + char).join('');
+  }
+  return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
+};
+
+const hexToRgba = (hex: string, alpha: number) => {
+  const normalized = normalizeHex(hex);
+  if (!normalized) return undefined;
+  const intValue = parseInt(normalized, 16);
+  const r = (intValue >> 16) & 255;
+  const g = (intValue >> 8) & 255;
+  const b = intValue & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+const getContrastTextColor = (hex: string) => {
+  const normalized = normalizeHex(hex);
+  if (!normalized) return '#111';
+  const intValue = parseInt(normalized, 16);
+  const r = (intValue >> 16) & 255;
+  const g = (intValue >> 8) & 255;
+  const b = intValue & 255;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? '#111' : '#fff';
+};
+
 interface AcademicTodayCardProps {
   event: AcademicEvent;
   subject: AcademicSubject | undefined;
@@ -60,12 +89,23 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
     ? examColors[(event.examType ?? 'parcial') as keyof typeof examColors].border
     : 'border-emerald-400');
 
+  const cardStyles = subject?.color ? {
+    borderColor: subject.color,
+    backgroundColor: hexToRgba(subject.color, 0.08),
+    backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.14)} 0%, ${hexToRgba(subject.color, 0.03)} 100%)`,
+  } : undefined;
+
+  const iconStyles = subject?.color ? {
+    backgroundColor: hexToRgba(subject.color, 0.12),
+    color: getContrastTextColor(subject.color),
+  } : undefined;
+
   return (
-    <div className={`group relative overflow-hidden rounded-3xl border-2 ${borderColor} bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-slate-950`}>
+    <div style={cardStyles} className={`group relative overflow-hidden rounded-3xl border-2 ${borderColor} bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-slate-950`}>
       {/* Header: Icono, Título y Check */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-4">
-          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-300`}>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-300" style={iconStyles}>
             {icon}
           </div>
           <div className="space-y-1">
