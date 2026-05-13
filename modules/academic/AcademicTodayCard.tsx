@@ -160,11 +160,11 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
               <span className={`rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${currentPriorityStyle}`}>
                 {badgeText}
               </span>
-              <p className="text-xs font-medium text-slate-400 dark:text-slate-500">
+              <p className="max-w-[14rem] truncate text-xs font-medium text-slate-400 dark:text-slate-500">
                 {subject?.name ?? 'Sin materia'}
               </p>
             </div>
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white">
+            <h3 className="max-w-full truncate text-lg font-bold leading-tight text-slate-900 dark:text-white">
               {event.title}
             </h3>
           </div>

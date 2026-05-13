@@ -611,7 +611,7 @@ export default function AcademicOverview() {
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                       </div>
                       <div className="flex flex-col gap-3 sm:items-end">
-                        <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] whitespace-normal break-words">
+                        <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
                           {event.subject?.name || 'Sin materia'}
                         </span>
                         <div className="flex gap-2">
@@ -686,7 +686,7 @@ export default function AcademicOverview() {
                                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                               </div>
                               <div className="flex flex-col gap-3 sm:items-end">
-                                <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] whitespace-normal break-words">
+                                <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
                                   {event.subject?.name || 'Sin materia'}
                                 </span>
                                 <div className="flex gap-2">
