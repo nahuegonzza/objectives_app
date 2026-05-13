@@ -21,10 +21,14 @@ export default function Navigation() {
   const pathname = usePathname();
   const { session } = useSupabaseSession();
   const supabase = createBrowserSupabaseClient();
+  const ACADEMIC_ACTIVE_STORAGE_KEY = 'goalyxAcademicModuleActive';
   const [userName, setUserName] = useState<string>('');
   const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(0);
-  const [academicModuleActive, setAcademicModuleActive] = useState(false);
+  const [academicModuleActive, setAcademicModuleActive] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(ACADEMIC_ACTIVE_STORAGE_KEY) === 'true';
+  });
 
   useEffect(() => {
     if (session?.user) {
@@ -46,9 +50,18 @@ export default function Navigation() {
 
       try {
         const activeModules = await getActiveModules();
-        setAcademicModuleActive(activeModules.some((module) => module.slug === 'academic'));
+        const isAcademicActive = activeModules.some((module) => module.slug === 'academic');
+        setAcademicModuleActive(isAcademicActive);
+        window.localStorage.setItem(ACADEMIC_ACTIVE_STORAGE_KEY, isAcademicActive ? 'true' : 'false');
       } catch (error) {
         console.error('Error loading active modules:', error);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      const storedValue = window.localStorage.getItem(ACADEMIC_ACTIVE_STORAGE_KEY);
+      if (storedValue !== null) {
+        setAcademicModuleActive(storedValue === 'true');
       }
     }
 
