@@ -318,9 +318,6 @@ export default function AcademicOverview() {
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Gestión universitaria</p>
             <h1 className="mt-2 text-4xl font-bold tracking-tight">Visor académico</h1>
-            <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
-              Toda la información académica en una sola vista. Filtra, agrupa y explora exámenes y tareas con más detalle.
-            </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -540,15 +537,18 @@ export default function AcademicOverview() {
                 const subject = event.subject;
                 const cardStyles = subject?.color ? {
                   borderColor: subject.color,
-                  backgroundColor: hexToRgba(subject.color, 0.08),
-                  backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.14)} 0%, ${hexToRgba(subject.color, 0.03)} 100%)`,
-                } : undefined;
-                const subjectBadgeStyles = subject?.color ? {
                   backgroundColor: hexToRgba(subject.color, 0.16),
+                  backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.24)} 0%, ${hexToRgba(subject.color, 0.10)} 100%)`,
+                } : undefined;
+                const cardClassName = subject?.color
+                  ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
+                  : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                const subjectBadgeStyles = subject?.color ? {
+                  backgroundColor: hexToRgba(subject.color, 0.22),
                   color: getContrastTextColor(subject.color),
                 } : undefined;
                 return (
-                  <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
+                  <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -560,7 +560,7 @@ export default function AcademicOverview() {
                             {event.completed ? 'Completado' : 'Pendiente'}
                           </span>
                         </div>
-                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white break-words">{event.title}</h2>
+                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white break-words line-clamp-2 overflow-hidden">{event.title}</h2>
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                       </div>
                       <div className="flex flex-col gap-3 sm:items-end">
@@ -616,16 +616,19 @@ export default function AcademicOverview() {
                         const subject = event.subject;
                         const cardStyles = subject?.color ? {
                           borderColor: subject.color,
-                          backgroundColor: hexToRgba(subject.color, 0.08),
-                          backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.14)} 0%, ${hexToRgba(subject.color, 0.03)} 100%)`,
-                        } : undefined;
-                        const subjectBadgeStyles = subject?.color ? {
                           backgroundColor: hexToRgba(subject.color, 0.16),
+                          backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.24)} 0%, ${hexToRgba(subject.color, 0.10)} 100%)`,
+                        } : undefined;
+                        const cardClassName = subject?.color
+                          ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
+                          : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                        const subjectBadgeStyles = subject?.color ? {
+                          backgroundColor: hexToRgba(subject.color, 0.22),
                           color: getContrastTextColor(subject.color),
                           borderColor: hexToRgba(subject.color, 0.3),
                         } : undefined;
                         return (
-                          <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950">
+                          <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -637,7 +640,7 @@ export default function AcademicOverview() {
                                     {event.completed ? 'Completado' : 'Pendiente'}
                                   </span>
                                 </div>
-                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white break-words">{event.title}</h2>
+                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white break-words line-clamp-2 overflow-hidden">{event.title}</h2>
                                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                               </div>
                               <div className="flex flex-col gap-3 sm:items-end">

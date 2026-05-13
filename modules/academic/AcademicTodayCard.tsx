@@ -91,17 +91,21 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
 
   const cardStyles = subject?.color ? {
     borderColor: subject.color,
-    backgroundColor: hexToRgba(subject.color, 0.08),
-    backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.14)} 0%, ${hexToRgba(subject.color, 0.03)} 100%)`,
+    backgroundColor: hexToRgba(subject.color, 0.18),
+    backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.26)} 0%, ${hexToRgba(subject.color, 0.12)} 100%)`,
   } : undefined;
 
+  const cardClassName = subject?.color
+    ? 'group relative overflow-hidden rounded-3xl border-2 border-transparent bg-transparent p-5 shadow-sm transition-all hover:shadow-md'
+    : 'group relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950';
+
   const iconStyles = subject?.color ? {
-    backgroundColor: hexToRgba(subject.color, 0.12),
+    backgroundColor: hexToRgba(subject.color, 0.20),
     color: getContrastTextColor(subject.color),
   } : undefined;
 
   return (
-    <div style={cardStyles} className={`group relative overflow-hidden rounded-3xl border-2 ${borderColor} bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-slate-950`}>
+    <div style={cardStyles} className={`${cardClassName} ${borderColor}`}>
       {/* Header: Icono, Título y Check */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-4">
