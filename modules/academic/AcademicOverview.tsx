@@ -383,16 +383,10 @@ export default function AcademicOverview() {
             >
               <Image src="/navbar_icons/settings_icon.png" alt="Configuración" width={20} height={20} unoptimized />
             </button>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              ← Volver al inicio
-            </Link>
           </div>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="space-y-4">
           <section className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-5 dark:from-emerald-950/50 dark:to-emerald-900/50 dark:border-emerald-700">
@@ -412,7 +406,7 @@ export default function AcademicOverview() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
               <div className="rounded-3xl bg-gradient-to-br from-violet-50 to-violet-100 border border-violet-200 p-5 dark:from-violet-950/50 dark:to-violet-900/50 dark:border-violet-700">
                 <p className="text-xs uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400">Completados</p>
                 <p className="mt-3 text-3xl font-semibold text-violet-900 dark:text-violet-100">{summary.completed}</p>
@@ -426,52 +420,35 @@ export default function AcademicOverview() {
             </div>
           </section>
 
-          <aside className="grid grid-cols-2 gap-4">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-              <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
-                  <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
-                  <span className="font-semibold">{summary.total}</span>
-                </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
-                  <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
-                  <span className="font-semibold">{summary.exams}</span>
-                </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
-                  <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
-                  <span className="font-semibold">{summary.tasks}</span>
-                </div>
-                <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
-                  <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
-                  <span className="font-semibold">{summary.completed}</span>
-                </div>
+          <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
+            <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
+                <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
+                <span className="font-semibold">{summary.total}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
+                <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
+                <span className="font-semibold">{summary.exams}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
+                <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
+                <span className="font-semibold">{summary.tasks}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
+                <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
+                <span className="font-semibold">{summary.completed}</span>
               </div>
             </div>
-
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-              <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materias</h2>
-              <div className="mt-4 space-y-2 max-h-[320px] overflow-y-auto">
-                {subjects.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-400">No hay materias registradas.</p>
-                ) : (
-                  subjects.map((subject) => (
-                    <div key={subject.id} className="rounded-2xl bg-white p-3 text-sm dark:bg-slate-900">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-semibold text-slate-900 dark:text-white">{subject.name}</span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">{subject.semester}</span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </aside>
+          </section>
         </div>
 
         <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-          <div className="grid grid-cols-3 gap-3">
-            <label className="space-y-1">
+          <div className="mb-4">
+            <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Filtro</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
               <input
                 value={search}
@@ -480,7 +457,7 @@ export default function AcademicOverview() {
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
               />
             </label>
-            <label className="space-y-1">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
               <select
                 value={groupBy}
@@ -492,7 +469,7 @@ export default function AcademicOverview() {
                 <option value="subject">Agrupar por materia</option>
               </select>
             </label>
-            <label className="space-y-1">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Orden</span>
               <select
                 value={sortBy}
@@ -508,8 +485,8 @@ export default function AcademicOverview() {
             </label>
           </div>
 
-          <div className="mt-4 grid grid-cols-4 gap-3">
-            <label className="space-y-1">
+          <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
               <div className="grid gap-2 sm:grid-cols-2">
                 <input
@@ -526,7 +503,7 @@ export default function AcademicOverview() {
                 />
               </div>
             </label>
-            <label className="space-y-1">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
               <select
                 value={eventTypeFilter}
@@ -538,7 +515,7 @@ export default function AcademicOverview() {
                 <option value="task">Tareas</option>
               </select>
             </label>
-            <label className="space-y-1">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Estado</span>
               <select
                 value={statusFilter}
@@ -550,7 +527,7 @@ export default function AcademicOverview() {
                 <option value="completed">Completados</option>
               </select>
             </label>
-            <label className="space-y-1">
+            <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materia</span>
               <select
                 value={subjectFilter}
