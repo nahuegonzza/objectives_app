@@ -163,7 +163,6 @@ export function AcademicEventForm({
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span>{eventType === 'exam' ? '📝' : '✓'}</span>
             {initialEvent ? 'Editar Evento' : 'Nuevo Evento'}
           </h2>
           <button
@@ -195,7 +194,7 @@ export function AcademicEventForm({
                       : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300'
                   }`}
                 >
-                  📝 Examen
+                  Examen
                 </button>
                 <button
                   type="button"
@@ -206,7 +205,7 @@ export function AcademicEventForm({
                       : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300'
                   }`}
                 >
-                  ✓ Tarea
+                  Tarea
                 </button>
               </div>
             </div>

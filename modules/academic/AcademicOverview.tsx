@@ -181,6 +181,9 @@ export default function AcademicOverview() {
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
+  const [homeCollapsed, setHomeCollapsed] = useState(false);
+  const [filterCollapsed, setFilterCollapsed] = useState(false);
+  const [eventsCollapsed, setEventsCollapsed] = useState(false);
 
   const todayString = getLocalDateString();
   const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule(academicModuleId, 'academic', todayString, {});
@@ -386,336 +389,381 @@ export default function AcademicOverview() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <section className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-5 dark:from-emerald-950/50 dark:to-emerald-900/50 dark:border-emerald-700">
-                <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Eventos</p>
-                <p className="mt-3 text-3xl font-semibold text-emerald-900 dark:text-emerald-100">{summary.total}</p>
-                <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Tareas y exámenes</p>
-              </div>
-              <div className="rounded-3xl bg-gradient-to-br from-sky-50 to-sky-100 border border-sky-200 p-5 dark:from-sky-950/50 dark:to-sky-900/50 dark:border-sky-700">
-                <p className="text-xs uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">Exámenes</p>
-                <p className="mt-3 text-3xl font-semibold text-sky-900 dark:text-sky-100">{summary.exams}</p>
-                <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">Programados</p>
-              </div>
-              <div className="rounded-3xl bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 p-5 dark:from-amber-950/50 dark:to-amber-900/50 dark:border-amber-700">
-                <p className="text-xs uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">Tareas</p>
-                <p className="mt-3 text-3xl font-semibold text-amber-900 dark:text-amber-100">{summary.tasks}</p>
-                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">Pendientes y completadas</p>
-              </div>
+        <section className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Inicio</p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">Resumen</h2>
             </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
-              <div className="rounded-3xl bg-gradient-to-br from-violet-50 to-violet-100 border border-violet-200 p-5 dark:from-violet-950/50 dark:to-violet-900/50 dark:border-violet-700">
-                <p className="text-xs uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400">Completados</p>
-                <p className="mt-3 text-3xl font-semibold text-violet-900 dark:text-violet-100">{summary.completed}</p>
-                <p className="mt-1 text-sm text-violet-700 dark:text-violet-300">Eventos resueltos</p>
-              </div>
-              <div className="rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-5 dark:from-slate-950/50 dark:to-slate-900/50 dark:border-slate-700">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">Materias</p>
-                <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{summary.subjects}</p>
-                <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Materias únicas</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-            <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
-                <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
-                <span className="font-semibold">{summary.total}</span>
-              </div>
-              <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
-                <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
-                <span className="font-semibold">{summary.exams}</span>
-              </div>
-              <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
-                <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
-                <span className="font-semibold">{summary.tasks}</span>
-              </div>
-              <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
-                <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
-                <span className="font-semibold">{summary.completed}</span>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-          <div className="mb-4">
-            <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Filtro</h2>
+            <button
+              type="button"
+              onClick={() => setHomeCollapsed((prev) => !prev)}
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              {homeCollapsed ? 'Mostrar' : 'Ocultar'}
+            </button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Título, descripción o materia"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              />
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
-              <select
-                value={groupBy}
-                onChange={(event) => setGroupBy(event.target.value as GroupByOption)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="none">Sin orden</option>
-                <option value="date">Agrupar por fecha</option>
-                <option value="subject">Agrupar por materia</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Orden</span>
-              <select
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value as SortOption)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="default">Sin orden</option>
-                <option value="dateAsc">Fecha ascendente</option>
-                <option value="dateDesc">Fecha descendente</option>
-                <option value="subject">Materia</option>
-                <option value="priority">Prioridad / examen</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <input
-                  type="date"
-                  value={dateFrom}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                />
-                <input
-                  type="date"
-                  value={dateTo}
-                  onChange={(event) => setDateTo(event.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                />
+          {!homeCollapsed && (
+            <div className="mt-6 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-5 dark:from-emerald-950/50 dark:to-emerald-900/50 dark:border-emerald-700">
+                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Eventos</p>
+                  <p className="mt-3 text-3xl font-semibold text-emerald-900 dark:text-emerald-100">{summary.total}</p>
+                  <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Tareas y exámenes</p>
+                </div>
+                <div className="rounded-3xl bg-gradient-to-br from-sky-50 to-sky-100 border border-sky-200 p-5 dark:from-sky-950/50 dark:to-sky-900/50 dark:border-sky-700">
+                  <p className="text-xs uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">Exámenes</p>
+                  <p className="mt-3 text-3xl font-semibold text-sky-900 dark:text-sky-100">{summary.exams}</p>
+                  <p className="mt-1 text-sm text-sky-700 dark:text-sky-300">Programados</p>
+                </div>
+                <div className="rounded-3xl bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 p-5 dark:from-amber-950/50 dark:to-amber-900/50 dark:border-amber-700">
+                  <p className="text-xs uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">Tareas</p>
+                  <p className="mt-3 text-3xl font-semibold text-amber-900 dark:text-amber-100">{summary.tasks}</p>
+                  <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">Pendientes y completadas</p>
+                </div>
               </div>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
-              <select
-                value={eventTypeFilter}
-                onChange={(event) => setEventTypeFilter(event.target.value as EventTypeFilter)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todos</option>
-                <option value="exam">Exámenes</option>
-                <option value="task">Tareas</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Estado</span>
-              <select
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todos</option>
-                <option value="pending">Pendientes</option>
-                <option value="completed">Completados</option>
-              </select>
-            </label>
-            <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materia</span>
-              <select
-                value={subjectFilter}
-                onChange={(event) => setSubjectFilter(event.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-              >
-                <option value="all">Todas</option>
-                {subjects.map((subject) => (
-                  <option key={subject.id} value={subject.id}>{subject.name}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </div>
 
-        <div className="mt-6">
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="h-28 rounded-3xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
-              ))}
-            </div>
-          ) : error ? (
-            <div className="rounded-3xl border border-rose-200 bg-rose-50 p-5 text-rose-700 dark:border-rose-700/40 dark:bg-rose-950/40 dark:text-rose-200">
-              {error}
-            </div>
-          ) : filteredEvents.length === 0 ? (
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-              No hay eventos académicos que coincidan con los filtros.
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {groupBy === 'none' && filteredEvents.map((event) => {
-                const subject = event.subject;
-                const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
-                const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                const cardClassName = cardStyles
-                  ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
-                  : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
-                const subjectBadgeStyles = resolvedSubjectColor ? {
-                  backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
-                  color: getContrastTextColor(resolvedSubjectColor),
-                } : undefined;
-                return (
-                  <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2 text-sm">
-                          <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
-                            {getExamLabel(event)}
-                          </span>
-                          <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
-                          <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
-                            {event.completed ? 'Completado' : 'Pendiente'}
-                          </span>
-                        </div>
-                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
-                      </div>
-                      <div className="flex flex-col gap-3 sm:items-end">
-                        <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
-                          {event.subject?.name || 'Sin materia'}
-                        </span>
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleReady(event)}
-                            className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
-                            aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
-                          >
-                            <Image
-                              src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
-                              alt={event.completed ? 'Deshacer' : 'Listo'}
-                              width={18}
-                              height={18}
-                            />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleEditEvent(event)}
-                            className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                            aria-label="Editar"
-                          >
-                            <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteEvent(event)}
-                            className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                            aria-label="Eliminar"
-                          >
-                            <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
+                <div className="rounded-3xl bg-gradient-to-br from-violet-50 to-violet-100 border border-violet-200 p-5 dark:from-violet-950/50 dark:to-violet-900/50 dark:border-violet-700">
+                  <p className="text-xs uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400">Completados</p>
+                  <p className="mt-3 text-3xl font-semibold text-violet-900 dark:text-violet-100">{summary.completed}</p>
+                  <p className="mt-1 text-sm text-violet-700 dark:text-violet-300">Eventos resueltos</p>
+                </div>
+                <div className="rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-5 dark:from-slate-950/50 dark:to-slate-900/50 dark:border-slate-700">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">Materias</p>
+                  <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{summary.subjects}</p>
+                  <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Materias únicas</p>
+                </div>
+              </div>
 
-              {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
-                <section key={groupLabel} className="space-y-4">
-                  <div className="p-4">
-                    <button
-                      onClick={() => setCollapsedGroups(prev => ({ ...prev, [groupLabel]: !prev[groupLabel] }))}
-                      className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
-                    >
-                      <span className={`transform transition-transform ${collapsedGroups[groupLabel] ? '' : 'rotate-90'}`}>▶</span>
-                      {groupLabel}
-                    </button>
+              <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
+                <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
+                    <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
+                    <span className="font-semibold">{summary.total}</span>
                   </div>
-                  {!collapsedGroups[groupLabel] && (
-                    <div className="space-y-4">
-                      {groupItems.map((event) => {
-                        const subject = event.subject;
-                        const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
-                        const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
-                        const cardClassName = cardStyles
-                          ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
-                          : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
-                        const subjectBadgeStyles = resolvedSubjectColor ? {
-                          backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
-                          color: getContrastTextColor(resolvedSubjectColor),
-                          borderColor: hexToRgba(resolvedSubjectColor, 0.3) ?? 'transparent',
-                        } : undefined;
-                        return (
-                          <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex flex-wrap items-center gap-2 text-sm">
-                                  <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
-                                    {getExamLabel(event)}
-                                  </span>
-                                  <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
-                                  <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
-                                    {event.completed ? 'Completado' : 'Pendiente'}
-                                  </span>
-                                </div>
-                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
-                              </div>
-                              <div className="flex flex-col gap-3 sm:items-end">
-                                <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
-                                  {event.subject?.name || 'Sin materia'}
-                                </span>
-                                <div className="flex gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleToggleReady(event)}
-                                    className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
-                                    aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
-                                  >
-                                    <Image
-                                      src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
-                                      alt={event.completed ? 'Deshacer' : 'Listo'}
-                                      width={18}
-                                      height={18}
-                                    />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleEditEvent(event)}
-                                    className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                                    aria-label="Editar"
-                                  >
-                                    <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteEvent(event)}
-                                    className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                                    aria-label="Eliminar"
-                                  >
-                                    <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </article>
-                        );
-                      })}
-                    </div>
-                  )}
-                </section>
-              ))}
+                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
+                    <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
+                    <span className="font-semibold">{summary.exams}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
+                    <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
+                    <span className="font-semibold">{summary.tasks}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
+                    <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
+                    <span className="font-semibold">{summary.completed}</span>
+                  </div>
+                </div>
+              </section>
             </div>
           )}
-        </div>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Filtro</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilterCollapsed((prev) => !prev)}
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              {filterCollapsed ? 'Mostrar' : 'Ocultar'}
+            </button>
+          </div>
+          {!filterCollapsed && (
+            <>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Buscar</span>
+                  <input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Título, descripción o materia"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  />
+                </label>
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
+                  <select
+                    value={groupBy}
+                    onChange={(event) => setGroupBy(event.target.value as GroupByOption)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="none">Sin orden</option>
+                    <option value="date">Agrupar por fecha</option>
+                    <option value="subject">Agrupar por materia</option>
+                  </select>
+                </label>
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Orden</span>
+                  <select
+                    value={sortBy}
+                    onChange={(event) => setSortBy(event.target.value as SortOption)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="default">Sin orden</option>
+                    <option value="dateAsc">Fecha ascendente</option>
+                    <option value="dateDesc">Fecha descendente</option>
+                    <option value="subject">Materia</option>
+                    <option value="priority">Prioridad / examen</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(event) => setDateFrom(event.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                    />
+                    <input
+                      type="date"
+                      value={dateTo}
+                      onChange={(event) => setDateTo(event.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                    />
+                  </div>
+                </label>
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo</span>
+                  <select
+                    value={eventTypeFilter}
+                    onChange={(event) => setEventTypeFilter(event.target.value as EventTypeFilter)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="exam">Exámenes</option>
+                    <option value="task">Tareas</option>
+                  </select>
+                </label>
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Estado</span>
+                  <select
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="all">Todos</option>
+                    <option value="pending">Pendientes</option>
+                    <option value="completed">Completados</option>
+                  </select>
+                </label>
+                <label className="space-y-1 min-w-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Materia</span>
+                  <select
+                    value={subjectFilter}
+                    onChange={(event) => setSubjectFilter(event.target.value)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="all">Todas</option>
+                    {subjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>{subject.name}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </>
+          )}
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos</p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">{filteredEvents.length} resultados</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEventsCollapsed((prev) => !prev)}
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              {eventsCollapsed ? 'Mostrar' : 'Ocultar'}
+            </button>
+          </div>
+          {!eventsCollapsed && (
+            <div className="mt-6">
+              {loading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((item) => (
+                    <div key={item} className="h-28 rounded-3xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="rounded-3xl border border-rose-200 bg-rose-50 p-5 text-rose-700 dark:border-rose-700/40 dark:bg-rose-950/40 dark:text-rose-200">
+                  {error}
+                </div>
+              ) : filteredEvents.length === 0 ? (
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
+                  No hay eventos académicos que coincidan con los filtros.
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {groupBy === 'none' && filteredEvents.map((event) => {
+                    const subject = event.subject;
+                    const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+                    const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
+                    const cardClassName = cardStyles
+                      ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
+                      : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                    const subjectBadgeStyles = resolvedSubjectColor ? {
+                      backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
+                      color: getContrastTextColor(resolvedSubjectColor),
+                    } : undefined;
+                    return (
+                      <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                              <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
+                                {getExamLabel(event)}
+                              </span>
+                              <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
+                              <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
+                                {event.completed ? 'Completado' : 'Pendiente'}
+                              </span>
+                            </div>
+                            <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
+                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
+                          </div>
+                          <div className="flex flex-col gap-3 sm:items-end">
+                            <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
+                              {event.subject?.name || 'Sin materia'}
+                            </span>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleReady(event)}
+                                className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                                aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
+                              >
+                                <Image
+                                  src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
+                                  alt={event.completed ? 'Deshacer' : 'Listo'}
+                                  width={18}
+                                  height={18}
+                                />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleEditEvent(event)}
+                                className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                aria-label="Editar"
+                              >
+                                <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteEvent(event)}
+                                className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                aria-label="Eliminar"
+                              >
+                                <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+
+                  {groupBy !== 'none' && Object.entries(groupedEvents || {}).map(([groupLabel, groupItems]) => (
+                    <section key={groupLabel} className="space-y-4">
+                      <div className="p-4">
+                        <button
+                          onClick={() => setCollapsedGroups((prev) => ({ ...prev, [groupLabel]: !prev[groupLabel] }))}
+                          className="flex items-center gap-1 text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition"
+                        >
+                          <span className={`transform transition-transform ${collapsedGroups[groupLabel] ? '' : 'rotate-90'}`}>▶</span>
+                          {groupLabel}
+                        </button>
+                      </div>
+                      {!collapsedGroups[groupLabel] && (
+                        <div className="space-y-4">
+                          {groupItems.map((event) => {
+                            const subject = event.subject;
+                            const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+                            const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
+                            const cardClassName = cardStyles
+                              ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
+                              : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
+                            const subjectBadgeStyles = resolvedSubjectColor ? {
+                              backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
+                              color: getContrastTextColor(resolvedSubjectColor),
+                              borderColor: hexToRgba(resolvedSubjectColor, 0.3) ?? 'transparent',
+                            } : undefined;
+                            return (
+                              <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                                      <span className={`rounded-full px-2 py-1 font-semibold uppercase tracking-[0.18em] ${getExamBadgeStyle(event)}`}>
+                                        {getExamLabel(event)}
+                                      </span>
+                                      <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
+                                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
+                                        {event.completed ? 'Completado' : 'Pendiente'}
+                                      </span>
+                                    </div>
+                                    <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
+                                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
+                                  </div>
+                                  <div className="flex flex-col gap-3 sm:items-end">
+                                    <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
+                                      {event.subject?.name || 'Sin materia'}
+                                    </span>
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleToggleReady(event)}
+                                        className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                                        aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
+                                      >
+                                        <Image
+                                          src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
+                                          alt={event.completed ? 'Deshacer' : 'Listo'}
+                                          width={18}
+                                          height={18}
+                                        />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleEditEvent(event)}
+                                        className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                        aria-label="Editar"
+                                      >
+                                        <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteEvent(event)}
+                                        className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                        aria-label="Eliminar"
+                                      >
+                                        <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </section>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
       </div>
 
       <AcademicEventForm
