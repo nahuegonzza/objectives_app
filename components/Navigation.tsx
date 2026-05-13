@@ -137,7 +137,6 @@ export default function Navigation() {
             ))}
             {academicModuleActive && (
               <>
-                <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
                 <Link href={academicNavItem.href} className={getLinkClasses(academicNavItem.href)} title={academicNavItem.label}>
                   <Image src={academicNavItem.icon} alt={academicNavItem.label} width={24} height={24} unoptimized className={getIconClasses(academicNavItem.href)} />
                 </Link>
@@ -220,6 +219,9 @@ export default function Navigation() {
                 <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={`${isActivePath(item.href) ? 'w-7 h-7' : 'w-6 h-6'}`} />
               </Link>
             ))}
+            {academicModuleActive && (
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl opacity-0 pointer-events-none" aria-hidden="true" />
+            )}
           </div>
         </div>
       </nav>
