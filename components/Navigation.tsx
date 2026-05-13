@@ -137,12 +137,13 @@ export default function Navigation() {
             ))}
             {academicModuleActive && (
               <>
+                <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
                 <Link href={academicNavItem.href} className={getLinkClasses(academicNavItem.href)} title={academicNavItem.label}>
                   <Image src={academicNavItem.icon} alt={academicNavItem.label} width={24} height={24} unoptimized className={getIconClasses(academicNavItem.href)} />
                 </Link>
-                <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
               </>
             )}
+            <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
             <Link href="/settings/modules" className={getLinkClasses('/settings/modules')} title="Módulos">
               <Image src="/navbar_icons/modules_icon.png" alt="Módulos" width={24} height={24} unoptimized className={getIconClasses('/settings/modules')} />
             </Link>
@@ -184,8 +185,8 @@ export default function Navigation() {
       </nav>
 
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-950/95 shadow-xl">
-        <div className="mx-auto flex max-w-5xl items-center justify-center gap-3 px-4 py-3">
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-5xl items-center justify-center gap-2 px-4 py-3">
+          <div className="flex items-center gap-1">
             {leftItems.map((item) => (
               <Link
                 key={item.href}
@@ -208,7 +209,7 @@ export default function Navigation() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {rightItems.map((item) => (
               <Link
                 key={item.href}
