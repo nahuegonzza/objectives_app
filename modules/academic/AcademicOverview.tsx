@@ -74,6 +74,10 @@ const getExamBadgeStyle = (event: AcademicEvent) => {
   }
 };
 
+const formatEventTitle = (title: string) => {
+  return title.length > 140 ? `${title.slice(0, 140)}…` : title;
+};
+
 const getTaskBadgeStyle = (priority?: string) => {
   switch (priority) {
     case 'alta':
@@ -599,27 +603,25 @@ export default function AcademicOverview() {
                             {getExamLabel(event)}
                           </span>
                           <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
-                          <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                          <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
                             {event.completed ? 'Completado' : 'Pendiente'}
                           </span>
                         </div>
-                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white break-words line-clamp-2 overflow-hidden">{event.title}</h2>
+                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white truncate whitespace-nowrap overflow-hidden text-ellipsis">{formatEventTitle(event.title)}</h2>
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                       </div>
                       <div className="flex flex-col gap-3 sm:items-end">
                         <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] whitespace-normal break-words">
                           {event.subject?.name || 'Sin materia'}
                         </span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                          {event.type === 'exam' ? `Examen ${event.examType ?? 'parcial'}` : ''}
-                        </span>
                         <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => handleToggleReady(event)}
                             className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                            aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
                           >
-                            {event.completed ? 'Deshacer' : 'Listo'}
+                            {event.completed ? '↩️' : '✔️'}
                           </button>
                           <button
                             type="button"
@@ -676,11 +678,11 @@ export default function AcademicOverview() {
                                     {getExamLabel(event)}
                                   </span>
                                   <span className="text-slate-500 dark:text-slate-400">{formatDateLabel(event.sourceDate)}</span>
-                                  <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                  <span className={`rounded-full px-2 py-1 text-xs font-semibold ${event.completed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'}`}>
                                     {event.completed ? 'Completado' : 'Pendiente'}
                                   </span>
                                 </div>
-                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white break-words line-clamp-2 overflow-hidden">{event.title}</h2>
+                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white truncate whitespace-nowrap overflow-hidden text-ellipsis">{formatEventTitle(event.title)}</h2>
                                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                               </div>
                               <div className="flex flex-col gap-3 sm:items-end">
@@ -692,8 +694,9 @@ export default function AcademicOverview() {
                                     type="button"
                                     onClick={() => handleToggleReady(event)}
                                     className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                                    aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
                                   >
-                                    {event.completed ? 'Deshacer' : 'Listo'}
+                                    {event.completed ? '↩️' : '✔️'}
                                   </button>
                                   <button
                                     type="button"
