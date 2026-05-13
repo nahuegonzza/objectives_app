@@ -31,6 +31,19 @@ const getContrastTextColor = (hex: string) => {
   return luminance > 0.6 ? '#111' : '#fff';
 };
 
+const getSubjectCardStyle = (color?: string) => {
+  if (!color) return undefined;
+  const bg = hexToRgba(color, 0.18);
+  const start = hexToRgba(color, 0.26);
+  const end = hexToRgba(color, 0.12);
+  if (!bg || !start || !end) return undefined;
+  return {
+    borderColor: color,
+    backgroundColor: bg,
+    backgroundImage: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
+  };
+};
+
 interface AcademicTodayCardProps {
   event: AcademicEvent;
   subject: AcademicSubject | undefined;
@@ -85,19 +98,15 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
     ? (priorityColors[event.priority as keyof typeof priorityColors] || priorityColors.default)
     : examColors[(event.examType ?? 'parcial') as keyof typeof examColors].badge;
 
-  const borderColor = subject?.color ?? (event.type === 'exam'
+  const borderClass = event.type === 'exam'
     ? examColors[(event.examType ?? 'parcial') as keyof typeof examColors].border
-    : 'border-emerald-400');
+    : 'border-emerald-400';
 
-  const cardStyles = subject?.color ? {
-    borderColor: subject.color,
-    backgroundColor: hexToRgba(subject.color, 0.18),
-    backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.26)} 0%, ${hexToRgba(subject.color, 0.12)} 100%)`,
-  } : undefined;
+  const cardStyles = getSubjectCardStyle(subject?.color);
 
-  const cardClassName = subject?.color
+  const cardClassName = cardStyles
     ? 'group relative overflow-hidden rounded-3xl border-2 border-transparent bg-transparent p-5 shadow-sm transition-all hover:shadow-md'
-    : 'group relative overflow-hidden rounded-3xl border-2 border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950';
+    : `group relative overflow-hidden rounded-3xl border-2 ${borderClass} bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950`;
 
   const iconStyles = subject?.color ? {
     backgroundColor: hexToRgba(subject.color, 0.20),
@@ -105,7 +114,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
   } : undefined;
 
   return (
-    <div style={cardStyles} className={`${cardClassName} ${borderColor}`}>
+    <div style={cardStyles} className={cardClassName}>
       {/* Header: Icono, Título y Check */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-4">

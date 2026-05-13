@@ -114,6 +114,19 @@ const getContrastTextColor = (hex: string) => {
   return luminance > 0.6 ? '#111' : '#fff';
 };
 
+const getSubjectCardStyle = (color?: string) => {
+  if (!color) return undefined;
+  const bg = hexToRgba(color, 0.16);
+  const start = hexToRgba(color, 0.24);
+  const end = hexToRgba(color, 0.10);
+  if (!bg || !start || !end) return undefined;
+  return {
+    borderColor: color,
+    backgroundColor: bg,
+    backgroundImage: `linear-gradient(135deg, ${start} 0%, ${end} 100%)`,
+  };
+};
+
 export default function AcademicOverview() {
   const [entries, setEntries] = useState<ModuleEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -535,16 +548,12 @@ export default function AcademicOverview() {
             <div className="space-y-6">
               {groupBy === 'none' && filteredEvents.map((event) => {
                 const subject = event.subject;
-                const cardStyles = subject?.color ? {
-                  borderColor: subject.color,
-                  backgroundColor: hexToRgba(subject.color, 0.16),
-                  backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.24)} 0%, ${hexToRgba(subject.color, 0.10)} 100%)`,
-                } : undefined;
-                const cardClassName = subject?.color
+                const cardStyles = getSubjectCardStyle(subject?.color);
+                const cardClassName = cardStyles
                   ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
                   : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
                 const subjectBadgeStyles = subject?.color ? {
-                  backgroundColor: hexToRgba(subject.color, 0.22),
+                  backgroundColor: hexToRgba(subject.color, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
                   color: getContrastTextColor(subject.color),
                 } : undefined;
                 return (
@@ -614,18 +623,14 @@ export default function AcademicOverview() {
                     <div className="space-y-4">
                       {groupItems.map((event) => {
                         const subject = event.subject;
-                        const cardStyles = subject?.color ? {
-                          borderColor: subject.color,
-                          backgroundColor: hexToRgba(subject.color, 0.16),
-                          backgroundImage: `linear-gradient(135deg, ${hexToRgba(subject.color, 0.24)} 0%, ${hexToRgba(subject.color, 0.10)} 100%)`,
-                        } : undefined;
-                        const cardClassName = subject?.color
+                        const cardStyles = getSubjectCardStyle(subject?.color);
+                        const cardClassName = cardStyles
                           ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
                           : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
                         const subjectBadgeStyles = subject?.color ? {
-                          backgroundColor: hexToRgba(subject.color, 0.22),
+                          backgroundColor: hexToRgba(subject.color, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
                           color: getContrastTextColor(subject.color),
-                          borderColor: hexToRgba(subject.color, 0.3),
+                          borderColor: hexToRgba(subject.color, 0.3) ?? 'transparent',
                         } : undefined;
                         return (
                           <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
