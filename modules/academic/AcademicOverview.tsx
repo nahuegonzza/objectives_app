@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getLocalDateString } from '@lib/dateHelpers';
+import { getColorOption } from '@lib/goalIconsColors';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
 import { useAcademicModule } from './useAcademicModule';
@@ -93,23 +94,55 @@ const normalizeHex = (hex: string) => {
   return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
 };
 
-const hexToRgba = (hex: string, alpha: number) => {
-  const normalized = normalizeHex(hex);
-  if (!normalized) return undefined;
-  const intValue = parseInt(normalized, 16);
-  const r = (intValue >> 16) & 255;
-  const g = (intValue >> 8) & 255;
-  const b = intValue & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+const parseRgbString = (rgb: string) => {
+  const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i);
+  if (!match) return null;
+  return {
+    r: Number(match[1]),
+    g: Number(match[2]),
+    b: Number(match[3]),
+  };
 };
 
-const getContrastTextColor = (hex: string) => {
-  const normalized = normalizeHex(hex);
-  if (!normalized) return '#111';
-  const intValue = parseInt(normalized, 16);
-  const r = (intValue >> 16) & 255;
-  const g = (intValue >> 8) & 255;
-  const b = intValue & 255;
+const hexToRgba = (color: string, alpha: number) => {
+  const normalizedHex = normalizeHex(color);
+  if (normalizedHex) {
+    const intValue = parseInt(normalizedHex, 16);
+    const r = (intValue >> 16) & 255;
+    const g = (intValue >> 8) & 255;
+    const b = intValue & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  const rgb = parseRgbString(color);
+  if (rgb) {
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+  }
+
+  return undefined;
+};
+
+const getContrastTextColor = (color: string) => {
+  const normalized = normalizeHex(color);
+  let r: number | null = null;
+  let g: number | null = null;
+  let b: number | null = null;
+
+  if (normalized) {
+    const intValue = parseInt(normalized, 16);
+    r = (intValue >> 16) & 255;
+    g = (intValue >> 8) & 255;
+    b = intValue & 255;
+  } else {
+    const rgb = parseRgbString(color);
+    if (rgb) {
+      r = rgb.r;
+      g = rgb.g;
+      b = rgb.b;
+    }
+  }
+
+  if (r === null || g === null || b === null) return '#111';
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.6 ? '#111' : '#fff';
 };
@@ -548,13 +581,14 @@ export default function AcademicOverview() {
             <div className="space-y-6">
               {groupBy === 'none' && filteredEvents.map((event) => {
                 const subject = event.subject;
-                const cardStyles = getSubjectCardStyle(subject?.color);
+                const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+                const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
                 const cardClassName = cardStyles
                   ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
                   : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
-                const subjectBadgeStyles = subject?.color ? {
-                  backgroundColor: hexToRgba(subject.color, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
-                  color: getContrastTextColor(subject.color),
+                const subjectBadgeStyles = resolvedSubjectColor ? {
+                  backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
+                  color: getContrastTextColor(resolvedSubjectColor),
                 } : undefined;
                 return (
                   <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>
@@ -623,14 +657,15 @@ export default function AcademicOverview() {
                     <div className="space-y-4">
                       {groupItems.map((event) => {
                         const subject = event.subject;
-                        const cardStyles = getSubjectCardStyle(subject?.color);
+                        const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+                        const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
                         const cardClassName = cardStyles
                           ? 'rounded-3xl border border-transparent bg-transparent p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl'
                           : 'rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950';
-                        const subjectBadgeStyles = subject?.color ? {
-                          backgroundColor: hexToRgba(subject.color, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
-                          color: getContrastTextColor(subject.color),
-                          borderColor: hexToRgba(subject.color, 0.3) ?? 'transparent',
+                        const subjectBadgeStyles = resolvedSubjectColor ? {
+                          backgroundColor: hexToRgba(resolvedSubjectColor, 0.22) ?? 'rgba(148, 163, 184, 0.16)',
+                          color: getContrastTextColor(resolvedSubjectColor),
+                          borderColor: hexToRgba(resolvedSubjectColor, 0.3) ?? 'transparent',
                         } : undefined;
                         return (
                           <article key={`${event.id}-${event.sourceDate}`} style={cardStyles} className={cardClassName}>

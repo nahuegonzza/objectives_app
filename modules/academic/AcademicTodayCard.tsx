@@ -1,6 +1,7 @@
 'use client';
 
 import type { AcademicEvent, AcademicSubject } from './academicHelpers';
+import { getColorOption } from '@lib/goalIconsColors';
 
 const normalizeHex = (hex: string) => {
   let cleaned = hex.trim().replace('#', '');
@@ -10,23 +11,55 @@ const normalizeHex = (hex: string) => {
   return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
 };
 
-const hexToRgba = (hex: string, alpha: number) => {
-  const normalized = normalizeHex(hex);
-  if (!normalized) return undefined;
-  const intValue = parseInt(normalized, 16);
-  const r = (intValue >> 16) & 255;
-  const g = (intValue >> 8) & 255;
-  const b = intValue & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+const parseRgbString = (rgb: string) => {
+  const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i);
+  if (!match) return null;
+  return {
+    r: Number(match[1]),
+    g: Number(match[2]),
+    b: Number(match[3]),
+  };
 };
 
-const getContrastTextColor = (hex: string) => {
-  const normalized = normalizeHex(hex);
-  if (!normalized) return '#111';
-  const intValue = parseInt(normalized, 16);
-  const r = (intValue >> 16) & 255;
-  const g = (intValue >> 8) & 255;
-  const b = intValue & 255;
+const hexToRgba = (color: string, alpha: number) => {
+  const normalized = normalizeHex(color);
+  if (normalized) {
+    const intValue = parseInt(normalized, 16);
+    const r = (intValue >> 16) & 255;
+    const g = (intValue >> 8) & 255;
+    const b = intValue & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  const rgb = parseRgbString(color);
+  if (rgb) {
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+  }
+
+  return undefined;
+};
+
+const getContrastTextColor = (color: string) => {
+  const normalized = normalizeHex(color);
+  let r: number | null = null;
+  let g: number | null = null;
+  let b: number | null = null;
+
+  if (normalized) {
+    const intValue = parseInt(normalized, 16);
+    r = (intValue >> 16) & 255;
+    g = (intValue >> 8) & 255;
+    b = intValue & 255;
+  } else {
+    const rgb = parseRgbString(color);
+    if (rgb) {
+      r = rgb.r;
+      g = rgb.g;
+      b = rgb.b;
+    }
+  }
+
+  if (r === null || g === null || b === null) return '#111';
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.6 ? '#111' : '#fff';
 };
@@ -102,15 +135,16 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
     ? examColors[(event.examType ?? 'parcial') as keyof typeof examColors].border
     : 'border-emerald-400';
 
-  const cardStyles = getSubjectCardStyle(subject?.color);
+  const resolvedSubjectColor = subject?.color ? getColorOption(subject.color).bgColor : undefined;
+  const cardStyles = getSubjectCardStyle(resolvedSubjectColor);
 
   const cardClassName = cardStyles
     ? 'group relative overflow-hidden rounded-3xl border-2 border-transparent bg-transparent p-5 shadow-sm transition-all hover:shadow-md'
     : `group relative overflow-hidden rounded-3xl border-2 ${borderClass} bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-950`;
 
-  const iconStyles = subject?.color ? {
-    backgroundColor: hexToRgba(subject.color, 0.20),
-    color: getContrastTextColor(subject.color),
+  const iconStyles = resolvedSubjectColor ? {
+    backgroundColor: hexToRgba(resolvedSubjectColor, 0.20),
+    color: getContrastTextColor(resolvedSubjectColor),
   } : undefined;
 
   return (
