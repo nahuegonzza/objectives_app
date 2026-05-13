@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { getLocalDateString } from '@lib/dateHelpers';
+import { getActiveModules } from '@lib/modules';
 import { useEffect, useState } from 'react';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
@@ -23,6 +24,7 @@ export default function Navigation() {
   const [userName, setUserName] = useState<string>('');
   const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(0);
+  const [academicModuleActive, setAcademicModuleActive] = useState(false);
 
   useEffect(() => {
     if (session?.user) {
@@ -34,6 +36,23 @@ export default function Navigation() {
         })
         .catch(() => setUserName(session.user.email || 'Usuario'));
     }
+  }, [session]);
+
+  useEffect(() => {
+    async function loadModules() {
+      if (!session?.user) {
+        return;
+      }
+
+      try {
+        const activeModules = await getActiveModules();
+        setAcademicModuleActive(activeModules.some((module) => module.slug === 'academic'));
+      } catch (error) {
+        console.error('Error loading active modules:', error);
+      }
+    }
+
+    loadModules();
   }, [session]);
 
   async function loadStreakInfo() {
@@ -81,7 +100,10 @@ export default function Navigation() {
   };
 
   const [homeItem, ...otherItems] = navItems;
-  const leftItems = [otherItems[1], otherItems[0]]; // calendar, goals
+  const academicNavItem = { href: '/academic', icon: '/module_icons/academic_icon.png', label: 'Académico' };
+  const leftItems = academicModuleActive
+    ? [academicNavItem, otherItems[1], otherItems[0]]
+    : [otherItems[1], otherItems[0]];
   const rightItems = otherItems.slice(2); // analytics, profile
 
   return (
@@ -113,7 +135,15 @@ export default function Navigation() {
                 <Image src={item.icon} alt={item.label} width={24} height={24} unoptimized className={getIconClasses(item.href)} />
               </Link>
             ))}
-            <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
+            {academicModuleActive && (
+              <>
+                <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
+                <Link href={academicNavItem.href} className={getLinkClasses(academicNavItem.href)} title={academicNavItem.label}>
+                  <Image src={academicNavItem.icon} alt={academicNavItem.label} width={24} height={24} unoptimized className={getIconClasses(academicNavItem.href)} />
+                </Link>
+                <div className="w-px h-8 bg-slate-300 dark:bg-slate-700 mx-1" />
+              </>
+            )}
             <Link href="/settings/modules" className={getLinkClasses('/settings/modules')} title="Módulos">
               <Image src="/navbar_icons/modules_icon.png" alt="Módulos" width={24} height={24} unoptimized className={getIconClasses('/settings/modules')} />
             </Link>
