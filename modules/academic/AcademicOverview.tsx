@@ -598,21 +598,28 @@ export default function AcademicOverview() {
                             className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
                             aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
                           >
-                            {event.completed ? '↩️' : '✔️'}
+                            <Image
+                              src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
+                              alt={event.completed ? 'Deshacer' : 'Listo'}
+                              width={18}
+                              height={18}
+                            />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleEditEvent(event)}
                             className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                            aria-label="Editar"
                           >
-                            ✏️
+                            <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteEvent(event)}
                             className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                            aria-label="Eliminar"
                           >
-                            🗑️
+                            <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
                           </button>
                         </div>
                       </div>
@@ -673,21 +680,28 @@ export default function AcademicOverview() {
                                     className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
                                     aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
                                   >
-                                    {event.completed ? '↩️' : '✔️'}
+                                    <Image
+                                      src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
+                                      alt={event.completed ? 'Deshacer' : 'Listo'}
+                                      width={18}
+                                      height={18}
+                                    />
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleEditEvent(event)}
                                     className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                    aria-label="Editar"
                                   >
-                                    ✏️
+                                    <Image src="/icons/ui/edit_icon.png" alt="Editar" width={18} height={18} />
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteEvent(event)}
                                     className="rounded-lg bg-slate-100 p-2 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+                                    aria-label="Eliminar"
                                   >
-                                    🗑️
+                                    <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={18} height={18} />
                                   </button>
                                 </div>
                               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import type { GoalEntryWithGoal, Goal, Event, ModuleEntry } from '@types';
 import { getLocalDateString, parseLocalDate, formatLocalDate } from '@lib/dateHelpers';
 import { isGoalActiveOnDate } from '@lib/goalHelpers';
@@ -579,9 +580,10 @@ export default function CalendarExplorer() {
                   <button
                     type="button"
                     onClick={buildInitialDayEdits}
-                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-sm font-semibold transition"
                   >
-                    ✏️ Editar día
+                    <Image src="/icons/ui/edit_icon.png" alt="Editar día" width={16} height={16} />
+                    Editar día
                   </button>
                 )}
 

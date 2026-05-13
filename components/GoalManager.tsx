@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { Reorder, useDragControls } from 'framer-motion';
 import type { Goal } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/goalIconsColors';
@@ -57,7 +58,7 @@ function GoalReorderItem({ goal, onEdit, onDeactivate, onDragEnd, onDragStart, i
             onClick={() => onEdit(goal)}
             className="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
           >
-            ✏️
+            <Image src="/icons/ui/edit_icon.png" alt="Editar" width={16} height={16} />
           </button>
           <button
             title="Desactivar"
@@ -462,7 +463,7 @@ export default function GoalManager() {
                         }}
                         className="rounded-lg border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950 px-3 py-2 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900 transition"
                       >
-                        🗑️
+                        <Image src="/icons/ui/delete_icon.png" alt="Eliminar" width={16} height={16} />
                       </button>
                     </div>
                   </div>
