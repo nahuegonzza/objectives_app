@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { getLocalDateString } from '@lib/dateHelpers';
+import { getLocalDateString, parseLocalDate } from '@lib/dateHelpers';
 import { parseAcademicData, DEFAULT_ACADEMIC_DATA, getLatestAcademicSubjects, AcademicSubject, AcademicEvent, AcademicTaskPriority } from './academicHelpers';
 import type { ModuleEntry } from '@types';
 
@@ -117,20 +117,20 @@ export function useAcademicModule(
   }, [allEntries]);
 
   const upcomingEvents = useMemo(() => {
-    const today = new Date(todayKey);
+    const today = parseLocalDate(todayKey);
     return sortAcademicEvents(
       allEvents.filter((event) => {
-        const eventDate = new Date(event.date.slice(0, 10));
+        const eventDate = parseLocalDate(event.date.slice(0, 10));
         return eventDate > today;
       })
     );
   }, [allEvents, todayKey]);
 
   const pastEvents = useMemo(() => {
-    const today = new Date(todayKey);
+    const today = parseLocalDate(todayKey);
     return sortAcademicEvents(
       allEvents.filter((event) => {
-        const eventDate = new Date(event.date.slice(0, 10));
+        const eventDate = parseLocalDate(event.date.slice(0, 10));
         return eventDate < today && !event.completed;
       })
     );

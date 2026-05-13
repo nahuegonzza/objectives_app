@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getLocalDateString } from '@lib/dateHelpers';
+import { getLocalDateString, parseLocalDate } from '@lib/dateHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
@@ -20,7 +20,7 @@ type StatusFilter = 'all' | 'completed' | 'pending';
 type EventTypeFilter = 'all' | 'exam' | 'task';
 
 const formatDateLabel = (dateString: string) => {
-  const date = new Date(dateString);
+  const date = parseLocalDate(dateString);
   return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 };
 
