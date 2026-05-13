@@ -75,7 +75,7 @@ const getExamBadgeStyle = (event: AcademicEvent) => {
 };
 
 const formatEventTitle = (title: string) => {
-  return title.length > 140 ? `${title.slice(0, 140)}…` : title;
+  return title.length > 28 ? `${title.slice(0, 28).trimEnd()}…` : title;
 };
 
 const getTaskBadgeStyle = (priority?: string) => {
@@ -607,7 +607,7 @@ export default function AcademicOverview() {
                             {event.completed ? 'Completado' : 'Pendiente'}
                           </span>
                         </div>
-                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white truncate whitespace-nowrap overflow-hidden text-ellipsis">{formatEventTitle(event.title)}</h2>
+                        <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                       </div>
                       <div className="flex flex-col gap-3 sm:items-end">
@@ -682,7 +682,7 @@ export default function AcademicOverview() {
                                     {event.completed ? 'Completado' : 'Pendiente'}
                                   </span>
                                 </div>
-                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white truncate whitespace-nowrap overflow-hidden text-ellipsis">{formatEventTitle(event.title)}</h2>
+                                <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
                                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
                               </div>
                               <div className="flex flex-col gap-3 sm:items-end">
