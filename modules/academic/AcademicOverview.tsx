@@ -31,9 +31,16 @@ const getEventWeight = (event: AcademicEvent) => {
         return 0;
       case 'recuperatorio':
         return 1;
-      case 'parcial':
-      default:
+      case 'exposicion':
         return 2;
+      case 'oral':
+        return 3;
+      case 'parcial':
+        return 4;
+      case 'regular':
+        return 5;
+      default:
+        return 6;
     }
   }
 
@@ -55,11 +62,22 @@ const getExamLabel = (event: AcademicEvent) => {
     const duration = event.estimatedDuration ? ` • ${getDurationLabel(event.estimatedDuration)}` : '';
     return `Tarea - Prioridad ${priorityCap}${duration}`;
   }
-  return event.examType === 'final'
-    ? 'Final'
-    : event.examType === 'recuperatorio'
-      ? 'Recuperatorio'
-      : 'Parcial';
+
+  switch (event.examType) {
+    case 'final':
+      return 'Final';
+    case 'recuperatorio':
+      return 'Recuperatorio';
+    case 'exposicion':
+      return 'Exposición';
+    case 'regular':
+      return 'Regular';
+    case 'oral':
+      return 'Oral';
+    case 'parcial':
+    default:
+      return 'Parcial';
+  }
 };
 
 const getExamBadgeStyle = (event: AcademicEvent) => {
@@ -69,6 +87,12 @@ const getExamBadgeStyle = (event: AcademicEvent) => {
       return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300';
     case 'recuperatorio':
       return 'bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300';
+    case 'exposicion':
+      return 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300';
+    case 'regular':
+      return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300';
+    case 'oral':
+      return 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-300';
     case 'parcial':
     default:
       return 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300';
@@ -112,6 +136,14 @@ const getDurationLabel = (duration: string) => {
   }
 };
 
+const normalizeHex = (hex: string) => {
+  let cleaned = hex.trim().replace('#', '');
+  if (cleaned.length === 3) {
+    cleaned = cleaned.split('').map((char) => char + char).join('');
+  }
+  return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
+};
+
 const parseRgbString = (rgb: string) => {
   const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i);
   if (!match) return null;
@@ -120,14 +152,6 @@ const parseRgbString = (rgb: string) => {
     g: Number(match[2]),
     b: Number(match[3]),
   };
-};
-
-const normalizeHex = (hex: string) => {
-  let cleaned = hex.trim().replace('#', '');
-  if (cleaned.length === 3) {
-    cleaned = cleaned.split('').map((char) => char + char).join('');
-  }
-  return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
 };
 
 const hexToRgba = (color: string, alpha: number) => {

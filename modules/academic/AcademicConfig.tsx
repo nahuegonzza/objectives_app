@@ -38,6 +38,15 @@ export function AcademicConfig({
   const [examPointsRecuperatorio, setExamPointsRecuperatorio] = useState(
     ((config?.examPoints as any)?.recuperatorio ?? 3).toString()
   );
+  const [examPointsExposicion, setExamPointsExposicion] = useState(
+    ((config?.examPoints as any)?.exposicion ?? 3).toString()
+  );
+  const [examPointsRegular, setExamPointsRegular] = useState(
+    ((config?.examPoints as any)?.regular ?? 2).toString()
+  );
+  const [examPointsOral, setExamPointsOral] = useState(
+    ((config?.examPoints as any)?.oral ?? 3).toString()
+  );
   const [taskPointsAlta, setTaskPointsAlta] = useState(
     ((config?.taskPoints as any)?.alta ?? 2).toString()
   );
@@ -67,6 +76,9 @@ export function AcademicConfig({
       examPointsPartial: ((config?.examPoints as any)?.parcial ?? 5).toString(),
       examPointsFinal: ((config?.examPoints as any)?.final ?? 8).toString(),
       examPointsRecuperatorio: ((config?.examPoints as any)?.recuperatorio ?? 6).toString(),
+      examPointsExposicion: ((config?.examPoints as any)?.exposicion ?? 6).toString(),
+      examPointsRegular: ((config?.examPoints as any)?.regular ?? 4).toString(),
+      examPointsOral: ((config?.examPoints as any)?.oral ?? 5).toString(),
       taskPointsAlta: ((config?.taskPoints as any)?.alta ?? 4).toString(),
       taskPointsMedia: ((config?.taskPoints as any)?.media ?? 2).toString(),
       taskPointsBaja: ((config?.taskPoints as any)?.baja ?? 1).toString(),
@@ -80,6 +92,9 @@ export function AcademicConfig({
       examPointsPartial,
       examPointsFinal,
       examPointsRecuperatorio,
+      examPointsExposicion,
+      examPointsRegular,
+      examPointsOral,
       taskPointsAlta,
       taskPointsMedia,
       taskPointsBaja,
@@ -129,6 +144,9 @@ export function AcademicConfig({
           parcial: Number(examPointsPartial),
           final: Number(examPointsFinal),
           recuperatorio: Number(examPointsRecuperatorio),
+          exposicion: Number(examPointsExposicion),
+          regular: Number(examPointsRegular),
+          oral: Number(examPointsOral),
         },
         taskPoints: {
           alta: Number(taskPointsAlta),
@@ -337,6 +355,47 @@ export function AcademicConfig({
                     type="number"
                     value={examPointsRecuperatorio}
                     onChange={(e) => setExamPointsRecuperatorio(e.target.value)}
+                    min="0"
+                    max="20"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3 mt-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Exposición
+                  </label>
+                  <input
+                    type="number"
+                    value={examPointsExposicion}
+                    onChange={(e) => setExamPointsExposicion(e.target.value)}
+                    min="0"
+                    max="20"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Regular
+                  </label>
+                  <input
+                    type="number"
+                    value={examPointsRegular}
+                    onChange={(e) => setExamPointsRegular(e.target.value)}
+                    min="0"
+                    max="20"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Oral
+                  </label>
+                  <input
+                    type="number"
+                    value={examPointsOral}
+                    onChange={(e) => setExamPointsOral(e.target.value)}
                     min="0"
                     max="20"
                     className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"

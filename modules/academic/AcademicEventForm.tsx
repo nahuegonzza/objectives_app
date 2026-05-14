@@ -262,6 +262,9 @@ export function AcademicEventForm({
                   <option value="parcial">Parcial</option>
                   <option value="final">Final</option>
                   <option value="recuperatorio">Recuperatorio</option>
+                  <option value="exposicion">Exposición</option>
+                  <option value="regular">Regular</option>
+                  <option value="oral">Oral</option>
                 </select>
               </div>
             ) : (

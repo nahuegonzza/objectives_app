@@ -6,7 +6,10 @@ const defaultConfig = {
   examPoints: {
     parcial: 3,
     final: 4,
-    recuperatorio: 2
+    recuperatorio: 2,
+    exposicion: 3,
+    regular: 2,
+    oral: 3
   },
   taskPoints: {
     alta: 2,

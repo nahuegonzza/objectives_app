@@ -1,7 +1,7 @@
 import type { ModuleEntry } from '@types';
 
 export type AcademicEventType = 'exam' | 'task';
-export type AcademicExamType = 'parcial' | 'final' | 'recuperatorio';
+export type AcademicExamType = 'parcial' | 'final' | 'recuperatorio' | 'exposicion' | 'regular' | 'oral';
 export type AcademicTaskPriority = 'alta' | 'media' | 'baja';
 export type AcademicTaskDuration = 'corta' | 'media' | 'extensa' | 'lectura' | 'escritura' | 'codigo' | 'practica';
 
@@ -60,9 +60,27 @@ export function parseAcademicData(data: string | null | undefined): AcademicData
   }
 }
 
+export function getAcademicExamTypeLabel(type: AcademicExamType | undefined): string {
+  switch (type) {
+    case 'final':
+      return 'Final';
+    case 'recuperatorio':
+      return 'Recuperatorio';
+    case 'exposicion':
+      return 'Exposición';
+    case 'regular':
+      return 'Regular';
+    case 'oral':
+      return 'Oral';
+    case 'parcial':
+    default:
+      return 'Parcial';
+  }
+}
+
 export function getAcademicEventLabel(event: AcademicEvent): string {
   if (event.type === 'exam') {
-    return `${event.examType ?? 'Parcial'} de ${event.title}`;
+    return `${getAcademicExamTypeLabel(event.examType)} de ${event.title}`;
   }
 
   return `Entrega de ${event.title}`;

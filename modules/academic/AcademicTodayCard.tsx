@@ -1,6 +1,7 @@
 'use client';
 
 import type { AcademicEvent, AcademicSubject } from './academicHelpers';
+import { getAcademicExamTypeLabel } from './academicHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
 
 const normalizeHex = (hex: string) => {
@@ -102,7 +103,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
   );
 
   const badgeText = event.type === 'exam'
-    ? `${event.examType ?? 'Parcial'}`
+    ? getAcademicExamTypeLabel(event.examType)
     : `${event.priority ? `Prioridad ${event.priority}` : 'Tarea'}`;
 
   const examColors = {
@@ -117,6 +118,18 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
     parcial: {
       badge: 'text-sky-700 bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300',
       border: 'border-sky-400'
+    },
+    exposicion: {
+      badge: 'text-orange-700 bg-orange-100 dark:bg-orange-950/40 dark:text-orange-300',
+      border: 'border-orange-400'
+    },
+    regular: {
+      badge: 'text-indigo-700 bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-300',
+      border: 'border-indigo-400'
+    },
+    oral: {
+      badge: 'text-fuchsia-700 bg-fuchsia-100 dark:bg-fuchsia-950/40 dark:text-fuchsia-300',
+      border: 'border-fuchsia-400'
     }
   };
 
