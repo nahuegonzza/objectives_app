@@ -365,8 +365,8 @@ export default function AcademicOverview() {
   }, [filteredEvents, subjects.length]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
-      <div className="mx-auto max-w-6xl">
+    <div className="w-full">
+      <div className="w-full">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Gestión universitaria</p>
