@@ -21,6 +21,10 @@ export async function GET(request: Request) {
       where: {
         receiverId: user.id,
         status: 'PENDING',
+        sender: {
+          blockedBy: { none: { blockerId: user.id } },
+          blocks: { none: { blockedId: user.id } },
+        },
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -33,6 +37,10 @@ export async function GET(request: Request) {
     const outgoingRequests = await prisma.friendRequest.findMany({
       where: {
         senderId: user.id,
+        receiver: {
+          blockedBy: { none: { blockerId: user.id } },
+          blocks: { none: { blockedId: user.id } },
+        },
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -49,6 +57,14 @@ export async function GET(request: Request) {
           { senderId: user.id },
           { receiverId: user.id },
         ],
+        sender: {
+          blockedBy: { none: { blockerId: user.id } },
+          blocks: { none: { blockedId: user.id } },
+        },
+        receiver: {
+          blockedBy: { none: { blockerId: user.id } },
+          blocks: { none: { blockedId: user.id } },
+        },
       },
       include: {
         sender: {
@@ -123,6 +139,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No puedes enviarte una solicitud a ti mismo' }, { status: 400 });
     }
 
+    const blockExists = await prisma.userBlock.findFirst({
+      where: {
+        OR: [
+          { blockerId: user.id, blockedId: target.id },
+          { blockerId: target.id, blockedId: user.id },
+        ],
+      },
+    });
+
+    if (blockExists) {
+      return NextResponse.json({ error: 'No puedes enviar una solicitud a este usuario' }, { status: 403 });
+    }
+
     const existingRequest = await prisma.friendRequest.findFirst({
       where: {
         OR: [
@@ -173,13 +202,45 @@ export async function PATCH(request: Request) {
 
   const body = await request.json().catch(() => null);
   const requestId = typeof body?.requestId === 'string' ? body.requestId.trim() : '';
+  const friendId = typeof body?.friendId === 'string' ? body.friendId.trim() : '';
   const action = body?.action;
 
-  if (!requestId || !['accept', 'decline', 'cancel'].includes(action)) {
-    return NextResponse.json({ error: 'requestId y action válidos son requeridos' }, { status: 400 });
+  if (!['accept', 'decline', 'cancel', 'unfriend'].includes(action)) {
+    return NextResponse.json({ error: 'Action válido es requerido' }, { status: 400 });
+  }
+
+  if (action !== 'unfriend' && !requestId) {
+    return NextResponse.json({ error: 'requestId es requerido para esta acción' }, { status: 400 });
+  }
+
+  if (action === 'unfriend' && !friendId) {
+    return NextResponse.json({ error: 'friendId es requerido para eliminar amistad' }, { status: 400 });
   }
 
   try {
+    if (action === 'unfriend') {
+      const existingFriend = await prisma.friendRequest.findFirst({
+        where: {
+          status: 'ACCEPTED',
+          OR: [
+            { senderId: user.id, receiverId: friendId },
+            { senderId: friendId, receiverId: user.id },
+          ],
+        },
+      });
+
+      if (!existingFriend) {
+        return NextResponse.json({ error: 'No se encontró una amistad activa con este usuario' }, { status: 404 });
+      }
+
+      const unfriended = await prisma.friendRequest.update({
+        where: { id: existingFriend.id },
+        data: { status: 'CANCELLED' },
+      });
+
+      return NextResponse.json({ request: unfriended, message: 'Amigo eliminado' });
+    }
+
     const existingRequest = await prisma.friendRequest.findUnique({
       where: { id: requestId },
       include: {

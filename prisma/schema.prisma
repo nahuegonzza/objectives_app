@@ -30,6 +30,19 @@ model User {
   sessions  Session[]
   sentFriendRequests     FriendRequest[] @relation("sentFriendRequests")
   receivedFriendRequests FriendRequest[] @relation("receivedFriendRequests")
+  blocks                UserBlock[]      @relation("blockerBlocks")
+  blockedBy             UserBlock[]      @relation("blockedByUsers")
+}
+
+model UserBlock {
+  id         String   @id @default(uuid())
+  blocker    User     @relation("blockerBlocks", fields: [blockerId], references: [id])
+  blockerId  String
+  blocked    User     @relation("blockedByUsers", fields: [blockedId], references: [id])
+  blockedId  String
+  createdAt  DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
 }
 
 enum FriendRequestStatus {

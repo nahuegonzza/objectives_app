@@ -10,6 +10,13 @@ import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import type { Module } from '@types';
 
+interface BlockedUser {
+  id: string;
+  username: string;
+  displayName: string;
+  blockedAt: string;
+}
+
 export const dynamic = 'force-dynamic';
 
 export default function SettingsPage() {
@@ -32,6 +39,9 @@ export default function SettingsPage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
+  const [blockedLoading, setBlockedLoading] = useState(false);
+  const [blockedMessage, setBlockedMessage] = useState('');
   const [profileCollapsed, setProfileCollapsed] = useState(true);
   const [passwordCollapsed, setPasswordCollapsed] = useState(true);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -136,6 +146,7 @@ export default function SettingsPage() {
 
     loadModules();
     loadUser();
+    loadBlockedUsers();
   }, [sessionLoading, session]);
 
   const [exportLoading, setExportLoading] = useState(false);
@@ -207,6 +218,47 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error toggling module:', error);
       alert('Error al cambiar el módulo');
+    }
+  };
+
+  const loadBlockedUsers = async () => {
+    setBlockedLoading(true);
+    try {
+      const res = await fetch('/api/user/blocks', { credentials: 'include' });
+      const data = await res.json();
+      if (!res.ok) {
+        setBlockedMessage(data?.error || 'Error al cargar usuarios bloqueados');
+      } else {
+        setBlockedUsers(data.blockedUsers || []);
+      }
+    } catch (error) {
+      setBlockedMessage('Error al cargar usuarios bloqueados');
+    } finally {
+      setBlockedLoading(false);
+    }
+  };
+
+  const handleUnblockUser = async (blockedUserId: string) => {
+    setBlockedLoading(true);
+    setBlockedMessage('');
+    try {
+      const res = await fetch('/api/user/blocks', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'unblock', blockedUserId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setBlockedMessage(data?.error || 'Error al desbloquear usuario');
+      } else {
+        setBlockedUsers((prev) => prev.filter((item) => item.id !== blockedUserId));
+        setBlockedMessage('Usuario desbloqueado correctamente.');
+      }
+    } catch (error) {
+      setBlockedMessage('Error al desbloquear usuario');
+    } finally {
+      setBlockedLoading(false);
     }
   };
 
@@ -586,6 +638,36 @@ export default function SettingsPage() {
                     Cambiar Contraseña
                   </button>
                 </form>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Usuarios Bloqueados</h2>
+            {blockedLoading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando bloqueos...</p>}
+            {blockedMessage && <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">{blockedMessage}</p>}
+            {blockedUsers.length === 0 && !blockedLoading ? (
+              <p className="text-slate-600 dark:text-slate-400">No tienes usuarios bloqueados.</p>
+            ) : (
+              <div className="space-y-3 max-h-72 overflow-y-auto">
+                {blockedUsers.map((blockedUser) => (
+                  <div key={blockedUser.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-slate-900 dark:text-white">{blockedUser.displayName}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">@{blockedUser.username}</p>
+                      </div>
+                      <button
+                        type="button"
+                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold transition"
+                        onClick={() => handleUnblockUser(blockedUser.id)}
+                        disabled={blockedLoading}
+                      >
+                        Desbloquear
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

@@ -22,6 +22,19 @@ export async function GET(request: Request) {
           contains: query,
           mode: 'insensitive',
         },
+        id: {
+          not: user.id,
+        },
+        blockedBy: {
+          none: {
+            blockerId: user.id,
+          },
+        },
+        blocks: {
+          none: {
+            blockedId: user.id,
+          },
+        },
       },
       select: {
         id: true,
