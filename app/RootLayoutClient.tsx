@@ -22,6 +22,16 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
     document.addEventListener('touchmove', preventZoom, { passive: false });
     document.addEventListener('dblclick', preventZoomOnDoubleTap, { passive: false });
 
+    // Prevenir scroll accidental sobre inputs numéricos
+    const preventScrollOnNumberInput = (e: WheelEvent) => {
+      const target = e.target as Element | null;
+      const numberInput = target?.closest('input[type="number"]');
+      if (numberInput) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('wheel', preventScrollOnNumberInput, { passive: false, capture: true });
+
     // Prevenir zoom con teclado
     const preventKeyboardZoom = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '0')) {
@@ -33,6 +43,7 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
     return () => {
       document.removeEventListener('touchmove', preventZoom);
       document.removeEventListener('dblclick', preventZoomOnDoubleTap);
+      document.removeEventListener('wheel', preventScrollOnNumberInput, { capture: true });
       document.removeEventListener('keydown', preventKeyboardZoom);
     };
   }, []);
