@@ -76,7 +76,6 @@ export default function RegisterPage() {
       }
       checkData = await checkRes.json();
     } catch (error) {
-      console.error('Error checking username:', error);
       setUsernameAvailable(false);
       setUsernameSuggestions([]);
       setStatus('Error verificando nombre de usuario');
@@ -143,7 +142,6 @@ export default function RegisterPage() {
             });
           }
         } catch (err) {
-          console.error('Error saving username:', err);
         }
       }
 
@@ -181,7 +179,6 @@ export default function RegisterPage() {
         setUsernameSuggestions([]);
       }
     } catch (error) {
-      console.error('Error checking username:', error);
       setUsernameAvailable(false);
       setUsernameSuggestions([]);
     }
@@ -396,3 +393,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

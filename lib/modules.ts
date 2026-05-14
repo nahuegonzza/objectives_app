@@ -16,7 +16,6 @@ export function parseModuleConfig(config: unknown): Record<string, unknown> {
     }
     return parsed as Record<string, unknown>;
   } catch (error) {
-    console.error('Error parsing module config:', config, error);
     return {};
   }
 }
@@ -38,7 +37,6 @@ export async function getActiveModules(): Promise<ActiveModule[]> {
         } as ActiveModule;
       });
   } catch (error) {
-    console.error('Error loading active modules:', error);
     return [];
   }
 }

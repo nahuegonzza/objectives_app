@@ -49,7 +49,6 @@ export async function PATCH(
       config: parsedConfig,
     });
   } catch (error) {
-    console.error('Error updating module:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

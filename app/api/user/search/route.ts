@@ -56,10 +56,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ users: filtered });
   } catch (error) {
-    console.error('Error searching users by username:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al buscar usuarios' },
       { status: 500 }
     );
   }
 }
+

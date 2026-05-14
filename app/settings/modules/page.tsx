@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@components/Navigation';
-import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import ModuleOrderManager from '@components/ModuleOrderManager';
 import type { Module } from '@types';
@@ -64,7 +63,6 @@ export default function ModulesSettingsPage() {
         const data = await res.json();
         setModules(data);
       } catch (error) {
-        console.error('Error loading modules:', error);
       } finally {
         setLoading(false);
       }
@@ -87,7 +85,6 @@ export default function ModulesSettingsPage() {
         throw new Error('Error toggling module');
       }
     } catch (error) {
-      console.error('Error toggling module:', error);
       setMessage('Error al cambiar el módulo');
       setMessageType('error');
       setShowToast(true);
@@ -116,7 +113,6 @@ export default function ModulesSettingsPage() {
       setShowToast(true);
       return false;
     } catch (error) {
-      console.error('Error saving config:', error);
       setMessage('Error al guardar la configuración');
       setMessageType('error');
       setShowToast(true);

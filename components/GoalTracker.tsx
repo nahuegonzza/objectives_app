@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Goal, GoalEntryWithGoal, ScoreHistory, Event, DailyScore } from '@types';
-import { getLocalDateString, parseLocalDate, formatLocalDate, formatDateDMY, formatDateLong } from '@lib/dateHelpers';
+import { getLocalDateString, parseLocalDate, formatLocalDate, formatDateLong } from '@lib/dateHelpers';
 import { isGoalActiveOnDate } from '@lib/goalHelpers';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
 import CompactGoalItem from '@components/CompactGoalItem';
@@ -119,7 +119,6 @@ export default function GoalTracker() {
       for (const item of responses) {
         if (!item.res.ok) {
           const body = await item.res.json().catch(() => null);
-          console.error(`Failed to fetch ${item.name}:`, item.res.status, item.res.statusText, body);
           setMessage(body?.error || item.defaultError);
           setMessageType('error');
           return;
@@ -139,7 +138,6 @@ export default function GoalTracker() {
       setEvents(eventsData);
       setModuleEntries(moduleEntriesData);
     } catch (error) {
-      console.error('Error loading data:', error);
       setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setMessageType('error');
     } finally {
@@ -166,7 +164,6 @@ export default function GoalTracker() {
       });
       setActiveModules(withDefinitions);
     } catch (error) {
-      console.error('Error loading modules', error);
       setMessage(error instanceof Error ? `Error cargando módulos: ${error.message}` : 'Error cargando módulos');
       setMessageType('error');
     }
@@ -176,7 +173,6 @@ export default function GoalTracker() {
     try {
       const res = await fetch(`/api/moduleEntries?date=${selectedDate}`, { credentials: 'include' });
       if (!res.ok) {
-        console.error('Failed to fetch moduleEntries');
         return;
       }
       const moduleEntriesData = await res.json();
@@ -188,7 +184,6 @@ export default function GoalTracker() {
         return [...otherEntries, ...moduleEntriesData];
       });
     } catch (error) {
-      console.error('Error loading moduleEntries:', error);
     }
   }
 
@@ -199,7 +194,6 @@ export default function GoalTracker() {
       const data = await res.json();
       setScoreHistory(data);
     } catch (error) {
-      console.error('Error loading score history:', error);
     }
   }
 
@@ -214,7 +208,6 @@ export default function GoalTracker() {
       setCurrentStreak(Number(data.currentStreak ?? 0));
       setLongestStreak(Number(data.longestStreak ?? 0));
     } catch (error) {
-      console.error('Error loading streak info:', error);
     }
   }
 
@@ -244,7 +237,6 @@ export default function GoalTracker() {
       setLongestStreak(Number(data.longestStreak ?? 0));
       window.dispatchEvent(new Event('streak-updated'));
     } catch (error) {
-      console.error('Error marking today streak:', error);
     }
   }
 
@@ -325,14 +317,12 @@ export default function GoalTracker() {
         );
         setMessage('✓ Registrado');
         setMessageType('success');
-        markTodayStreak().catch((error) => console.error('Error marking streak:', error));
+        markTodayStreak().catch(() => {});
       } else {
-        console.warn('Error saving goal entry', res.status, res.statusText);
         setMessage('Error al guardar');
         setMessageType('error');
       }
     } catch (error) {
-      console.error('Error saving goal entry:', error);
       setMessage('Error de conexión');
       setMessageType('error');
     } finally {
@@ -651,3 +641,4 @@ export default function GoalTracker() {
     </div>
   );
 }
+

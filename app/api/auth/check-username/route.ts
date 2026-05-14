@@ -70,10 +70,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error checking username:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al verificar username' },
       { status: 500 }
     );
   }
 }
+

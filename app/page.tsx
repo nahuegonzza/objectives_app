@@ -20,7 +20,6 @@ export default async function Home() {
       select: { username: true, firstName: true, name: true }
     });
   } catch (error) {
-    console.error('Prisma sync failed', error);
   }
 
   const displayName =

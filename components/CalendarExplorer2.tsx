@@ -1,5 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
 export default function CalendarExplorer() {
   return (
     <div>

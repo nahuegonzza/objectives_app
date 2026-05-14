@@ -62,7 +62,6 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
         onUpdate?.();
       }
     } catch (error) {
-      console.error('Error adding glass:', error);
       // Reload on error to sync state
       loadEntries();
     } finally {
@@ -101,7 +100,6 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
       }
 
     } catch (error) {
-      console.error('Error removing glass:', error);
       loadEntries();
     } finally {
       setSaving(false);
@@ -145,3 +143,4 @@ export default function WaterDashboard({ module, date, isEditing, onUpdate }: Wa
     </div>
   );
 }
+

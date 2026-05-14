@@ -171,7 +171,6 @@ export function AcademicConfig({
 
       onClose?.();
     } catch (error) {
-      console.error("Error saving academic config:", error);
       setError('Error al guardar');
     } finally {
       setSaving(false);
@@ -494,3 +493,4 @@ export function AcademicConfig({
     </div>
   );
 }
+

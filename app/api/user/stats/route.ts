@@ -87,7 +87,6 @@ export async function GET() {
       totalScore
     });
   } catch (error) {
-    console.error('Error fetching user stats:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

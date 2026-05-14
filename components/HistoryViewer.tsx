@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Goal, GoalEntryWithGoal, Event, DailyScore } from '@types';
 import { getLocalDateString, parseLocalDate, formatLocalDate } from '@lib/dateHelpers';
-import { calculateDailyScore } from '@core/score/scoreCalculator';
 import CompactGoalItem from '@components/CompactGoalItem';
 import { getActiveModules, type ActiveModule } from '../lib/modules';
 
@@ -64,7 +63,6 @@ export default function HistoryViewer() {
       const data = await res.json();
       setGoals(data.sort((a: Goal, b: Goal) => (a.order ?? 0) - (b.order ?? 0)));
     } catch (error) {
-      console.error('Error loading goals:', error);
     }
   }
 
@@ -73,7 +71,6 @@ export default function HistoryViewer() {
       const modules = await getActiveModules();
       setActiveModules(modules);
     } catch (error) {
-      console.error('Error loading modules:', error);
     }
   }
 
@@ -85,7 +82,6 @@ export default function HistoryViewer() {
       const data = await res.json();
       setEntries(data);
     } catch (error) {
-      console.error('Error loading entries:', error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +94,6 @@ export default function HistoryViewer() {
       const data = await res.json();
       setEvents(data);
     } catch (error) {
-      console.error('Error loading events:', error);
     }
   }
 
@@ -168,12 +163,10 @@ export default function HistoryViewer() {
         setMessage('✓ Registrado');
         setMessageType('success');
       } else {
-        console.warn('Error saving goal entry', res.status, res.statusText);
         setMessage('Error al guardar');
         setMessageType('error');
       }
     } catch (error) {
-      console.error('Error saving goal entry:', error);
       setMessage('Error de conexión');
       setMessageType('error');
     } finally {
@@ -354,3 +347,4 @@ export default function HistoryViewer() {
     </div>
   );
 }
+

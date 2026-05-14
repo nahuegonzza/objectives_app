@@ -96,7 +96,6 @@ export default function CalendarExplorer() {
         ]);
 
         if (!entriesRes.ok || !goalsRes.ok || !scoreRes.ok || !eventsRes.ok || !modulesRes.ok || !moduleEntriesRes.ok) {
-          console.error('API error:', { entriesRes: entriesRes.status, goalsRes: goalsRes.status, scoreRes: scoreRes.status, eventsRes: eventsRes.status, modulesRes: modulesRes.status, moduleEntriesRes: moduleEntriesRes.status });
           return;
         }
 
@@ -290,7 +289,6 @@ export default function CalendarExplorer() {
 
     const failures = results.filter((result) => result.status === 'rejected');
     if (failures.length > 0) {
-      console.error('Some entries failed to save', failures);
       setMessage('Algunos registros no se pudieron guardar. Intenta nuevamente.');
       setMessageType('error');
     } else {
@@ -862,3 +860,4 @@ export default function CalendarExplorer() {
     </div>
   );
 }
+

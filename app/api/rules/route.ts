@@ -4,7 +4,6 @@ export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { getServerSupabaseUser, ensurePrismaUserForSession } from '@lib/supabase-server';
 import { prisma } from '@lib/prisma';
-import type { Rule } from '@types';
 import { RulePayloadSchema, type ValidatedRulePayload } from '@lib/validators';
 
 export async function GET() {
@@ -83,7 +82,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(rule, { status: 201 });
   } catch (error) {
-    console.error('Error creating rule:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

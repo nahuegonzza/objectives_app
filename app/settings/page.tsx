@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Navigation from '@components/Navigation';
 import ThemeToggle from '@components/ThemeToggle';
-import ModuleTile from '@components/ModuleTile';
 import InfoModal from '@components/InfoModal';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
@@ -69,7 +68,6 @@ export default function SettingsPage() {
         const data = await res.json();
         setModules(data);
       } catch (error) {
-        console.error('Error loading modules:', error);
       } finally {
         setLoading(false);
       }
@@ -83,7 +81,6 @@ export default function SettingsPage() {
           throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
         }
         const data = await res.json();
-        console.log('📥 Datos cargados desde API:', data);
         setUser(data);
 
         // Parse name into firstName and lastName if they are not set
@@ -108,11 +105,8 @@ export default function SettingsPage() {
           newPassword: '',
           confirmPassword: ''
         };
-
-        console.log('📝 Datos iniciales del formulario:', initialFormData);
         setProfileForm(initialFormData);
       } catch (error) {
-        console.error('❌ Error loading user:', error);
         // Fallback: try to get basic info from session
         if (session?.user) {
           const fallbackUser = {
@@ -123,7 +117,6 @@ export default function SettingsPage() {
             lastName: session.user.user_metadata?.last_name || session.user.user_metadata?.lastName || null,
             birthDate: null
           };
-          console.log('🔄 Usando datos de fallback:', fallbackUser);
           setUser(fallbackUser);
 
           const firstName = fallbackUser.firstName || '';
@@ -139,8 +132,6 @@ export default function SettingsPage() {
             newPassword: '',
             confirmPassword: ''
           };
-
-          console.log('📝 Datos de fallback del formulario:', fallbackFormData);
           setProfileForm(fallbackFormData);
         }
       } finally {
@@ -156,7 +147,6 @@ export default function SettingsPage() {
   const [exportLoading, setExportLoading] = useState(false);
 
   const handleExportData = async () => {
-    console.log('Iniciando exportación...');
     setExportLoading(true);
     try {
       const [goalsRes, entriesRes, eventsRes, modulesRes, moduleEntriesRes] = await Promise.all([
@@ -197,9 +187,7 @@ export default function SettingsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      console.log('Exportación completada');
     } catch (error) {
-      console.error('Export error:', error);
       setInfoModalTitle('Error al exportar datos');
       setInfoModalDescription(error instanceof Error ? error.message : 'Unknown error');
       setInfoModalOpen(true);
@@ -222,7 +210,6 @@ export default function SettingsPage() {
         throw new Error('Error toggling module');
       }
     } catch (error) {
-      console.error('Error toggling module:', error);
       setInfoModalTitle('Error al cambiar el módulo');
       setInfoModalDescription('No se pudo cambiar el estado del módulo. Intenta de nuevo.');
       setInfoModalOpen(true);
@@ -296,7 +283,6 @@ export default function SettingsPage() {
         setUsernameAvailable(false);
       }
     } catch (error) {
-      console.error('Error checking username:', error);
       setUsernameAvailable(false);
     }
   };
@@ -319,8 +305,6 @@ export default function SettingsPage() {
       username: profileForm.username.trim() || null,
       birthDate: profileForm.birthDate || null
     };
-    console.log('📤 Enviando datos del perfil:', dataToSend);
-
     // Validate username if provided
     if (profileForm.username.trim()) {
       const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
@@ -354,18 +338,12 @@ export default function SettingsPage() {
           birthDate: profileForm.birthDate || null
         })
       });
-
-      console.log('📥 Respuesta de la API:', res.status, res.statusText);
-
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('❌ Error de la API:', errorData);
         throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`);
       }
 
       const updatedUser = await res.json();
-      console.log('✅ Usuario actualizado:', updatedUser);
-
       setMessage('✓ Perfil actualizado');
       setMessageType('success');
       // Reload user
@@ -379,7 +357,6 @@ export default function SettingsPage() {
         birthDate: dataToSend.birthDate || prev.birthDate
       }));
     } catch (error) {
-      console.error('Error updating profile:', error);
       setMessage(error instanceof Error ? error.message : 'Error updating profile');
       setMessageType('error');
     }
@@ -411,7 +388,6 @@ export default function SettingsPage() {
       setMessageType('success');
       setProfileForm({ ...profileForm, currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
-      console.error('Error changing password:', error);
       setMessage(error instanceof Error ? error.message : 'Error changing password');
       setMessageType('error');
     }
@@ -713,3 +689,4 @@ export default function SettingsPage() {
     </main>
   );
 }
+

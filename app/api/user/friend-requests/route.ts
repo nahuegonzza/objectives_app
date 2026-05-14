@@ -99,7 +99,6 @@ export async function GET(request: Request) {
       pendingOutgoingCount: outgoingRequests.filter((item) => item.status === 'PENDING').length,
     });
   } catch (error) {
-    console.error('Error fetching friend requests:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al obtener solicitudes de amistad' },
       { status: 500 }
@@ -186,7 +185,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: 'Solicitud de amistad enviada' });
   } catch (error) {
-    console.error('Error sending friend request:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al enviar solicitud' },
       { status: 500 }
@@ -298,10 +296,10 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ error: 'Acción no válida' }, { status: 400 });
   } catch (error) {
-    console.error('Error updating friend request:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al actualizar solicitud' },
       { status: 500 }
     );
   }
 }
+

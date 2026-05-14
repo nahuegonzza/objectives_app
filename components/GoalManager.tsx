@@ -6,7 +6,6 @@ import { Reorder, useDragControls } from 'framer-motion';
 import type { Goal } from '@types';
 import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/goalIconsColors';
 import GoalCreateModal from './GoalCreateModal';
-import NumberInput from '@components/NumberInput';
 import { GoalEditModal } from '@components/GoalEditModal';
 import ConfirmationModal from '@components/ConfirmationModal';
 
@@ -154,7 +153,6 @@ export default function GoalManager() {
       const data = await res.json();
       setGoals(data);
     } catch (error) {
-      console.error('Error loading goals:', error);
       setStatusMessage(error instanceof Error ? `Error cargando objetivos: ${error.message}` : 'Error cargando objetivos');
       setStatusType('error');
     } finally {
@@ -222,7 +220,6 @@ export default function GoalManager() {
       setShowEditModal(false);
       setEditingGoal(null);
     } catch (error) {
-      console.error('Error updating goal:', error);
       setStatusMessage(error instanceof Error ? `Error actualizando objetivo: ${error.message}` : 'Error actualizando objetivo');
       setStatusType('error');
     }  }
@@ -237,7 +234,6 @@ export default function GoalManager() {
       setStatusMessage('Objetivo eliminado correctamente');
       setStatusType('success');
     } catch (error) {
-      console.error('Error deleting goal:', error);
       setStatusMessage(error instanceof Error ? `Error eliminando objetivo: ${error.message}` : 'Error eliminando objetivo');
       setStatusType('error');
     } finally {
@@ -259,7 +255,6 @@ export default function GoalManager() {
       setStatusMessage('Objetivo desactivado correctamente');
       setStatusType('success');
     } catch (error) {
-      console.error('Error deactivating goal:', error);
       setStatusMessage(error instanceof Error ? `Error desactivando objetivo: ${error.message}` : 'Error desactivando objetivo');
       setStatusType('error');
     } finally {
@@ -281,7 +276,6 @@ export default function GoalManager() {
       setStatusMessage('Objetivo reactivado correctamente');
       setStatusType('success');
     } catch (error) {
-      console.error('Error reactivating goal:', error);
       setStatusMessage(error instanceof Error ? `Error reactivando objetivo: ${error.message}` : 'Error reactivando objetivo');
       setStatusType('error');
     } finally {
@@ -313,7 +307,6 @@ export default function GoalManager() {
       setStatusMessage('Orden de objetivos actualizado');
       setStatusType('success');
     } catch (error) {
-      console.error('Error updating goal order:', error);
       setStatusMessage(error instanceof Error ? `Error actualizando orden: ${error.message}` : 'Error actualizando orden');
       setStatusType('error');
     }
@@ -554,3 +547,4 @@ export default function GoalManager() {
     </div>
   );
 }
+

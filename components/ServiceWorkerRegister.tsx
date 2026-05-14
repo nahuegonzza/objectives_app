@@ -14,9 +14,7 @@ export default function ServiceWorkerRegister() {
         await Promise.all(registrations.map((registration) => registration.unregister()));
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map((name) => caches.delete(name)));
-        console.info('Service worker and cache cleanup complete');
       } catch (error) {
-        console.warn('Service Worker cleanup failed:', error);
       }
     })();
   }, []);

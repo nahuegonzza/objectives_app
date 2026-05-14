@@ -53,7 +53,6 @@ export default function LoginPage() {
           return;
         }
       } catch (checkError) {
-        console.error('Error looking up username:', checkError);
         setError('Usuario o contraseña incorrectos');
         setLoading(false);
         return;
@@ -83,7 +82,6 @@ export default function LoginPage() {
           }
         }
       } catch (checkError) {
-        console.error('Error comprobando email:', checkError);
       }
       setError(message);
     } else if (data?.session) {
@@ -254,3 +252,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

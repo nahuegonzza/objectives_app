@@ -119,7 +119,6 @@ export default function Analytics() {
       const data = await res.json();
       setEntries(data);
     } catch (error) {
-      console.error('Error loading entries:', error);
     } finally {
       setLoading(false);
     }
@@ -132,7 +131,6 @@ export default function Analytics() {
       const data = await res.json();
       setModuleEntries(data);
     } catch (error) {
-      console.error('Error loading module entries:', error);
     }
   }
 
@@ -152,7 +150,6 @@ export default function Analytics() {
       });
       setActiveModules(withDefinitions);
     } catch (error) {
-      console.error('Error loading modules:', error);
     }
   }
 
@@ -163,7 +160,6 @@ export default function Analytics() {
       const data = await res.json();
       setGoals(data);
     } catch (error) {
-      console.error('Error loading goals:', error);
     }
   }
 
@@ -551,3 +547,4 @@ export default function Analytics() {
     </div>
   );
 }
+

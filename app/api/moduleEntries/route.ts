@@ -53,7 +53,6 @@ export async function GET(request: Request) {
       endOfDay.setHours(23, 59, 59, 999);
       whereClause.date = { gte: date, lte: endOfDay };
     } catch (error) {
-      console.error('Error parsing date parameter:', dateParam, error);
       return NextResponse.json({ error: 'Invalid date parameter' }, { status: 400 });
     }
   }
@@ -79,7 +78,6 @@ export async function GET(request: Request) {
     );
     return NextResponse.json(entries);
   } catch (error) {
-    console.error('Error fetching module entries:', error);
     return NextResponse.json({ error: 'Failed to fetch module entries' }, { status: 500 });
   }
 }
@@ -153,7 +151,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(entry);
   } catch (error) {
-    console.error('Error saving module entry:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -199,7 +196,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting module entry:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

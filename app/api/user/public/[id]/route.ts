@@ -181,7 +181,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
       streakInfo,
     });
   } catch (error) {
-    console.error('Error fetching public user profile:', error);
     return NextResponse.json({ error: 'Error al obtener el perfil' }, { status: 500 });
   }
 }

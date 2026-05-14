@@ -181,7 +181,6 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
       onOrderSaved?.(orderUpdates);
       onClose();
     } catch (error) {
-      console.error('Error saving module order:', error);
       setMessage('Error al guardar el orden');
       setMessageType('error');
     } finally {
@@ -270,3 +269,4 @@ export default function ModuleOrderManager({ modules, onClose, onOrderSaved }: M
       />    </div>
   );
 }
+

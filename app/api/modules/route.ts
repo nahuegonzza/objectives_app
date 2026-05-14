@@ -73,7 +73,6 @@ export async function GET() {
 
     return NextResponse.json(mapped);
   } catch (error) {
-    console.error('Error in /api/modules GET:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -130,7 +129,6 @@ export async function PATCH(request: Request) {
       config: parseModuleConfig(updatedModule.config)
     });
   } catch (error) {
-    console.error('Error in /api/modules PATCH:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -175,10 +173,10 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in /api/modules PUT:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
 }
+

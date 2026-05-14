@@ -2,14 +2,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@lib/prisma';
 import { getServerSupabaseUser } from '@lib/supabase-server';
 
-function buildUserSummary(user: any) {
-  return {
-    id: user.id,
-    username: user.username,
-    displayName: `${user.firstName || user.name || ''} ${user.lastName || ''}`.trim() || user.username,
-  };
-}
-
 export async function GET() {
   const { user } = await getServerSupabaseUser();
   if (!user?.id) {
@@ -36,7 +28,6 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    console.error('Error fetching blocked users:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al cargar usuarios bloqueados' },
       { status: 500 }
@@ -109,7 +100,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: 'Usuario bloqueado correctamente' });
   } catch (error) {
-    console.error('Error blocking user:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al bloquear usuario' },
       { status: 500 }
@@ -156,10 +146,10 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ message: 'Usuario desbloqueado correctamente' });
   } catch (error) {
-    console.error('Error unblocking user:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al desbloquear usuario' },
       { status: 500 }
     );
   }
 }
+

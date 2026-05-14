@@ -26,7 +26,6 @@ export default function ModuleTracker() {
         });
         setActiveModules(withDefinitions);
       } catch (error) {
-        console.error('Error loading modules', error);
       } finally {
         setLoading(false);
       }
@@ -53,3 +52,4 @@ export default function ModuleTracker() {
     </div>
   );
 }
+

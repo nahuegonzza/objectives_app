@@ -66,7 +66,6 @@ export async function GET(request: Request) {
         endOfDay.setUTCMilliseconds(-1); // End of the day
         whereClause.date = { gte: date, lte: endOfDay };
       } catch (error) {
-        console.error('Error parsing date parameter:', dateParam, error);
         return NextResponse.json({ error: 'Invalid date parameter' }, { status: 400 });
       }
     }
@@ -91,7 +90,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(normalized);
   } catch (error) {
-    console.error('Error fetching goal entries:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -196,7 +194,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating/updating goal entry:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

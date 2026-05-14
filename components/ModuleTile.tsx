@@ -1,7 +1,6 @@
 import type { ModuleState } from '@types';
 import { useState } from 'react';
 import { SleepConfig } from '../modules/sleep/SleepConfig';
-import { MoodConfig } from '../modules/mood/MoodConfig';
 import { AcademicConfig } from '../modules/academic/AcademicConfig';
 
 interface ModuleTileProps {
@@ -25,7 +24,6 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
       }
       return false;
     } catch (error) {
-      console.error('Error saving config:', error);
       return false;
     }
   };
@@ -89,3 +87,4 @@ export default function ModuleTile({ module, onToggle }: ModuleTileProps) {
     </article>
   );
 }
+

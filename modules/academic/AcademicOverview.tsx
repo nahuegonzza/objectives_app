@@ -330,7 +330,6 @@ export default function AcademicOverview() {
           }
         }
       } catch (err) {
-        console.error('Error loading academic module ID:', err);
       }
     }
 
@@ -861,3 +860,4 @@ export default function AcademicOverview() {
     </div>
   );
 }
+

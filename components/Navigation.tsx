@@ -54,7 +54,6 @@ export default function Navigation() {
         setAcademicModuleActive(isAcademicActive);
         window.localStorage.setItem(ACADEMIC_ACTIVE_STORAGE_KEY, isAcademicActive ? 'true' : 'false');
       } catch (error) {
-        console.error('Error loading active modules:', error);
       }
     }
 
@@ -84,7 +83,6 @@ export default function Navigation() {
       setTodayStreakFulfilled(Boolean(data.todayFulfilled));
       setCurrentStreak(Number(data.currentStreak ?? 0));
     } catch (error) {
-      console.error('Error loading streak info:', error);
     }
   }
 
@@ -242,3 +240,4 @@ export default function Navigation() {
     </>
   );
 }
+

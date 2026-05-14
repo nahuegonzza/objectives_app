@@ -92,7 +92,6 @@ export async function PATCH(request: Request, { params }: { params: { goalId: st
 
     return NextResponse.json(updatedGoal);
   } catch (error) {
-    console.error('Error updating goal:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -136,7 +135,6 @@ export async function DELETE(request: Request, { params }: { params: { goalId: s
 
     return NextResponse.json({ message: 'Objetivo eliminado permanentemente' });
   } catch (error) {
-    console.error('Error deleting goal:', error);
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Error deleting goal' }, { status: 500 });
   }
 }

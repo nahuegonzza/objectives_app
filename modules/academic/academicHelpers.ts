@@ -55,7 +55,6 @@ export function parseAcademicData(data: string | null | undefined): AcademicData
       events: Array.isArray(parsed?.events) ? parsed.events : []
     };
   } catch (error) {
-    console.error('Error parsing academic module data', error);
     return DEFAULT_ACADEMIC_DATA;
   }
 }
@@ -135,3 +134,4 @@ export function getAcademicEventsForDate(entries: ModuleEntry[], targetDate: str
   const entry = entries.find((entryItem) => entryItem.date.slice(0, 10) === targetKey);
   return entry ? parseAcademicData(entry.data).events : [];
 }
+

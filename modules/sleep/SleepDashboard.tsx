@@ -231,7 +231,6 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
           setDirty(false);
         }
       } catch (error) {
-        console.error('Error loading sleep entry', error);
         if (isMounted) {
           setDirty(false);
         }
@@ -331,7 +330,6 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
         onUpdate?.();
       }
     } catch (error) {
-      console.error('Error saving sleep data', error);
     } finally {
       setSaving(false);
     }
@@ -501,3 +499,4 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
     </div>
   );
 };
+

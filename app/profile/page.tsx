@@ -1,4 +1,4 @@
-Ôªø'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import Navigation from '@components/Navigation';
@@ -65,7 +65,6 @@ export default function ProfilePage() {
         const data = await res.json();
         setUserData(data);
       } catch (error) {
-        console.error('Error loading user data:', error);
         if (session?.user) {
           setUserData({
             id: session.user.id,
@@ -93,7 +92,6 @@ export default function ProfilePage() {
         const data = await res.json();
         setStats({ goalsCompleted: data.goalsCompleted || 0, totalScore: data.totalScore || 0 });
       } catch (error) {
-        console.error('Error loading user stats:', error);
       }
     }
     loadStats();
@@ -113,7 +111,6 @@ export default function ProfilePage() {
           todayFulfilled: Boolean(data.todayFulfilled),
         }));
       } catch (error) {
-        console.error('Error loading profile streak info:', error);
       }
     }
     loadStreakInfo();
@@ -126,27 +123,27 @@ export default function ProfilePage() {
 
         <div className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight">Perfil</h1>
-          <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estad√≠sticas y conexiones.</p>
+          <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estadÌsticas y conexiones.</p>
         </div>
 
         <div className="space-y-8">
-          {/* Informaci√≥n Personal y Estad√≠sticas */}
+          {/* InformaciÛn Personal y EstadÌsticas */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Card Principal - Info Personal */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
               <div className="text-center">
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                  <span className="text-4xl">üë§</span>
+                  <span className="text-4xl">??</span>
                 </div>
                 <h2 className="text-3xl font-bold mb-1">{loading ? 'Cargando...' : getDisplayName(userData, loading, session)}</h2>
                 <p className="text-blue-100 text-sm">@{userData?.username || 'sin_usuario'}</p>
                 {calculateAge(userData?.birthDate) !== null && (
-                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} a√±os</p>
+                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} aÒos</p>
                 )}
               </div>
             </div>
 
-            {/* Estad√≠sticas */}
+            {/* EstadÌsticas */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700 rounded-2xl p-6 shadow-md text-white">
                 <p className="text-4xl font-bold">{stats.goalsCompleted}</p>
@@ -167,11 +164,11 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Secci√≥n Social - Grid de 2 columnas */}
+          {/* SecciÛn Social - Grid de 2 columnas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Columna Izquierda - B√∫squeda y Solicitudes */}
+            {/* Columna Izquierda - B˙squeda y Solicitudes */}
             <div className="space-y-6">
-              {/* B√∫squeda de Amigos */}
+              {/* B˙squeda de Amigos */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Buscar Amigos</h2>
@@ -199,9 +196,9 @@ export default function ProfilePage() {
 
           {/* Info Personal Expandida */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Informaci√≥n Personal</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">InformaciÛn Personal</h2>
             {loading ? (
-              <p className="text-slate-600 dark:text-slate-400">Cargando informaci√≥n...</p>
+              <p className="text-slate-600 dark:text-slate-400">Cargando informaciÛn...</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700">
@@ -281,7 +278,7 @@ function FriendSearchPanel() {
       if (!response.ok) {
         setMessage(data?.error || 'Error al enviar');
       } else {
-        setMessage('‚úÖ Solicitud enviada.');
+        setMessage('? Solicitud enviada.');
         setResults(results.filter((item) => item.username !== username));
       }
     } catch (error) {
@@ -310,7 +307,7 @@ function FriendSearchPanel() {
         </button>
       </div>
 
-      {message && <p className={`text-sm font-medium ${message.startsWith('‚úÖ') ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{message}</p>}
+      {message && <p className={`text-sm font-medium ${message.startsWith('?') ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{message}</p>}
 
       {results.length > 0 && (
         <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -377,7 +374,7 @@ function PendingRequestsPanel() {
         setMessage(data?.error || 'Error al actualizar');
       } else {
         setRequests((prev) => prev.filter((item) => item.id !== requestId));
-        setMessage(action === 'accept' ? '‚úÖ Aceptado.' : '‚ùå Rechazado.');
+        setMessage(action === 'accept' ? '? Aceptado.' : '? Rechazado.');
       }
     } catch (error) {
       setMessage('Error al actualizar.');
@@ -389,7 +386,7 @@ function PendingRequestsPanel() {
   return (
     <div className="space-y-4">
       {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando...</p>}
-      {message && <p className={`text-sm font-medium ${message.startsWith('‚úÖ') ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{message}</p>}
+      {message && <p className={`text-sm font-medium ${message.startsWith('?') ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{message}</p>}
       {requests.length === 0 && !loading ? (
         <p className="text-slate-600 dark:text-slate-400 text-center py-6">No hay solicitudes pendientes</p>
       ) : (
@@ -522,7 +519,7 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
       {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando...</p>}
       {message && <p className="text-sm text-amber-600 dark:text-amber-400">{message}</p>}
       {friends.length === 0 && !loading ? (
-        <p className="text-slate-600 dark:text-slate-400 text-center py-8">A√∫n no tienes amigos. ¬°Comienza a conectar!</p>
+        <p className="text-slate-600 dark:text-slate-400 text-center py-8">A˙n no tienes amigos. °Comienza a conectar!</p>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
@@ -561,11 +558,11 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
 
           <ConfirmationModal
             open={Boolean(confirmation)}
-            title={confirmation?.type === 'block' ? '¬øBloquear a este amigo?' : '¬øEliminar a este amigo?'}
+            title={confirmation?.type === 'block' ? 'øBloquear a este amigo?' : 'øEliminar a este amigo?'}
             description={
               confirmation?.type === 'block'
-                ? 'Si bloqueas a este amigo, ya no podr√°n interactuar ni verse en tu lista de amigos.'
-                : '¬øEst√°s seguro de que quieres eliminar a este amigo de tu red? Esta acci√≥n se puede revertir solo volviendo a enviarle una solicitud.'
+                ? 'Si bloqueas a este amigo, ya no podr·n interactuar ni verse en tu lista de amigos.'
+                : 'øEst·s seguro de que quieres eliminar a este amigo de tu red? Esta acciÛn se puede revertir solo volviendo a enviarle una solicitud.'
             }
             confirmLabel={confirmation?.type === 'block' ? 'Bloquear' : 'Eliminar'}
             cancelLabel="Cancelar"
@@ -577,3 +574,4 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
     </div>
   );
 }
+

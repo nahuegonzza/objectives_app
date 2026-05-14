@@ -28,11 +28,6 @@ export async function GET() {
       
       // If user exists in DB with different ID, something is wrong with the session
       if (dbUserByEmail && dbUserByEmail.id !== userId) {
-        console.error('CRITICAL: User ID mismatch in GET', { 
-          sessionUserId: userId, 
-          dbUserId: dbUserByEmail.id,
-          sessionEmail: user.email 
-        });
         return NextResponse.json({ error: 'Session error - please re-login' }, { status: 403 });
       }
     }
@@ -94,7 +89,6 @@ export async function GET() {
 
     return NextResponse.json(dbUser);
   } catch (error) {
-    console.error('Error fetching user:', error);
     return NextResponse.json({ error: 'Error fetching user' }, { status: 500 });
   }
 }
@@ -125,11 +119,6 @@ export async function PATCH(request: Request) {
       
       // If user exists in DB, the ID must match the session user ID
       if (dbUser && dbUser.id !== userId) {
-        console.error('CRITICAL: User ID mismatch - possible session hijacking', { 
-          sessionUserId: userId, 
-          dbUserId: dbUser.id,
-          sessionEmail: user.email 
-        });
         return NextResponse.json({ error: 'Session error - please re-login' }, { status: 403 });
       }
     }
@@ -220,7 +209,6 @@ export async function PATCH(request: Request) {
       
       // If user exists in DB with different ID, something is wrong with the session
       if (dbUserByEmail && dbUserByEmail.id !== userId) {
-        console.error('Security: Session user ID mismatch', { sessionUserId: userId, dbUserId: dbUserByEmail.id });
         return NextResponse.json({ error: 'Session mismatch - please re-login' }, { status: 403 });
       }
     }
@@ -245,7 +233,6 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Error updating user' }, { status: 500 });
   }
 }

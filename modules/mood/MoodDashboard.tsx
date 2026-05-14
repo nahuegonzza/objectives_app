@@ -163,7 +163,6 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
           setSelectedMood(data.moodId || null);
         }
       } catch (error) {
-        console.error('Error loading mood entry', error);
       } finally {
         setLoading(false);
       }
@@ -198,7 +197,6 @@ export const MoodDashboard: React.FC<MoodDashboardProps> = ({ config, module, on
         onUpdate?.();
       }
     } catch (error) {
-      console.error('Error saving mood data', error);
     }
   };
 

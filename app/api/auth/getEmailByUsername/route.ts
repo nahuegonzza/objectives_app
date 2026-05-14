@@ -29,10 +29,10 @@ export async function GET(request: Request) {
       username: user.username
     });
   } catch (error) {
-    console.error('Error getting email by username:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al obtener email' },
       { status: 500 }
     );
   }
 }
+

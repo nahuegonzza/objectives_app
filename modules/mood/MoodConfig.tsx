@@ -226,7 +226,6 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
         await Promise.all(updatePromises);
       }
     } catch (error) {
-      console.error('Error updating entries when deleting state:', error);
       // No fallar la operación si hay error actualizando entradas
     }
     

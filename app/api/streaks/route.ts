@@ -105,7 +105,6 @@ export async function GET(request: Request) {
     const streakInfo = await getStreakInfo(userId!, referenceDateKey);
     return NextResponse.json(streakInfo);
   } catch (error) {
-    console.error('Error loading streak info:', error);
     return NextResponse.json({ error: 'Error loading streak info' }, { status: 500 });
   }
 }
@@ -133,7 +132,6 @@ export async function POST(request: Request) {
   try {
     entryDate = normalizeDateToStartOfDay(dateParam);
   } catch (error) {
-    console.error('Invalid streak date:', error);
     return NextResponse.json({ error: 'Invalid date' }, { status: 400 });
   }
 
@@ -149,7 +147,7 @@ export async function POST(request: Request) {
     const streakInfo = await getStreakInfo(userId!, entryDateKey);
     return NextResponse.json(streakInfo, { status: 201 });
   } catch (error) {
-    console.error('Error saving streak day:', error);
     return NextResponse.json({ error: 'Error saving streak day' }, { status: 500 });
   }
 }
+

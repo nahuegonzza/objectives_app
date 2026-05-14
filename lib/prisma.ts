@@ -81,7 +81,6 @@ function getPrismaClient() {
   }
 
   process.env.DATABASE_URL = normalizedDatabaseUrl;
-  console.log('[Prisma] Initializing client with URL:', normalizedDatabaseUrl.substring(0, 50) + '...');
 
   // Configurar pool de PostgreSQL con opciones para conexiones móviles
   const poolConfig: PoolConfig = {
@@ -103,7 +102,6 @@ function getPrismaClient() {
 
   // Add connection event handlers
   prisma.$on('error', (e) => {
-    console.error('[Prisma Error]', e);
   });
 
   // Mantener singleton en todos los entornos para evitar múltiples pools
@@ -151,7 +149,6 @@ export async function withRetry<T>(
       }
 
       if (attempt < maxRetries) {
-        console.log(`[Prisma] Retry attempt ${attempt + 1}/${maxRetries} after connection error`, lastError.message);
         await new Promise((resolve) => setTimeout(resolve, delay * (attempt + 1)));
         continue;
       }
@@ -160,3 +157,4 @@ export async function withRetry<T>(
 
   throw lastError ?? new Error('Unknown Prisma error');
 }
+

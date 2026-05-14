@@ -12,14 +12,13 @@ async function main() {
       name: 'Default User'
     }
   });
-  console.log('Default user seeded.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
   });
+

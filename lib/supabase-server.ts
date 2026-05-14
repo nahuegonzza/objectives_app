@@ -46,7 +46,6 @@ export async function getServerSupabaseUser() {
     const { data: { session }, error } = await supabase.auth.getSession();
 
     if (error || !session?.user) {
-      console.log('❌ No user session found', error?.message ?? '');
       return {
         user: null,
         supabase: null,
@@ -54,8 +53,6 @@ export async function getServerSupabaseUser() {
         serviceRoleAvailable: false
       };
     }
-
-    console.log('✅ User authenticated:', session.user.id);
     return {
       user: session.user,
       supabase,
@@ -63,8 +60,6 @@ export async function getServerSupabaseUser() {
       serviceRoleAvailable: false
     };
   } catch (error) {
-    console.log('⚠️ Auth error:', error);
-    console.log('❌ Auth error - denying access');
     return {
       user: null,
       supabase: null,

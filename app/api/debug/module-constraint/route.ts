@@ -57,7 +57,7 @@ export async function GET(request: Request) {
       indexes: refreshedIndexes
     });
   } catch (error) {
-    console.error('Error inspecting or fixing module indexes:', error);
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
+
