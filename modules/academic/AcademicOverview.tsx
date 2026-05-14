@@ -52,7 +52,8 @@ const getExamLabel = (event: AcademicEvent) => {
   if (event.type !== 'exam') {
     const priority = event.priority ?? 'media';
     const priorityCap = priority.charAt(0).toUpperCase() + priority.slice(1);
-    return `Tarea - Prioridad ${priorityCap}`;
+    const duration = event.estimatedDuration ? ` • ${getDurationLabel(event.estimatedDuration)}` : '';
+    return `Tarea - Prioridad ${priorityCap}${duration}`;
   }
   return event.examType === 'final'
     ? 'Final'
@@ -90,12 +91,25 @@ const getTaskBadgeStyle = (priority?: string) => {
   }
 };
 
-const normalizeHex = (hex: string) => {
-  let cleaned = hex.trim().replace('#', '');
-  if (cleaned.length === 3) {
-    cleaned = cleaned.split('').map((char) => char + char).join('');
+const getDurationLabel = (duration: string) => {
+  switch (duration) {
+    case 'corta':
+      return 'Corta';
+    case 'media':
+      return 'Media';
+    case 'extensa':
+      return 'Extensa';
+    case 'lectura':
+      return 'Lectura';
+    case 'escritura':
+      return 'Escritura';
+    case 'codigo':
+      return 'Código';
+    case 'practica':
+      return 'Práctica';
+    default:
+      return duration;
   }
-  return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
 };
 
 const parseRgbString = (rgb: string) => {
@@ -106,6 +120,14 @@ const parseRgbString = (rgb: string) => {
     g: Number(match[2]),
     b: Number(match[3]),
   };
+};
+
+const normalizeHex = (hex: string) => {
+  let cleaned = hex.trim().replace('#', '');
+  if (cleaned.length === 3) {
+    cleaned = cleaned.split('').map((char) => char + char).join('');
+  }
+  return /^[0-9A-Fa-f]{6}$/.test(cleaned) ? cleaned : null;
 };
 
 const hexToRgba = (color: string, alpha: number) => {

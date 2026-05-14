@@ -3,6 +3,7 @@ import type { ModuleEntry } from '@types';
 export type AcademicEventType = 'exam' | 'task';
 export type AcademicExamType = 'parcial' | 'final' | 'recuperatorio';
 export type AcademicTaskPriority = 'alta' | 'media' | 'baja';
+export type AcademicTaskDuration = 'corta' | 'media' | 'extensa' | 'lectura' | 'escritura' | 'codigo' | 'practica';
 
 export interface AcademicSubject {
   id: string;
@@ -21,6 +22,7 @@ export interface AcademicEvent {
   type: AcademicEventType;
   examType?: AcademicExamType;
   priority?: AcademicTaskPriority;
+  estimatedDuration?: AcademicTaskDuration;
 }
 
 export interface AcademicData {

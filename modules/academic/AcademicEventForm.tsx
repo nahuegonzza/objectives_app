@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getLocalDateString } from '@lib/dateHelpers';
-import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority } from './academicHelpers';
+import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority, AcademicTaskDuration } from './academicHelpers';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface ValidationModalProps {
@@ -55,6 +55,7 @@ export function AcademicEventForm({
   const [eventType, setEventType] = useState<AcademicEventType>('task');
   const [examType, setExamType] = useState<AcademicExamType>('parcial');
   const [priority, setPriority] = useState<AcademicTaskPriority>('media');
+  const [estimatedDuration, setEstimatedDuration] = useState<AcademicTaskDuration>('media');
   const [subjectId, setSubjectId] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -73,6 +74,7 @@ export function AcademicEventForm({
         eventType !== initialEvent.type ||
         examType !== (initialEvent.examType || 'parcial') ||
         priority !== (initialEvent.priority || 'media') ||
+        estimatedDuration !== (initialEvent.estimatedDuration || 'media') ||
         subjectId !== initialEvent.subjectId ||
         title !== initialEvent.title ||
         description !== initialEvent.description ||
@@ -85,6 +87,7 @@ export function AcademicEventForm({
         eventType !== 'task' ||
         examType !== 'parcial' ||
         priority !== 'media' ||
+        estimatedDuration !== 'media' ||
         subjectId !== defaultSubjectId ||
         title !== '' ||
         description !== '' ||
@@ -116,6 +119,7 @@ export function AcademicEventForm({
       setEventType(initialEvent.type);
       setExamType(initialEvent.examType || 'parcial');
       setPriority(initialEvent.priority || 'media');
+      setEstimatedDuration(initialEvent.estimatedDuration || 'media');
       setSubjectId(initialEvent.subjectId);
       setTitle(initialEvent.title);
       setDescription(initialEvent.description);
@@ -125,6 +129,7 @@ export function AcademicEventForm({
       setEventType('task');
       setExamType('parcial');
       setPriority('media');
+      setEstimatedDuration('media');
       setSubjectId(subjects.length > 0 ? subjects[0].id : '');
       setTitle('');
       setDescription('');
@@ -149,7 +154,7 @@ export function AcademicEventForm({
       date: date,
       completed: completed,
       type: eventType,
-      ...(eventType === 'exam' ? { examType } : { priority }),
+      ...(eventType === 'exam' ? { examType } : { priority, estimatedDuration }),
     };
 
     await onSave(event);
@@ -260,20 +265,40 @@ export function AcademicEventForm({
                 </select>
               </div>
             ) : (
-              <div>
-                <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                  Prioridad
-                </label>
-                <select
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value as AcademicTaskPriority)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                >
-                  <option value="alta">Alta</option>
-                  <option value="media">Media</option>
-                  <option value="baja">Baja</option>
-                </select>
-              </div>
+              <>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Prioridad
+                  </label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value as AcademicTaskPriority)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Duración estimada
+                  </label>
+                  <select
+                    value={estimatedDuration}
+                    onChange={(e) => setEstimatedDuration(e.target.value as AcademicTaskDuration)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="corta">Corta (15-30 min)</option>
+                    <option value="media">Media (30-60 min)</option>
+                    <option value="extensa">Extensa (1-2 horas)</option>
+                    <option value="lectura">Lectura</option>
+                    <option value="escritura">Escritura</option>
+                    <option value="codigo">Código/Programación</option>
+                    <option value="practica">Práctica/Ejercicios</option>
+                  </select>
+                </div>
+              </>
             )}
 
             {/* Fecha */}
