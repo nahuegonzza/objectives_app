@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Navigation from '@components/Navigation';
+import FriendProfileModal from '@components/FriendProfileModal';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import { getLocalDateString } from '@lib/dateHelpers';
 
@@ -48,6 +49,10 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ goalsCompleted: 0, totalScore: 0 });
   const [streakInfo, setStreakInfo] = useState({ currentStreak: 0, longestStreak: 0, todayFulfilled: false, today: getLocalDateString() });
+  const [selectedFriend, setSelectedFriend] = useState<FriendSummary | null>(null);
+
+  const openFriendProfile = (friend: FriendSummary) => setSelectedFriend(friend);
+  const closeFriendProfile = () => setSelectedFriend(null);
 
   useEffect(() => {
     if (!session?.user) return;
@@ -187,7 +192,7 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3 mb-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Tus Amigos</h2>
               </div>
-              <FriendsListPanel />
+              <FriendsListPanel onOpenProfile={openFriendProfile} />
             </div>
           </div>
 
@@ -219,6 +224,14 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {selectedFriend && (
+        <FriendProfileModal
+          friendId={selectedFriend.id}
+          onClose={closeFriendProfile}
+          initialDisplayName={selectedFriend.displayName}
+          initialUsername={selectedFriend.username}
+        />
+      )}
     </main>
   );
 }
@@ -410,7 +423,7 @@ function PendingRequestsPanel() {
   );
 }
 
-function FriendsListPanel() {
+function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSummary) => void }) {
   const [friends, setFriends] = useState<FriendSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -495,7 +508,10 @@ function FriendsListPanel() {
           {friends.map((friend) => (
             <div key={friend.id} className="rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 p-4 border-2 border-emerald-200 dark:border-slate-600 hover:shadow-md transition">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div
+                  className="flex-1 cursor-pointer rounded-xl p-1 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                  onClick={() => onOpenProfile?.(friend)}
+                >
                   <p className="font-semibold text-slate-900 dark:text-white">{friend.displayName}</p>
                   <p className="text-xs text-slate-600 dark:text-slate-400">@{friend.username}</p>
                 </div>
