@@ -31,3 +31,12 @@ Se añadió una escucha global en `app/RootLayoutClient.tsx` que intercepta el e
 - La corrección se aplica a todos los inputs nativos de tipo `number`.
 - Si existieran componentes personalizados que usen otro tipo de input numérico, puede requerir una segunda revisión.
 - La escucha se registra con `{ passive: false, capture: true }` para asegurar que `preventDefault()` funcione correctamente.
+
+## Ajuste adicional
+
+Tras detectar un caso válido en el módulo de sueño, se actualizó el comportamiento global para que el `wheel` sobre `input[type="number"]`:
+
+- no haga scroll de página
+- continúe ajustando el valor del input
+- emule el incremento/decremento del valor
+- dispare eventos `input` y `change` para que los componentes React reciban el cambio
