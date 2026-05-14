@@ -123,11 +123,11 @@ export default function ProfilePage() {
 
         <div className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight">Perfil</h1>
-          <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estadísticas y conexiones.</p>
+          <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">Tu espacio personal, estadÃ­sticas y conexiones.</p>
         </div>
 
         <div className="space-y-8">
-          {/* Información Personal y Estadísticas */}
+          {/* InformaciÃ³n Personal y EstadÃ­sticas */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Card Principal - Info Personal */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
@@ -138,12 +138,12 @@ export default function ProfilePage() {
                 <h2 className="text-3xl font-bold mb-1">{loading ? 'Cargando...' : getDisplayName(userData, loading, session)}</h2>
                 <p className="text-blue-100 text-sm">@{userData?.username || 'sin_usuario'}</p>
                 {calculateAge(userData?.birthDate) !== null && (
-                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} años</p>
+                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} aï¿½os</p>
                 )}
               </div>
             </div>
 
-            {/* Estadísticas */}
+            {/* Estadï¿½sticas */}
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700 rounded-2xl p-6 shadow-md text-white">
                 <p className="text-4xl font-bold">{stats.goalsCompleted}</p>
@@ -164,11 +164,11 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Sección Social - Grid de 2 columnas */}
+          {/* SecciÃ³n Social - Grid de 2 columnas */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Columna Izquierda - Búsqueda y Solicitudes */}
+            {/* Columna Izquierda - BÃºsqueda y Solicitudes */}
             <div className="space-y-6">
-              {/* Búsqueda de Amigos */}
+              {/* Bï¿½squeda de Amigos */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Buscar Amigos</h2>
@@ -196,9 +196,9 @@ export default function ProfilePage() {
 
           {/* Info Personal Expandida */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Información Personal</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">InformaciÃ³n Personal</h2>
             {loading ? (
-              <p className="text-slate-600 dark:text-slate-400">Cargando información...</p>
+              <p className="text-slate-600 dark:text-slate-400">Cargando informaciÃ³n...</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700">
@@ -519,7 +519,7 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
       {loading && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando...</p>}
       {message && <p className="text-sm text-amber-600 dark:text-amber-400">{message}</p>}
       {friends.length === 0 && !loading ? (
-        <p className="text-slate-600 dark:text-slate-400 text-center py-8">Aún no tienes amigos. ¡Comienza a conectar!</p>
+        <p className="text-slate-600 dark:text-slate-400 text-center py-8">AÃºn no tienes amigos. Â¿Comienza a conectar?</p>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
@@ -558,11 +558,11 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
 
           <ConfirmationModal
             open={Boolean(confirmation)}
-            title={confirmation?.type === 'block' ? '¿Bloquear a este amigo?' : '¿Eliminar a este amigo?'}
+            title={confirmation?.type === 'block' ? 'Â¿Bloquear a este amigo?' : 'Â¿Eliminar a este amigo?'}
             description={
               confirmation?.type === 'block'
-                ? 'Si bloqueas a este amigo, ya no podrán interactuar ni verse en tu lista de amigos.'
-                : '¿Estás seguro de que quieres eliminar a este amigo de tu red? Esta acción se puede revertir solo volviendo a enviarle una solicitud.'
+                ? 'Si bloqueas a este amigo, ya no podrÃ¡n interactuar ni verse en tu lista de amigos.'
+                : 'Â¿EstÃ¡s seguro de que quieres eliminar a este amigo de tu red? Esta acciÃ³n se puede revertir solo volviendo a enviarle una solicitud.'
             }
             confirmLabel={confirmation?.type === 'block' ? 'Bloquear' : 'Eliminar'}
             cancelLabel="Cancelar"
