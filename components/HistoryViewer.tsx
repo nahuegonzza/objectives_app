@@ -33,7 +33,7 @@ export default function HistoryViewer() {
   const [savingGoalIds, setSavingGoalIds] = useState<string[]>([]);
   const goalSaveQueueRef = useRef<Record<string, {
     value: boolean | number;
-    timeoutId: ReturnType<typeof setTimeout> | null;
+    timeoutId: number | null;
     inflight: boolean;
     requestId: number;
   }>>({});
