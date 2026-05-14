@@ -70,14 +70,13 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
         {goal.type === 'BOOLEAN' ? (
           <button
             onClick={() => handleChange(!currentValue)}
-            disabled={isLoading}
             className={`
               w-12 h-7 rounded-full transition-colors duration-200 relative
               ${Boolean(currentValue)
                 ? 'bg-emerald-500 dark:bg-emerald-600'
                 : 'bg-slate-300 dark:bg-slate-600'
               }
-              disabled:opacity-50 cursor-pointer
+              cursor-pointer
               focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900
             `}
             aria-label={`Toggle ${goal.title}`}
@@ -92,8 +91,7 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
           <div className="flex items-center gap-1">
             <button
               onClick={() => handleChange(Number(inputValue) - 1)}
-              disabled={isLoading}
-              className="px-2 py-1 rounded bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-semibold hover:bg-slate-400 dark:hover:bg-slate-600 disabled:opacity-50 transition"
+              className="px-2 py-1 rounded bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-semibold hover:bg-slate-400 dark:hover:bg-slate-600 transition"
               type="button"
             >
               −
@@ -123,13 +121,11 @@ export default function CompactGoalItem({ goal, entry, isLoading = false, onChan
                 setInputValue(String(value));
                 commitValue(String(value));
               }}
-              disabled={isLoading}
-              className="w-20 px-2 py-1 text-center text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
+              className="w-20 px-2 py-1 text-center text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
             <button
               onClick={() => handleChange(Number(inputValue) + 1)}
-              disabled={isLoading}
-              className="px-2 py-1 rounded bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-semibold hover:bg-slate-400 dark:hover:bg-slate-600 disabled:opacity-50 transition"
+              className="px-2 py-1 rounded bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-semibold hover:bg-slate-400 dark:hover:bg-slate-600 transition"
             >
               +
             </button>

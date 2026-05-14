@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Goal, GoalEntryWithGoal, Event, DailyScore } from '@types';
 import { getLocalDateString, parseLocalDate, formatLocalDate } from '@lib/dateHelpers';
 import { calculateDailyScore } from '@core/score/scoreCalculator';
@@ -30,7 +30,13 @@ export default function HistoryViewer() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
-  const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
+  const [savingGoalIds, setSavingGoalIds] = useState<string[]>([]);
+  const goalSaveQueueRef = useRef<Record<string, {
+    value: boolean | number;
+    timeoutId: ReturnType<typeof setTimeout> | null;
+    inflight: boolean;
+    requestId: number;
+  }>>({});
 
   useEffect(() => {
     loadGoals();
@@ -97,9 +103,11 @@ export default function HistoryViewer() {
   }
 
   async function handleSaveEntry(goal: Goal, value: boolean | number) {
-    setSavingGoalId(goal.id);
     setMessage('');
+    scheduleGoalSave(goal, value);
+  }
 
+  function updateLocalEntry(goal: Goal, value: boolean | number) {
     setEntries((prevEntries) => {
       const existingIndex = prevEntries.findIndex((entry) =>
         entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === selectedDate
@@ -121,9 +129,19 @@ export default function HistoryViewer() {
 
       return [...prevEntries, updatedEntry];
     });
+  }
+
+  async function processGoalSave(goalId: string, goal: Goal, date: string) {
+    const queue = goalSaveQueueRef.current;
+    const item = queue[goalId];
+    if (!item || item.inflight) return;
+
+    item.timeoutId = null;
+    item.inflight = true;
+    setSavingGoalIds((current) => (current.includes(goalId) ? current : [...current, goalId]));
+    const payload = buildEntryPayload(goal, item.value, date);
 
     try {
-      const payload = buildEntryPayload(goal, value, selectedDate);
       const res = await fetch('/api/goalEntries', {
         method: 'POST',
         credentials: 'include',
@@ -132,20 +150,60 @@ export default function HistoryViewer() {
       });
 
       if (res.ok) {
+        const updatedEntry = await res.json();
+        setEntries((prevEntries) =>
+          prevEntries.map((entry) => {
+            if (entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === date) {
+              return {
+                ...entry,
+                id: updatedEntry.id,
+                createdAt: updatedEntry.createdAt,
+                valueBoolean: entry.valueBoolean,
+                valueFloat: entry.valueFloat
+              } as GoalEntryWithGoal;
+            }
+            return entry;
+          })
+        );
         setMessage('✓ Registrado');
         setMessageType('success');
       } else {
+        console.warn('Error saving goal entry', res.status, res.statusText);
         setMessage('Error al guardar');
         setMessageType('error');
-        await loadEntries();
       }
     } catch (error) {
+      console.error('Error saving goal entry:', error);
       setMessage('Error de conexión');
       setMessageType('error');
-      await loadEntries();
     } finally {
-      setSavingGoalId(null);
+      item.inflight = false;
+      const queueItem = goalSaveQueueRef.current[goalId];
+      if (queueItem?.timeoutId) {
+        processGoalSave(goalId, goal, date);
+        return;
+      }
+      delete goalSaveQueueRef.current[goalId];
+      setSavingGoalIds((current) => current.filter((id) => id !== goalId));
     }
+  }
+
+  function scheduleGoalSave(goal: Goal, value: boolean | number) {
+    updateLocalEntry(goal, value);
+    const queue = goalSaveQueueRef.current;
+    const existing = queue[goal.id];
+    if (existing?.timeoutId) {
+      clearTimeout(existing.timeoutId);
+    }
+
+    const timeoutId = window.setTimeout(() => processGoalSave(goal.id, goal, selectedDate), 250);
+    queue[goal.id] = {
+      value,
+      timeoutId,
+      inflight: existing?.inflight ?? false,
+      requestId: Date.now()
+    };
+    setSavingGoalIds((current) => (current.includes(goal.id) ? current : [...current, goal.id]));
   }
 
   const goalEntriesMap = useMemo(
@@ -265,7 +323,7 @@ export default function HistoryViewer() {
                 key={goal.id}
                 goal={goal}
                 entry={goalEntriesMap.get(goal.id)}
-                isLoading={savingGoalId === goal.id}
+                isLoading={savingGoalIds.includes(goal.id)}
                 onChange={handleSaveEntry}
               />
             ))}

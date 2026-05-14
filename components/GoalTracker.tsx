@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Goal, GoalEntryWithGoal, ScoreHistory, Event, DailyScore } from '@types';
 import { getLocalDateString, parseLocalDate, formatLocalDate, formatDateDMY, formatDateLong } from '@lib/dateHelpers';
 import { isGoalActiveOnDate } from '@lib/goalHelpers';
@@ -35,7 +35,13 @@ export default function GoalTracker() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
-  const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
+  const [savingGoalIds, setSavingGoalIds] = useState<string[]>([]);
+  const goalSaveQueueRef = useRef<Record<string, {
+    value: boolean | number;
+    timeoutId: ReturnType<typeof setTimeout> | null;
+    inflight: boolean;
+    requestId: number;
+  }>>({});
   const [dailyScore, setDailyScore] = useState<DailyScore>({ points: 0, date: getLocalDateString(), note: '' });
   const [scoreHistory, setScoreHistory] = useState<ScoreHistory | null>(null);
   const [todayStreakFulfilled, setTodayStreakFulfilled] = useState(false);
@@ -257,9 +263,7 @@ export default function GoalTracker() {
     }
   }
 
-  async function handleSaveEntry(goal: Goal, value: boolean | number) {
-    setSavingGoalId(goal.id);
-    setMessage('');
+  function updateLocalEntry(goal: Goal, value: boolean | number) {
     setEntries((prevEntries) => {
       const existingIndex = prevEntries.findIndex((entry) =>
         entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === selectedDate
@@ -281,9 +285,20 @@ export default function GoalTracker() {
 
       return [...prevEntries, updatedEntry];
     });
+  }
+
+  async function processGoalSave(goalId: string, goal: Goal, date: string) {
+    const queue = goalSaveQueueRef.current;
+    const item = queue[goalId];
+    if (!item || item.inflight) return;
+
+    item.timeoutId = null;
+    item.inflight = true;
+    setSavingGoalIds((current) => (current.includes(goalId) ? current : [...current, goalId]));
+    const currentRequestId = item.requestId;
+    const payload = buildEntryPayload(goal, item.value, date);
 
     try {
-      const payload = buildEntryPayload(goal, value, selectedDate);
       const res = await fetch('/api/goalEntries', {
         method: 'POST',
         credentials: 'include',
@@ -293,35 +308,66 @@ export default function GoalTracker() {
 
       if (res.ok) {
         const updatedEntry = await res.json();
-        setEntries((prevEntries) => {
-          const existingIndex = prevEntries.findIndex((entry) =>
-            entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === selectedDate
-          );
-          if (existingIndex !== -1) {
-            return prevEntries.map((entry, index) =>
-              index === existingIndex ? updatedEntry : entry
-            );
-          }
-          return [...prevEntries, updatedEntry];
-        });
+        setEntries((prevEntries) =>
+          prevEntries.map((entry) => {
+            if (entry.goalId === goal.id && getLocalDateStringFromEntry(entry.date) === date) {
+              return {
+                ...entry,
+                id: updatedEntry.id,
+                createdAt: updatedEntry.createdAt,
+                // preserve local current values to avoid stale overwrite
+                valueBoolean: entry.valueBoolean,
+                valueFloat: entry.valueFloat
+              } as GoalEntryWithGoal;
+            }
+            return entry;
+          })
+        );
         setMessage('✓ Registrado');
         setMessageType('success');
-        await markTodayStreak();
-        // NO recargar datos - actualizar solo score y entradas localmente
-        // Los puntos se actualizan automáticamente por el useEffect de score
+        markTodayStreak().catch((error) => console.error('Error marking streak:', error));
       } else {
+        console.warn('Error saving goal entry', res.status, res.statusText);
         setMessage('Error al guardar');
         setMessageType('error');
-        // Solo recargar en caso de error para sincronizar estado
-        await loadData();
       }
     } catch (error) {
+      console.error('Error saving goal entry:', error);
       setMessage('Error de conexión');
       setMessageType('error');
-      await loadData();
     } finally {
-      setSavingGoalId(null);
+      item.inflight = false;
+      const queueItem = queue[goalId];
+      if (queueItem?.timeoutId) {
+        processGoalSave(goalId, goal, date);
+        return;
+      }
+      delete queue[goalId];
+      setSavingGoalIds((current) => current.filter((id) => id !== goalId));
     }
+  }
+
+  function scheduleGoalSave(goal: Goal, value: boolean | number) {
+    updateLocalEntry(goal, value);
+    const queue = goalSaveQueueRef.current;
+    const existing = queue[goal.id];
+    if (existing?.timeoutId) {
+      clearTimeout(existing.timeoutId);
+    }
+
+    const timeoutId = window.setTimeout(() => processGoalSave(goal.id, goal, selectedDate), 250);
+    queue[goal.id] = {
+      value,
+      timeoutId,
+      inflight: existing?.inflight ?? false,
+      requestId: Date.now()
+    };
+    setSavingGoalIds((current) => (current.includes(goal.id) ? current : [...current, goal.id]));
+  }
+
+  function handleSaveEntry(goal: Goal, value: boolean | number) {
+    setMessage('');
+    scheduleGoalSave(goal, value);
   }
 
   const goalEntriesMap = useMemo(() => {
@@ -514,7 +560,7 @@ export default function GoalTracker() {
                                   key={goal.id}
                                   goal={goal}
                                   entry={goalEntriesMap.get(goal.id)}
-                                  isLoading={savingGoalId === goal.id}
+                                  isLoading={savingGoalIds.includes(goal.id)}
                                   onChange={handleSaveEntry}
                                 />
                               ))}
@@ -540,7 +586,7 @@ export default function GoalTracker() {
                                   key={goal.id}
                                   goal={goal}
                                   entry={goalEntriesMap.get(goal.id)}
-                                  isLoading={savingGoalId === goal.id}
+                                  isLoading={savingGoalIds.includes(goal.id)}
                                   onChange={handleSaveEntry}
                                 />
                               ))}
