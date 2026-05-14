@@ -102,6 +102,10 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
           max={23}
           value={String(hours).padStart(2, '0')}
           onChange={handleHoursChange}
+          onWheel={(event) => {
+            event.preventDefault();
+            if (event.deltaY < 0) incrementHour(); else decrementHour();
+          }}
           disabled={disabled}
           onFocus={() => setEditingHours(true)}
           onBlur={() => setEditingHours(false)}
@@ -150,6 +154,10 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
           max={59}
           value={String(minutes).padStart(2, '0')}
           onChange={handleMinutesChange}
+          onWheel={(event) => {
+            event.preventDefault();
+            if (event.deltaY < 0) incrementMinute(); else decrementMinute();
+          }}
           disabled={disabled}
           onFocus={() => setEditingMinutes(true)}
           onBlur={() => setEditingMinutes(false)}

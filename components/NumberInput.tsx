@@ -79,6 +79,7 @@ export default function NumberInput({
           (event.target as HTMLInputElement).blur();
         }
       }}
+      data-wheel-handler="true"
       onWheel={(event) => {
         event.preventDefault();
         const normalized = internalValue.trim().replace(',', '.');

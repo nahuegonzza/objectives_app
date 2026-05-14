@@ -28,6 +28,7 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
       const numberInput = target?.closest('input[type="number"]') as HTMLInputElement | null;
       if (!numberInput || numberInput.disabled || numberInput.readOnly) return;
 
+      const hasCustomWheelHandler = numberInput.dataset.wheelHandler === 'true';
       const stepAttr = numberInput.getAttribute('step');
       const step = stepAttr && stepAttr !== 'any' ? parseFloat(stepAttr) : 1;
       const minAttr = numberInput.getAttribute('min');
@@ -54,7 +55,10 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
       if (!Number.isFinite(nextValue)) return;
 
       e.preventDefault();
-      e.stopImmediatePropagation();
+
+      if (hasCustomWheelHandler) {
+        return;
+      }
 
       numberInput.value = String(nextValue);
       numberInput.dispatchEvent(new Event('input', { bubbles: true }));
