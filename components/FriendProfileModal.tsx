@@ -66,7 +66,19 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
           setError(data?.error || 'No se pudo cargar el perfil.');
           setFriendData(null);
         } else {
-          setFriendData(data.user ?? data);
+          if (data?.user && data?.stats) {
+            setFriendData({
+              ...data.user,
+              stats: {
+                goalsCompleted: data.stats.goalsCompleted ?? 0,
+                totalScore: data.stats.totalScore ?? 0,
+                currentStreak: data.streakInfo?.currentStreak ?? data.stats.currentStreak ?? 0,
+                longestStreak: data.streakInfo?.longestStreak ?? data.stats.longestStreak ?? 0,
+              },
+            });
+          } else {
+            setFriendData(data.user ?? data);
+          }
         }
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : 'Error desconocido al cargar el perfil.');
@@ -86,6 +98,7 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
   const displayName = getDisplayName(friendData, initialDisplayName, initialUsername);
   const age = calculateAge(friendData?.birthDate ?? null);
   const memberSince = friendData?.createdAt ? new Date(friendData.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' }) : 'No disponible';
+  const stats = friendData?.stats ?? { goalsCompleted: 0, totalScore: 0, currentStreak: 0, longestStreak: 0 };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
@@ -127,19 +140,19 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700 rounded-2xl p-6 shadow-md text-white">
-                <p className="text-4xl font-bold">{friendData.stats.goalsCompleted}</p>
+                <p className="text-4xl font-bold">{stats.goalsCompleted}</p>
                 <p className="text-sm mt-2 text-emerald-100">Objetivos</p>
               </div>
               <div className="bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700 rounded-2xl p-6 shadow-md text-white">
-                <p className="text-4xl font-bold">{friendData.stats.totalScore}</p>
+                <p className="text-4xl font-bold">{stats.totalScore}</p>
                 <p className="text-sm mt-2 text-blue-100">Puntos</p>
               </div>
               <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-500 dark:to-emerald-700 rounded-2xl p-6 shadow-md text-white">
-                <p className="text-4xl font-bold">{friendData.stats.currentStreak}</p>
+                <p className="text-4xl font-bold">{stats.currentStreak}</p>
                 <p className="text-sm mt-2 text-orange-100">Racha Actual</p>
               </div>
               <div className="bg-gradient-to-br from-purple-400 to-purple-600 dark:from-purple-500 dark:to-purple-700 rounded-2xl p-6 shadow-md text-white">
-                <p className="text-4xl font-bold">{friendData.stats.longestStreak}</p>
+                <p className="text-4xl font-bold">{stats.longestStreak}</p>
                 <p className="text-sm mt-2 text-purple-100">Mejor Racha</p>
               </div>
             </div>
