@@ -39,13 +39,13 @@ export function AcademicConfig({
     ((config?.examPoints as any)?.recuperatorio ?? 3).toString()
   );
   const [examPointsExposicion, setExamPointsExposicion] = useState(
-    ((config?.examPoints as any)?.exposicion ?? 3).toString()
+    ((config?.examPoints as any)?.exposicion ?? 2).toString()
   );
   const [examPointsRegular, setExamPointsRegular] = useState(
-    ((config?.examPoints as any)?.regular ?? 2).toString()
+    ((config?.examPoints as any)?.regular ?? 1).toString()
   );
   const [examPointsOral, setExamPointsOral] = useState(
-    ((config?.examPoints as any)?.oral ?? 3).toString()
+    ((config?.examPoints as any)?.oral ?? 1.5).toString()
   );
   const [taskPointsAlta, setTaskPointsAlta] = useState(
     ((config?.taskPoints as any)?.alta ?? 2).toString()

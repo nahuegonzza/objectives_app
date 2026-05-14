@@ -8,6 +8,7 @@ import { AcademicTodayCard } from './AcademicTodayCard';
 import { AcademicEventForm } from './AcademicEventForm';
 import type { AcademicEvent } from './academicHelpers';
 import { academicModule } from './module';
+import ConfirmationModal from '@components/ConfirmationModal';
 
 interface AcademicDashboardProps {
   config: Record<string, unknown>;
@@ -37,6 +38,8 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
   const [showUpcomingEvents, setShowUpcomingEvents] = useState(true);
   const [message, setMessage] = useState('');
+  const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [dailyScore, setDailyScore] = useState(0);
 
@@ -65,14 +68,24 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
     setShowEventForm(true);
   };
 
-  const handleDeleteEvent = async (event: AcademicEvent) => {
-    if (!window.confirm('¿Eliminar este evento?')) {
-      return;
-    }
+  const handleDeleteEvent = (event: AcademicEvent) => {
+    setEventToDelete(event);
+    setShowDeleteEventConfirm(true);
+  };
 
-    await discardEvent(event);
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) return;
+
+    await discardEvent(eventToDelete);
     setMessage('✓ Evento eliminado');
     setMessageType('success');
+    setEventToDelete(null);
+    setShowDeleteEventConfirm(false);
+  };
+
+  const cancelDeleteEvent = () => {
+    setEventToDelete(null);
+    setShowDeleteEventConfirm(false);
   };
 
   if (loading) {
@@ -95,6 +108,15 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
         }}
         onSave={handleSaveEvent}
         isSaving={isSaving}
+      />
+      <ConfirmationModal
+        open={showDeleteEventConfirm}
+        title="Eliminar evento"
+        description="¿Eliminar este evento?"
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDeleteEvent}
+        onCancel={cancelDeleteEvent}
       />
 
       {message && (

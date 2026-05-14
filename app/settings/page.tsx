@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navigation from '@components/Navigation';
 import ThemeToggle from '@components/ThemeToggle';
 import ModuleTile from '@components/ModuleTile';
+import InfoModal from '@components/InfoModal';
 import { createBrowserSupabaseClient } from '@lib/supabase-client';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import type { Module } from '@types';
@@ -39,6 +40,9 @@ export default function SettingsPage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [infoModalTitle, setInfoModalTitle] = useState('');
+  const [infoModalDescription, setInfoModalDescription] = useState('');
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
   const [blockedLoading, setBlockedLoading] = useState(false);
   const [blockedMessage, setBlockedMessage] = useState('');
@@ -196,7 +200,9 @@ export default function SettingsPage() {
       console.log('Exportación completada');
     } catch (error) {
       console.error('Export error:', error);
-      alert('Error al exportar datos: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      setInfoModalTitle('Error al exportar datos');
+      setInfoModalDescription(error instanceof Error ? error.message : 'Unknown error');
+      setInfoModalOpen(true);
     } finally {
       setExportLoading(false);
     }
@@ -217,7 +223,9 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error toggling module:', error);
-      alert('Error al cambiar el módulo');
+      setInfoModalTitle('Error al cambiar el módulo');
+      setInfoModalDescription('No se pudo cambiar el estado del módulo. Intenta de nuevo.');
+      setInfoModalOpen(true);
     }
   };
 
@@ -413,6 +421,12 @@ export default function SettingsPage() {
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
       <div className="mx-auto max-w-4xl">
         <Navigation />
+        <InfoModal
+          open={infoModalOpen}
+          title={infoModalTitle}
+          description={infoModalDescription}
+          onClose={() => setInfoModalOpen(false)}
+        />
 
         {message && (
           <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${

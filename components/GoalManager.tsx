@@ -8,6 +8,7 @@ import { ICON_OPTIONS, COLOR_OPTIONS, getGoalIcon, getColorOption } from '@lib/g
 import GoalCreateModal from './GoalCreateModal';
 import NumberInput from '@components/NumberInput';
 import { GoalEditModal } from '@components/GoalEditModal';
+import ConfirmationModal from '@components/ConfirmationModal';
 
 type GoalReorderItemProps = {
   goal: Goal;
@@ -103,6 +104,8 @@ export default function GoalManager() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showRgbPicker, setShowRgbPicker] = useState(false);
   const [rgbColor, setRgbColor] = useState({ r: 255, g: 255, b: 255 });
+  const [showDeleteGoalConfirm, setShowDeleteGoalConfirm] = useState(false);
+  const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
   const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
   const habitGoalsRef = useRef<Goal[]>([]);
   const metricGoalsRef = useRef<Goal[]>([]);
@@ -379,6 +382,24 @@ export default function GoalManager() {
             {statusMessage}
           </div>
         )}
+        <ConfirmationModal
+          open={showDeleteGoalConfirm}
+          title="Eliminar objetivo"
+          description="¿Estás seguro de que quieres eliminar permanentemente este objetivo? Esta acción no se puede deshacer."
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          onConfirm={async () => {
+            if (goalToDelete) {
+              await handleDeleteGoal(goalToDelete);
+            }
+            setShowDeleteGoalConfirm(false);
+            setGoalToDelete(null);
+          }}
+          onCancel={() => {
+            setShowDeleteGoalConfirm(false);
+            setGoalToDelete(null);
+          }}
+        />
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
@@ -457,9 +478,8 @@ export default function GoalManager() {
                         title="Eliminar permanentemente"
                         type="button"
                         onClick={() => {
-                          if (confirm('¿Estás seguro de que quieres eliminar permanentemente este objetivo? Esta acción no se puede deshacer.')) {
-                            handleDeleteGoal(goal.id);
-                          }
+                          setGoalToDelete(goal.id);
+                          setShowDeleteGoalConfirm(true);
                         }}
                         className="rounded-lg border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950 px-3 py-2 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900 transition"
                       >

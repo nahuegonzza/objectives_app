@@ -88,7 +88,9 @@ export default function ModulesSettingsPage() {
       }
     } catch (error) {
       console.error('Error toggling module:', error);
-      alert('Error al cambiar el módulo');
+      setMessage('Error al cambiar el módulo');
+      setMessageType('error');
+      setShowToast(true);
     }
   };
 

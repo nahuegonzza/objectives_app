@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Navigation from '@components/Navigation';
 import FriendProfileModal from '@components/FriendProfileModal';
+import ConfirmationModal from '@components/ConfirmationModal';
 import { useSupabaseSession } from '@hooks/useSupabaseSession';
 import { getLocalDateString } from '@lib/dateHelpers';
 
@@ -427,6 +428,10 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
   const [friends, setFriends] = useState<FriendSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [confirmation, setConfirmation] = useState<{
+    type: 'unfriend' | 'block';
+    friend: FriendSummary;
+  } | null>(null);
 
   const loadFriends = async () => {
     setLoading(true);
@@ -493,6 +498,21 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
     }
   };
 
+  const confirmAction = async () => {
+    if (!confirmation) return;
+    const { type, friend } = confirmation;
+    setConfirmation(null);
+    if (type === 'unfriend') {
+      await unfriendUser(friend.id);
+    } else {
+      await blockUser(friend.id);
+    }
+  };
+
+  const handleRequestAction = (type: 'unfriend' | 'block', friend: FriendSummary) => {
+    setConfirmation({ type, friend });
+  };
+
   useEffect(() => {
     loadFriends();
   }, []);
@@ -504,7 +524,8 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
       {friends.length === 0 && !loading ? (
         <p className="text-slate-600 dark:text-slate-400 text-center py-8">Aún no tienes amigos. ¡Comienza a conectar!</p>
       ) : (
-        <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
+        <>
+          <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
           {friends.map((friend) => (
             <div key={friend.id} className="rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 p-4 border-2 border-emerald-200 dark:border-slate-600 hover:shadow-md transition">
               <div className="flex items-start justify-between gap-4">
@@ -519,7 +540,7 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
                   <button
                     type="button"
                     className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-950 dark:text-white dark:hover:bg-slate-800"
-                    onClick={() => unfriendUser(friend.id)}
+                    onClick={() => handleRequestAction('unfriend', friend)}
                     disabled={loading}
                   >
                     Eliminar
@@ -527,7 +548,7 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
                   <button
                     type="button"
                     className="rounded-lg bg-red-600 hover:bg-red-700 text-white px-3 py-2 text-xs font-semibold transition"
-                    onClick={() => blockUser(friend.id)}
+                    onClick={() => handleRequestAction('block', friend)}
                     disabled={loading}
                   >
                     Bloquear
@@ -537,6 +558,21 @@ function FriendsListPanel({ onOpenProfile }: { onOpenProfile?: (friend: FriendSu
             </div>
           ))}
         </div>
+
+          <ConfirmationModal
+            open={Boolean(confirmation)}
+            title={confirmation?.type === 'block' ? '¿Bloquear a este amigo?' : '¿Eliminar a este amigo?'}
+            description={
+              confirmation?.type === 'block'
+                ? 'Si bloqueas a este amigo, ya no podrán interactuar ni verse en tu lista de amigos.'
+                : '¿Estás seguro de que quieres eliminar a este amigo de tu red? Esta acción se puede revertir solo volviendo a enviarle una solicitud.'
+            }
+            confirmLabel={confirmation?.type === 'block' ? 'Bloquear' : 'Eliminar'}
+            cancelLabel="Cancelar"
+            onCancel={() => setConfirmation(null)}
+            onConfirm={confirmAction}
+          />
+        </>
       )}
     </div>
   );

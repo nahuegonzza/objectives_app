@@ -7,6 +7,7 @@ import { getLocalDateString, parseLocalDate } from '@lib/dateHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
 import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
+import ConfirmationModal from '@components/ConfirmationModal';
 import { useAcademicModule } from './useAcademicModule';
 import { AcademicConfig } from './AcademicConfig';
 import type { ModuleEntry } from '@types';
@@ -227,6 +228,8 @@ export default function AcademicOverview() {
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
+  const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [homeCollapsed, setHomeCollapsed] = useState(false);
   const [filterCollapsed, setFilterCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
@@ -275,13 +278,23 @@ export default function AcademicOverview() {
     setShowEventForm(false);
   };
 
-  const handleDeleteEvent = async (event: AcademicEvent) => {
-    if (!confirm('¿Eliminar este evento?')) {
-      return;
-    }
+  const handleDeleteEvent = (event: AcademicEvent) => {
+    setEventToDelete(event);
+    setShowDeleteEventConfirm(true);
+  };
 
-    await discardEvent(event);
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) return;
+
+    await discardEvent(eventToDelete);
     await loadAcademicEntries();
+    setEventToDelete(null);
+    setShowDeleteEventConfirm(false);
+  };
+
+  const cancelDeleteEvent = () => {
+    setEventToDelete(null);
+    setShowDeleteEventConfirm(false);
   };
 
   const handleToggleReady = async (event: AcademicEvent) => {
@@ -821,6 +834,15 @@ export default function AcademicOverview() {
           setEditingEvent(null);
         }}
         onSave={handleSaveEvent}
+      />
+      <ConfirmationModal
+        open={showDeleteEventConfirm}
+        title="Eliminar evento"
+        description="¿Eliminar este evento?"
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={confirmDeleteEvent}
+        onCancel={cancelDeleteEvent}
       />
 
       {showConfigModal && (
