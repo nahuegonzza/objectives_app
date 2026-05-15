@@ -44,6 +44,17 @@ function calculateAge(birthDate?: string | Date | null) {
   return age;
 }
 
+function formatShortDate(dateLike?: string | Date | null) {
+  if (!dateLike) return '';
+  const date = typeof dateLike === 'string' ? new Date(dateLike) : new Date(dateLike);
+  if (Number.isNaN(date.getTime())) return '';
+  const dd = String(date.getDate()).padStart(2, '0');
+  const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const mon = months[date.getMonth()] + '.';
+  const yyyy = date.getFullYear();
+  return `${dd} ${mon} ${yyyy}`;
+}
+
 export default function ProfilePage() {
   const { session } = useSupabaseSession();
   const [userData, setUserData] = useState<any>(null);
@@ -202,24 +213,25 @@ export default function ProfilePage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700">
-                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wide">Nombre</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">{getDisplayName(userData, loading, session)}</p>
+                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wide text-center">Nombre</p>
+                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center">{getDisplayName(userData, loading, session)}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-800 dark:to-slate-700">
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide">Email</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center break-all">{userData?.email || 'No disponible'}</p>
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide text-center">Email</p>
+                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center break-all">{userData?.email || 'No disponible'}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-slate-800 dark:to-slate-700">
-                  <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide">Nacimiento</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">{userData?.birthDate ? new Date(userData.birthDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No registrada'}</p>
+                  <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide text-center">Nacimiento</p>
+                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center">{userData?.birthDate ? formatShortDate(userData.birthDate) : 'No registrada'}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 dark:from-slate-800 dark:to-slate-700">
-                  <p className="text-xs font-semibold text-orange-600 dark:text-orange-300 uppercase tracking-wide">Miembro desde</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">{userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No disponible'}</p>
+                  <p className="text-xs font-semibold text-orange-600 dark:text-orange-300 uppercase tracking-wide text-center">Miembro desde</p>
+                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center">{userData?.createdAt ? formatShortDate(userData.createdAt) : 'No disponible'}</p>
                 </div>
               </div>
             )}
           </div>
+          <div className="h-12" />
         </div>
       </div>
       {selectedFriend && (
