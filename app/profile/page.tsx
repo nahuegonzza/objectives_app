@@ -48,8 +48,10 @@ function formatShortDate(dateLike?: string | Date | null) {
   if (!dateLike) return '';
   let date: Date;
   if (typeof dateLike === 'string') {
-    // If it's a bare date like YYYY-MM-DD, append midday to avoid timezone shift
-    const safe = dateLike.length === 10 ? `${dateLike}T12:00:00` : dateLike;
+    // If string contains time (ISO), extract only the date part to avoid timezone shifts
+    let dateStr = dateLike;
+    if (dateLike.includes('T')) dateStr = dateLike.slice(0, 10);
+    const safe = dateStr.length === 10 ? `${dateStr}T12:00:00` : dateStr;
     date = new Date(safe);
   } else {
     date = new Date(dateLike);
@@ -135,7 +137,7 @@ export default function ProfilePage() {
   }, [session, streakInfo.today]);
 
   return (
-    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10 pb-24 sm:pb-0">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
       <div className="mx-auto max-w-4xl">
         <Navigation />
 

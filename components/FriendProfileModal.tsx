@@ -51,7 +51,9 @@ function formatShortDate(dateLike?: string | Date | null) {
   if (!dateLike) return '';
   let date: Date;
   if (typeof dateLike === 'string') {
-    const safe = dateLike.length === 10 ? `${dateLike}T12:00:00` : dateLike;
+    let dateStr = dateLike;
+    if (dateLike.includes('T')) dateStr = dateLike.slice(0, 10);
+    const safe = dateStr.length === 10 ? `${dateStr}T12:00:00` : dateStr;
     date = new Date(safe);
   } else {
     date = new Date(dateLike);
