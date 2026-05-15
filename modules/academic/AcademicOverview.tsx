@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocalDateString, parseLocalDate } from '@lib/dateHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
-import { parseAcademicData, AcademicEvent, AcademicSubject } from './academicHelpers';
+import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration, AcademicTaskPriority } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
 import ConfirmationModal from '@components/ConfirmationModal';
 import { useAcademicModule } from './useAcademicModule';
@@ -19,6 +19,10 @@ type SortOption = 'default' | 'dateAsc' | 'dateDesc' | 'subject' | 'priority';
 type StatusFilter = 'all' | 'completed' | 'pending';
 
 type EventTypeFilter = 'all' | 'exam' | 'task';
+
+type PriorityFilter = 'all' | AcademicTaskPriority;
+
+type DurationFilter = 'all' | AcademicTaskDuration;
 
 const formatDateLabel = (dateString: string) => {
   const date = parseLocalDate(dateString);
@@ -145,6 +149,8 @@ function AcademicFilterModal({
   eventTypeFilter,
   statusFilter,
   subjectFilter,
+  priorityFilter,
+  durationFilter,
   dateFrom,
   dateTo,
   subjects,
@@ -159,6 +165,8 @@ function AcademicFilterModal({
   eventTypeFilter: EventTypeFilter;
   statusFilter: StatusFilter;
   subjectFilter: string;
+  priorityFilter: PriorityFilter;
+  durationFilter: DurationFilter;
   dateFrom: string;
   dateTo: string;
   subjects: AcademicSubject[];
@@ -192,7 +200,7 @@ function AcademicFilterModal({
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <label className="space-y-1 min-w-0">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Agrupar</span>
               <select
@@ -229,6 +237,19 @@ function AcademicFilterModal({
                 <option value="all">Todos</option>
                 <option value="exam">Exámenes</option>
                 <option value="task">Tareas</option>
+              </select>
+            </label>
+            <label className="space-y-1 min-w-0">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Prioridad</span>
+              <select
+                value={priorityFilter}
+                onChange={(e) => onChange('priorityFilter', e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="all">Todas</option>
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
               </select>
             </label>
           </div>
@@ -274,6 +295,23 @@ function AcademicFilterModal({
                 {subjects.map((subject) => (
                   <option key={subject.id} value={subject.id}>{subject.name}</option>
                 ))}
+              </select>
+            </label>
+            <label className="space-y-1 min-w-0">
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Duración</span>
+              <select
+                value={durationFilter}
+                onChange={(e) => onChange('durationFilter', e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+              >
+                <option value="all">Todas</option>
+                <option value="corta">Corta</option>
+                <option value="media">Media</option>
+                <option value="extensa">Extensa</option>
+                <option value="lectura">Lectura</option>
+                <option value="escritura">Escritura</option>
+                <option value="codigo">Código</option>
+                <option value="practica">Práctica</option>
               </select>
             </label>
           </div>
@@ -383,6 +421,8 @@ export default function AcademicOverview() {
   const [eventTypeFilter, setEventTypeFilter] = useState<EventTypeFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('all');
+  const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -526,6 +566,8 @@ export default function AcademicOverview() {
         if (statusFilter === 'completed' && !event.completed) return false;
         if (statusFilter === 'pending' && event.completed) return false;
         if (subjectFilter !== 'all' && event.subjectId !== subjectFilter) return false;
+        if (priorityFilter !== 'all' && event.priority !== priorityFilter) return false;
+        if (durationFilter !== 'all' && event.estimatedDuration !== durationFilter) return false;
         if (dateFrom && event.sourceDate < dateFrom) return false;
         if (dateTo && event.sourceDate > dateTo) return false;
         if (search.trim()) {
@@ -551,7 +593,7 @@ export default function AcademicOverview() {
         }
         return 0;
       });
-  }, [allEvents, eventTypeFilter, statusFilter, subjectFilter, dateFrom, dateTo, search, sortBy]);
+  }, [allEvents, eventTypeFilter, statusFilter, subjectFilter, priorityFilter, durationFilter, dateFrom, dateTo, search, sortBy]);
 
   const groupedEvents = useMemo(() => {
     if (groupBy === 'date') {
@@ -662,6 +704,8 @@ export default function AcademicOverview() {
           eventTypeFilter={eventTypeFilter}
           statusFilter={statusFilter}
           subjectFilter={subjectFilter}
+          priorityFilter={priorityFilter}
+          durationFilter={durationFilter}
           dateFrom={dateFrom}
           dateTo={dateTo}
           subjects={subjects}
@@ -673,6 +717,8 @@ export default function AcademicOverview() {
             setEventTypeFilter('all');
             setStatusFilter('all');
             setSubjectFilter('all');
+            setPriorityFilter('all');
+            setDurationFilter('all');
             setDateFrom('');
             setDateTo('');
           }}
@@ -695,6 +741,12 @@ export default function AcademicOverview() {
                 break;
               case 'subjectFilter':
                 setSubjectFilter(value);
+                break;
+              case 'priorityFilter':
+                setPriorityFilter(value as PriorityFilter);
+                break;
+              case 'durationFilter':
+                setDurationFilter(value as DurationFilter);
                 break;
               case 'dateFrom':
                 setDateFrom(value);
