@@ -77,6 +77,12 @@ function fitTextToWidth(el?: HTMLElement | null, initial = 14, min = 10) {
 
 export default function ProfilePage() {
   const { session } = useSupabaseSession();
+  const userId = session?.user?.id;
+  const sessionEmail = session?.user?.email;
+  const sessionCreatedAt = session?.user?.created_at;
+  const sessionFullName = session?.user?.user_metadata?.full_name ?? null;
+  const sessionFirstName = session?.user?.user_metadata?.first_name ?? session?.user?.user_metadata?.firstName ?? null;
+  const sessionLastName = session?.user?.user_metadata?.last_name ?? session?.user?.user_metadata?.lastName ?? null;
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ goalsCompleted: 0, totalScore: 0 });
@@ -88,7 +94,7 @@ export default function ProfilePage() {
   const closeFriendProfile = () => setSelectedFriend(null);
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (!userId) return;
     async function loadUser() {
       setLoading(true);
       try {
@@ -97,15 +103,15 @@ export default function ProfilePage() {
         const data = await res.json();
         setUserData(data);
       } catch (error) {
-        if (session?.user) {
+        if (userId) {
           setUserData({
-            id: session.user.id,
-            email: session.user.email,
-            name: session.user.user_metadata?.full_name || null,
-            firstName: session.user.user_metadata?.first_name || session.user.user_metadata?.firstName || null,
-            lastName: session.user.user_metadata?.last_name || session.user.user_metadata?.lastName || null,
+            id: userId,
+            email: sessionEmail,
+            name: sessionFullName,
+            firstName: sessionFirstName,
+            lastName: sessionLastName,
             birthDate: null,
-            createdAt: session.user.created_at,
+            createdAt: sessionCreatedAt,
           });
         }
       } finally {
@@ -113,10 +119,10 @@ export default function ProfilePage() {
       }
     }
     loadUser();
-  }, [session]);
+  }, [userId, sessionEmail, sessionCreatedAt, sessionFullName, sessionFirstName, sessionLastName]);
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (!userId) return;
     async function loadStats() {
       try {
         const res = await fetch('/api/user/stats', { credentials: 'include' });
@@ -127,7 +133,7 @@ export default function ProfilePage() {
       }
     }
     loadStats();
-  }, [session]);
+  }, [userId]);
 
   useEffect(() => {
     const handle = () => fitTextToWidth(profileEmailRef.current, 14, 10);
@@ -137,7 +143,7 @@ export default function ProfilePage() {
   }, [userData?.email]);
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (!userId) return;
     async function loadStreakInfo() {
       try {
         const res = await fetch(`/api/streaks?date=${streakInfo.today}`, { credentials: 'include' });
@@ -153,7 +159,7 @@ export default function ProfilePage() {
       }
     }
     loadStreakInfo();
-  }, [session, streakInfo.today]);
+  }, [userId, streakInfo.today]);
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10">
@@ -171,12 +177,12 @@ export default function ProfilePage() {
             <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-100 dark:border-slate-800 p-8 shadow-sm">
               <div className="text-center">
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                  <span className="text-4xl">??</span>
+                  <span className="text-4xl">👤</span>
                 </div>
                 <h2 className="text-3xl font-bold mb-1">{loading ? 'Cargando...' : getDisplayName(userData, loading, session)}</h2>
                 <p className="text-blue-100 text-sm">@{userData?.username || 'sin_usuario'}</p>
                 {calculateAge(userData?.birthDate) !== null && (
-                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} a�os</p>
+                  <p className="text-blue-100 text-xs mt-1">{calculateAge(userData?.birthDate)} años</p>
                 )}
               </div>
             </div>
