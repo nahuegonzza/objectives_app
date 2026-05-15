@@ -157,6 +157,7 @@ function AcademicFilterModal({
   onClose,
   onClear,
   onChange,
+  availableTaskTypes,
 }: {
   open: boolean;
   search: string;
@@ -173,6 +174,7 @@ function AcademicFilterModal({
   onClose: () => void;
   onClear: () => void;
   onChange: (field: string, value: string) => void;
+  availableTaskTypes: AcademicTypeConfig[];
 }) {
   if (!open) return null;
 
@@ -305,7 +307,7 @@ function AcademicFilterModal({
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
               >
                 <option value="all">Todas</option>
-                {availableTaskTypes.length > 0 ? availableTaskTypes.map((t) => (
+                {availableTaskTypes && availableTaskTypes.length > 0 ? availableTaskTypes.map((t) => (
                   <option key={t.key} value={t.key}>{t.label}</option>
                 )) : (
                   <>
@@ -787,6 +789,7 @@ export default function AcademicOverview() {
                 break;
             }
           }}
+          availableTaskTypes={availableTaskTypes}
         />
 
         <section className="mt-6 rounded-3xl bg-slate-50 p-4 dark:bg-slate-950">
