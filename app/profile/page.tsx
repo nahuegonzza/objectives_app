@@ -240,7 +240,7 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
-          <div className="h-12" />
+          {/* no extra spacer here; page bottom controlled by layout */}
         </div>
       </div>
       {selectedFriend && (
