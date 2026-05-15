@@ -66,8 +66,20 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
 
   const incrementHour = () => updateTime((hours + 1) % 24, minutes);
   const decrementHour = () => updateTime((hours - 1 + 24) % 24, minutes);
-  const incrementMinute = () => updateTime(hours, (minutes + 15) % 60);
-  const decrementMinute = () => updateTime(hours, (minutes - 15 + 60) % 60);
+  
+  const incrementMinute = () => {
+    const validMinutes = [0, 15, 30, 45];
+    const currentIndex = validMinutes.indexOf(minutes);
+    const nextIndex = (currentIndex + 1) % validMinutes.length;
+    updateTime(hours, validMinutes[nextIndex]);
+  };
+  
+  const decrementMinute = () => {
+    const validMinutes = [0, 15, 30, 45];
+    const currentIndex = validMinutes.indexOf(minutes);
+    const prevIndex = (currentIndex - 1 + validMinutes.length) % validMinutes.length;
+    updateTime(hours, validMinutes[prevIndex]);
+  };
 
   const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value === '' ? 0 : Math.min(23, Math.max(0, Number(e.target.value)));
@@ -104,7 +116,9 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
           onChange={handleHoursChange}
           onWheel={(event) => {
             event.preventDefault();
-            if (event.deltaY < 0) incrementHour(); else decrementHour();
+            if (!disabled) {
+              if (event.deltaY < 0) incrementHour(); else decrementHour();
+            }
           }}
           disabled={disabled}
           onFocus={() => setEditingHours(true)}
@@ -154,7 +168,9 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
           max={59}
           value={String(minutes).padStart(2, '0')}
           onChange={handleMinutesChange}
-          onWheel={(event) => {
+          onWhee!disabled) {
+              if (event.deltaY < 0) incrementMinute(); else decrementMinute();
+            }
             event.preventDefault();
             if (event.deltaY < 0) incrementMinute(); else decrementMinute();
           }}
