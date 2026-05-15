@@ -393,9 +393,7 @@ export default function AcademicOverview() {
   const [editingEvent, setEditingEvent] = useState<AcademicEvent | null>(null);
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
-  const [homeCollapsed, setHomeCollapsed] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [eventsCollapsed, setEventsCollapsed] = useState(false);
 
   const todayString = getLocalDateString();
   const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule(academicModuleId, 'academic', todayString, {});
@@ -616,21 +614,13 @@ export default function AcademicOverview() {
           </div>
         </div>
 
-        <section className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+        <section className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-950">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Inicio</p>
               <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">Resumen</h2>
             </div>
-            <button
-              type="button"
-              onClick={() => setHomeCollapsed((prev) => !prev)}
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
-            >
-              {homeCollapsed ? 'Mostrar' : 'Ocultar'}
-            </button>
           </div>
-          {!homeCollapsed && (
             <div className="mt-6 space-y-4">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 p-5 dark:from-emerald-950/50 dark:to-emerald-900/50 dark:border-emerald-700">
@@ -662,30 +652,7 @@ export default function AcademicOverview() {
                   <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Materias únicas</p>
                 </div>
               </div>
-
-              <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950">
-                <h2 className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista rápida</h2>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-emerald-50 p-4 text-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-200">
-                    <span className="text-sm text-emerald-700 dark:text-emerald-300">Eventos totales</span>
-                    <span className="font-semibold">{summary.total}</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-sky-50 p-4 text-sky-900 dark:bg-sky-950/20 dark:text-sky-200">
-                    <span className="text-sm text-sky-700 dark:text-sky-300">Exámenes</span>
-                    <span className="font-semibold">{summary.exams}</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 p-4 text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
-                    <span className="text-sm text-amber-700 dark:text-amber-300">Tareas</span>
-                    <span className="font-semibold">{summary.tasks}</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 rounded-2xl bg-violet-50 p-4 text-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
-                    <span className="text-sm text-violet-700 dark:text-violet-300">Completados</span>
-                    <span className="font-semibold">{summary.completed}</span>
-                  </div>
-                </div>
-              </section>
-            </div>
-          )}
+          </div>
         </section>
 
         <AcademicFilterModal
@@ -742,21 +709,13 @@ export default function AcademicOverview() {
           }}
         />
 
-        <section className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+        <section className="mt-6 rounded-3xl bg-slate-50 p-4 dark:bg-slate-950">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Eventos</p>
               <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">{filteredEvents.length} resultados</h2>
             </div>
-            <button
-              type="button"
-              onClick={() => setEventsCollapsed((prev) => !prev)}
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
-            >
-              {eventsCollapsed ? 'Mostrar' : 'Ocultar'}
-            </button>
           </div>
-          {!eventsCollapsed && (
             <div className="mt-6">
               {loading ? (
                 <div className="space-y-3">
@@ -930,7 +889,6 @@ export default function AcademicOverview() {
                 </div>
               )}
             </div>
-          )}
         </section>
       </div>
 
