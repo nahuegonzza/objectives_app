@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Navigation from '@components/Navigation';
 import FriendProfileModal from '@components/FriendProfileModal';
 import ConfirmationModal from '@components/ConfirmationModal';
@@ -64,6 +64,17 @@ function formatShortDate(dateLike?: string | Date | null) {
   return `${dd} ${mon} ${yyyy}`;
 }
 
+function fitTextToWidth(el?: HTMLElement | null, initial = 14, min = 10) {
+  if (!el) return;
+  el.style.whiteSpace = 'nowrap';
+  let size = initial;
+  el.style.fontSize = `${size}px`;
+  while (el.scrollWidth > el.clientWidth && size > min) {
+    size -= 1;
+    el.style.fontSize = `${size}px`;
+  }
+}
+
 export default function ProfilePage() {
   const { session } = useSupabaseSession();
   const [userData, setUserData] = useState<any>(null);
@@ -71,6 +82,7 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({ goalsCompleted: 0, totalScore: 0 });
   const [streakInfo, setStreakInfo] = useState({ currentStreak: 0, longestStreak: 0, todayFulfilled: false, today: getLocalDateString() });
   const [selectedFriend, setSelectedFriend] = useState<FriendSummary | null>(null);
+  const profileEmailRef = useRef<HTMLParagraphElement | null>(null);
 
   const openFriendProfile = (friend: FriendSummary) => setSelectedFriend(friend);
   const closeFriendProfile = () => setSelectedFriend(null);
@@ -116,6 +128,13 @@ export default function ProfilePage() {
     }
     loadStats();
   }, [session]);
+
+  useEffect(() => {
+    const handle = () => fitTextToWidth(profileEmailRef.current, 14, 10);
+    handle();
+    window.addEventListener('resize', handle);
+    return () => window.removeEventListener('resize', handle);
+  }, [userData?.email]);
 
   useEffect(() => {
     if (!session?.user) return;
@@ -226,7 +245,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide text-center">Email</p>
-                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center break-all">{userData?.email || 'No disponible'}</p>
+                  <p ref={profileEmailRef} title={userData?.email || ''} className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center inline-block max-w-full whitespace-nowrap">{userData?.email || 'No disponible'}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide text-center">Nacimiento</p>

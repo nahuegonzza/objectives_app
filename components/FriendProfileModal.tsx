@@ -177,8 +177,8 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
                 <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
                   <span className="text-4xl">👤</span>
                 </div>
-                <h3 className="text-3xl font-bold mb-1 text-slate-900 dark:text-white">{displayName}</h3>
-                <p ref={headerEmailRef} title={friendData?.email || friendData?.username} className="text-blue-100 text-sm inline-block max-w-full">{friendData?.email || `@${friendData?.username}`}</p>
+                <h3 className="text-3xl font-bold mb-1 text-slate-900 dark:text-white">@{friendData.username}</h3>
+                <p ref={headerEmailRef} title={friendData?.email || ''} className="text-blue-100 text-sm inline-block max-w-full text-center whitespace-nowrap">{friendData?.email || 'No disponible'}</p>
                 {age !== null && <p className="text-blue-100 text-xs mt-1">{age} años</p>}
               </div>
             </div>
