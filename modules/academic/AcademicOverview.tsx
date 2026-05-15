@@ -149,6 +149,7 @@ function AcademicFilterModal({
   dateTo,
   subjects,
   onClose,
+  onClear,
   onChange,
 }: {
   open: boolean;
@@ -162,6 +163,7 @@ function AcademicFilterModal({
   dateTo: string;
   subjects: AcademicSubject[];
   onClose: () => void;
+  onClear: () => void;
   onChange: (field: string, value: string) => void;
 }) {
   if (!open) return null;
@@ -232,20 +234,20 @@ function AcademicFilterModal({
           </div>
 
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <label className="space-y-1 min-w-0">
+            <label className="space-y-1 min-w-0 lg:col-span-2">
               <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Entre fechas</span>
               <div className="grid gap-2 sm:grid-cols-2">
                 <input
                   type="date"
                   value={dateFrom}
                   onChange={(e) => onChange('dateFrom', e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  className="w-full min-w-[14rem] rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
                 />
                 <input
                   type="date"
                   value={dateTo}
                   onChange={(e) => onChange('dateTo', e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  className="w-full min-w-[14rem] rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
                 />
               </div>
             </label>
@@ -276,13 +278,20 @@ function AcademicFilterModal({
             </label>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClear}
+              className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              Limpiar filtros
+            </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
+              className="rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
             >
-              Cerrar
+              Buscar
             </button>
           </div>
         </div>
@@ -691,6 +700,16 @@ export default function AcademicOverview() {
           dateTo={dateTo}
           subjects={subjects}
           onClose={() => setShowFilterModal(false)}
+          onClear={() => {
+            setSearch('');
+            setGroupBy('none');
+            setSortBy('priority');
+            setEventTypeFilter('all');
+            setStatusFilter('all');
+            setSubjectFilter('all');
+            setDateFrom('');
+            setDateTo('');
+          }}
           onChange={(field, value) => {
             switch (field) {
               case 'search':
