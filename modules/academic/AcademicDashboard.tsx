@@ -161,10 +161,10 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
             <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{upcomingEvents.length}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400">Eventos programados</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Materias</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">{subjects.length}</p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Materias configuradas</p>
+          <div className="rounded-2xl border border-red-300 bg-red-50 p-4 dark:border-red-700 dark:bg-red-950">
+            <p className="text-xs uppercase tracking-[0.2em] text-red-600 dark:text-red-400">Pendientes</p>
+            <p className="mt-2 text-3xl font-semibold text-red-700 dark:text-red-300">{upcomingEvents.filter((e) => !e.completed).length}</p>
+            <p className="text-sm text-red-600 dark:text-red-400">Eventos sin completar</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Puntos</p>
