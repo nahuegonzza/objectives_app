@@ -22,6 +22,88 @@ const TrashIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
 );
 
+// Top-level item component mirroring MoodStateReorderItem (no emoji)
+function AcademicTypeReorderItemTop({
+  type,
+  isDragging,
+  onDragStart,
+  onDragEnd,
+  onUpdate,
+  onDelete,
+}: {
+  type: AcademicTypeConfig;
+  isDragging: boolean;
+  onDragStart: (id: string) => void;
+  onDragEnd: () => void;
+  onUpdate: (id: string, field: keyof AcademicTypeConfig, value: string | number) => void;
+  onDelete: (id: string) => void;
+}) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      key={type.id}
+      value={type.id}
+      layout={isDragging ? undefined : true}
+      dragListener={false}
+      dragControls={dragControls}
+      dragMomentum={false}
+      dragTransition={{ bounceStiffness: 180, bounceDamping: 25, timeConstant: 20 }}
+      whileDrag={{ scale: 1.02, boxShadow: '0 18px 40px rgba(5, 150, 105, 0.18)' }}
+      onDragEnd={onDragEnd}
+      className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 p-2 pr-3 dark:border-slate-700/50 dark:bg-slate-800/50"
+    >
+      <div className="flex-1 min-w-0">
+        <input
+          type="text"
+          value={type.label}
+          onChange={(e) => onUpdate(type.id, 'label', e.target.value)}
+          className="flex-1 min-w-0 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200"
+          placeholder="Nombre del tipo..."
+        />
+      </div>
+
+      <input
+        type="number"
+        value={type.points}
+        onChange={(e) => onUpdate(type.id, 'points', Number(e.target.value))}
+        className="w-16 bg-transparent py-2 text-base font-medium text-slate-700 outline-none dark:text-slate-200 border border-slate-300 rounded px-2"
+        placeholder="1"
+        min="0"
+        step="0.5"
+      />
+
+      <div className="flex items-center gap-2">
+        <div className="min-w-[3rem]">
+          <UnifiedColorPicker value={type.color} onChange={(color) => onUpdate(type.id, 'color', color)} />
+        </div>
+        <button
+          type="button"
+          onClick={() => onDelete(type.id)}
+          className="rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+        >
+          <TrashIcon />
+        </button>
+      </div>
+
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            onDragStart(type.id);
+            dragControls.start(event, { snapToCursor: true });
+          }}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900 touch-none"
+          aria-label="Arrastrar"
+        >
+          <span className="text-lg">≡</span>
+        </button>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export function AcademicConfig({
   config,
   moduleId,
@@ -505,7 +587,7 @@ export function AcademicConfig({
                 <div className="space-y-3 mt-3">
                   <Reorder.Group axis="y" values={examTypes.map((t) => t.id)} onReorder={handleExamTypesReorder} className="space-y-3">
                     {examTypes.map((type) => (
-                      <AcademicTypeReorderItem
+                      <AcademicTypeReorderItemTop
                         key={type.id}
                         type={type}
                         isDragging={draggingExamId === type.id}
@@ -555,7 +637,7 @@ export function AcademicConfig({
                 <div className="space-y-3 mt-3">
                   <Reorder.Group axis="y" values={taskTypes.map((t) => t.id)} onReorder={handleTaskTypesReorder} className="space-y-3">
                     {taskTypes.map((type) => (
-                      <AcademicTypeReorderItem
+                      <AcademicTypeReorderItemTop
                         key={type.id}
                         type={type}
                         isDragging={draggingTaskId === type.id}
