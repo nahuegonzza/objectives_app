@@ -70,14 +70,37 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
   const incrementMinute = () => {
     const validMinutes = [0, 15, 30, 45];
     const currentIndex = validMinutes.indexOf(minutes);
-    const nextIndex = (currentIndex + 1) % validMinutes.length;
+    let nextIndex;
+    
+    if (currentIndex === -1) {
+      // Si no está en los valores válidos, busca el siguiente
+      nextIndex = validMinutes.findIndex(m => m > minutes);
+      if (nextIndex === -1) nextIndex = 0; // Si no hay siguiente, vuelve a 0
+    } else {
+      nextIndex = (currentIndex + 1) % validMinutes.length;
+    }
+    
     updateTime(hours, validMinutes[nextIndex]);
   };
   
   const decrementMinute = () => {
     const validMinutes = [0, 15, 30, 45];
     const currentIndex = validMinutes.indexOf(minutes);
-    const prevIndex = (currentIndex - 1 + validMinutes.length) % validMinutes.length;
+    let prevIndex;
+    
+    if (currentIndex === -1) {
+      // Si no está en los valores válidos, busca el anterior
+      prevIndex = validMinutes.length - 1;
+      for (let i = validMinutes.length - 1; i >= 0; i--) {
+        if (validMinutes[i] < minutes) {
+          prevIndex = i;
+          break;
+        }
+      }
+    } else {
+      prevIndex = (currentIndex - 1 + validMinutes.length) % validMinutes.length;
+    }
+    
     updateTime(hours, validMinutes[prevIndex]);
   };
 
