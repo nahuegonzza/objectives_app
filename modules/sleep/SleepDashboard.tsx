@@ -168,11 +168,11 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, disabled = fal
           max={59}
           value={String(minutes).padStart(2, '0')}
           onChange={handleMinutesChange}
-          onWhee!disabled) {
+          onWheel={(event) => {
+            event.preventDefault();
+            if (!disabled) {
               if (event.deltaY < 0) incrementMinute(); else decrementMinute();
             }
-            event.preventDefault();
-            if (event.deltaY < 0) incrementMinute(); else decrementMinute();
           }}
           disabled={disabled}
           onFocus={() => setEditingMinutes(true)}
