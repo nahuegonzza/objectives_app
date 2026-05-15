@@ -341,6 +341,11 @@ export function AcademicConfig({
   const canAddTaskType = !hasEmptyTaskType;
 
   const handleSave = async () => {
+    if (hasEmptyExamType || hasEmptyTaskType) {
+      setError('No se puede guardar mientras exista un tipo sin nombre.');
+      return;
+    }
+
     setSaving(true);
     try {
       const { examPoints, taskPoints, ...legacyConfig } = config || {};
@@ -684,8 +689,8 @@ export function AcademicConfig({
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+            disabled={saving || hasEmptyExamType || hasEmptyTaskType}
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? "Guardando..." : "Guardar"}
           </button>
