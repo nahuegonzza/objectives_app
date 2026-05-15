@@ -17,6 +17,7 @@ type ScoreHistory = {
 };
 
 const WEEKDAY_LABELS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+const MONTH_LABELS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const MODE_LABELS = {
   weekly: 'Semanal',
   monthly: 'Mensual',
@@ -47,6 +48,30 @@ function formatMonthLabel(date: Date) {
   return date.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
 }
 
+function formatWeekLabel(start: Date) {
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const formatDay = (date: Date) => date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+  return `${formatDay(start)} – ${formatDay(end)}`;
+}
+
+function getYearList(scoresByDay: Map<string, { points: number; entries: GoalEntryWithGoal[]; events: Event[] }>, currentYear: number) {
+  const years = new Set<number>();
+  years.add(currentYear);
+  years.add(new Date().getFullYear());
+  scoresByDay.forEach((_, key) => {
+    const year = parseLocalDate(key).getFullYear();
+    years.add(year);
+  });
+
+  const minYear = Math.min(...Array.from(years));
+  const maxYear = Math.max(...Array.from(years));
+  for (let y = minYear; y <= maxYear; y += 1) {
+    years.add(y);
+  }
+
+  return Array.from(years).sort((a, b) => a - b);
+}
 
 export default function CalendarExplorer() {
   const today = getLocalDateString();
@@ -398,11 +423,57 @@ export default function CalendarExplorer() {
     setViewDate(next);
   };
 
+  const yearOptions = useMemo(() => getYearList(scoresByDay, viewDate.getFullYear()), [scoresByDay, viewDate]);
+
+  const weekOptions = useMemo(() => {
+    const year = viewDate.getFullYear();
+    const endOfYear = new Date(year, 11, 31);
+    const firstWeekStart = getWeekStart(new Date(year, 0, 1));
+    const weeks: Array<{ value: string; label: string }> = [];
+    let current = new Date(firstWeekStart);
+
+    while (current <= endOfYear) {
+      weeks.push({ value: formatLocalDate(current), label: formatWeekLabel(current) });
+      current = new Date(current);
+      current.setDate(current.getDate() + 7);
+    }
+
+    return weeks;
+  }, [viewDate]);
+
   const displayLabel = mode === 'monthly' ? formatMonthLabel(viewDate) : mode === 'annual' ? viewDate.getFullYear().toString() : selectedDate.split('-').reverse().join('/');
+
+  const handleSelectYear = (year: number) => {
+    const next = new Date(viewDate);
+    next.setFullYear(year);
+    setViewDate(next);
+    if (mode === 'annual') {
+      setSelectedDate(formatLocalDate(new Date(year, 0, 1)));
+    } else if (mode === 'monthly') {
+      setSelectedDate(formatLocalDate(new Date(year, viewDate.getMonth(), 1)));
+    } else {
+      const currentWeek = getWeekStart(parseLocalDate(selectedDate));
+      if (currentWeek.getFullYear() !== year) {
+        setSelectedDate(formatLocalDate(getWeekStart(new Date(year, 0, 1))));
+      }
+    }
+  };
+
+  const handleSelectMonth = (month: number) => {
+    const next = new Date(viewDate.getFullYear(), month, 1);
+    setViewDate(next);
+    setSelectedDate(formatLocalDate(next));
+  };
+
+  const handleSelectWeek = (weekStart: string) => {
+    const next = parseLocalDate(weekStart);
+    setViewDate(next);
+    setSelectedDate(weekStart);
+  };
 
   return (
     <div className="space-y-6 transition-all duration-200">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Calendario</p>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Visión temporal</h2>
@@ -430,9 +501,85 @@ export default function CalendarExplorer() {
       ) : (
         <div className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-2">
             <div className="text-sm text-slate-500 dark:text-slate-400">
-              {mode === 'annual' ? 'Resumen de año' : `${MODE_LABELS[mode]} · ${displayLabel}`}
+              {mode === 'annual' ? `Año ${displayLabel}` : `${MODE_LABELS[mode]} · ${displayLabel}`}
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {mode === 'annual' && (
+                <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                  Año:
+                  <select
+                    value={viewDate.getFullYear()}
+                    onChange={(event) => handleSelectYear(Number(event.target.value))}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    {yearOptions.map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {mode === 'monthly' && (
+                <>
+                  <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    Mes:
+                    <select
+                      value={viewDate.getMonth()}
+                      onChange={(event) => handleSelectMonth(Number(event.target.value))}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    >
+                      {MONTH_LABELS.map((label, index) => (
+                        <option key={label} value={index}>{label}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    Año:
+                    <select
+                      value={viewDate.getFullYear()}
+                      onChange={(event) => handleSelectYear(Number(event.target.value))}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    >
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+
+              {mode === 'weekly' && (
+                <>
+                  <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    Semana:
+                    <select
+                      value={formatLocalDate(getWeekStart(parseLocalDate(selectedDate)))}
+                      onChange={(event) => handleSelectWeek(event.target.value)}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    >
+                      {weekOptions.map((week) => (
+                        <option key={week.value} value={week.value}>{week.label}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    Año:
+                    <select
+                      value={viewDate.getFullYear()}
+                      onChange={(event) => handleSelectYear(Number(event.target.value))}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    >
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+            </div>
+          </div>
             <div className="flex items-center gap-1">
               <button
                 type="button"
