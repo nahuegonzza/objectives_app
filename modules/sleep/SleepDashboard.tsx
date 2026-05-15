@@ -375,6 +375,7 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
   }, [bedtime, waketime, naps, module.id, onUpdate, selectedDate, saving]);
 
   const hours = calculateHours();
+  const canAddNap = isEditing && (naps.length === 0 || (naps[naps.length - 1].start && naps[naps.length - 1].end));
 
   useEffect(() => {
     if (loading || !isEditing || !dirty) return;
@@ -440,8 +441,8 @@ export const SleepDashboard: React.FC<SleepDashboardProps> = ({ config, module, 
                   setNaps((prev) => [...prev, { id: `nap-${Date.now()}`, start: '', end: '' }]);
                 }
               }}
-              disabled={!isEditing || (naps.length > 0 && !(naps[naps.length - 1].start && naps[naps.length - 1].end))}
-              className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-700"
+              disabled={!canAddNap}
+              className={`inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition ${canAddNap ? 'bg-emerald-600 shadow-emerald-500/20 hover:bg-emerald-700' : 'bg-slate-400 cursor-not-allowed opacity-70'}`}
             >
               Agregar Siesta
             </button>

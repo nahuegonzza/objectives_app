@@ -208,20 +208,22 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
       </div>
 
       {/* Footer: Acciones de edición */}
-      {isEditing && (onEdit || onDelete) && (
+      {(onEdit || onDelete) && (
         <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-900">
           {onEdit && (
             <button
-              onClick={() => onEdit(event)}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900"
+              onClick={() => { if (isEditing) onEdit(event); }}
+              disabled={!isEditing}
+              className={`rounded-xl px-4 py-2 text-xs font-bold transition ${isEditing ? 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900' : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500'}`}
             >
               Editar
             </button>
           )}
           {onDelete && (
             <button
-              onClick={() => onDelete(event)}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-rose-500 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30"
+              onClick={() => { if (isEditing) onDelete(event); }}
+              disabled={!isEditing}
+              className={`rounded-xl px-4 py-2 text-xs font-bold transition ${isEditing ? 'text-rose-500 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30' : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500'}`}
             >
               Eliminar
             </button>

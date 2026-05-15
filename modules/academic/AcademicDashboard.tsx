@@ -42,6 +42,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [dailyScore, setDailyScore] = useState(0);
+  const sectionDisabled = !isEditing;
 
   useEffect(() => {
     if (moduleEntries.length > 0 && academicModule.calculateScore) {
@@ -258,8 +259,9 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                           </div>
                           {event.type === 'task' && (
                             <button
-                              onClick={() => toggleEventCompleted(event)}
-                              className="ml-3 rounded-lg bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
+                              onClick={() => { if (!sectionDisabled) toggleEventCompleted(event); }}
+                              disabled={sectionDisabled}
+                              className={`ml-3 rounded-lg px-2 py-1 text-xs font-medium transition ${sectionDisabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'}`}
                             >
                               ✓
                             </button>
@@ -290,15 +292,17 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                           <div className="ml-3 flex gap-2">
                             {event.type === 'task' && (
                               <button
-                                onClick={() => toggleEventCompleted(event)}
-                                className="rounded-lg bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
+                                onClick={() => { if (!sectionDisabled) toggleEventCompleted(event); }}
+                                disabled={sectionDisabled}
+                                className={`rounded-lg px-2 py-1 text-xs font-medium transition ${sectionDisabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'}`}
                               >
                                 ✓
                               </button>
                             )}
                             <button
-                              onClick={() => discardEvent(event)}
-                              className="rounded-lg bg-red-100 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
+                              onClick={() => { if (!sectionDisabled) discardEvent(event); }}
+                              disabled={sectionDisabled}
+                              className={`rounded-lg px-2 py-1 text-xs font-medium transition ${sectionDisabled ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'}`}
                             >
                               X
                             </button>
