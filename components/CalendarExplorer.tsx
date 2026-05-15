@@ -491,7 +491,7 @@ export default function CalendarExplorer() {
                         type="button"
                         onClick={() => item.key && setSelectedDate(item.key)}
                         disabled={!item.key}
-                        className={`rounded-2xl p-3 min-h-[72px] transition ${item.key ? getStatusClass(points) : 'bg-transparent pointer-events-none'} ${isSelected ? 'ring-2 ring-emerald-500 dark:ring-emerald-400' : 'hover:shadow-lg'}`}
+                        className={`rounded-2xl p-3 min-h-[72px] transition ${item.key ? getStatusClass(points) : 'bg-transparent pointer-events-none'} ${isSelected ? 'ring-2 ring-slate-900 dark:ring-slate-200' : 'hover:shadow-lg'}`}
                       >
                         <span className="block text-base font-semibold text-slate-900 dark:text-white">{item.label}</span>
                         <span className="block text-xs text-slate-600 dark:text-slate-300">{item.key ? points.toFixed(1) : ''}</span>
@@ -518,7 +518,7 @@ export default function CalendarExplorer() {
                           type="button"
                           onClick={() => item.key && setSelectedDate(item.key)}
                           disabled={!item.key}
-                          className={`rounded-2xl p-3 min-h-[80px] transition ${item.key ? getStatusClass(points) : 'bg-transparent pointer-events-none'} ${isSelected ? 'ring-2 ring-emerald-500 dark:ring-emerald-400' : 'hover:shadow-lg'}`}
+                          className={`rounded-2xl p-3 min-h-[80px] transition ${item.key ? getStatusClass(points) : 'bg-transparent pointer-events-none'} ${isSelected ? 'ring-2 ring-slate-900 dark:ring-slate-200' : 'hover:shadow-lg'}`}
                         >
                           <span className="block text-sm font-semibold text-slate-900 dark:text-white">{item.label}</span>
                           <span className="block text-xs text-slate-600 dark:text-slate-300 mt-1">{item.key ? points.toFixed(1) : ''}</span>
