@@ -214,9 +214,9 @@ export function AcademicConfig({
       {
         id: crypto.randomUUID(),
         key: `examen_${Date.now()}`,
-        label: 'Nuevo tipo',
+        label: '',
         points: 2,
-        color: '#0ea5e9',
+        color: '#ffffff',
       },
     ]);
   };
@@ -227,9 +227,9 @@ export function AcademicConfig({
       {
         id: crypto.randomUUID(),
         key: `tarea_${Date.now()}`,
-        label: 'Nuevo tipo',
+        label: '',
         points: 1,
-        color: '#0ea5e9',
+        color: '#ffffff',
       },
     ]);
   };
