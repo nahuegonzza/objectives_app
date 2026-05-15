@@ -758,7 +758,7 @@ export default function AcademicOverview() {
                               </span>
                             </div>
                             <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
+                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
                           </div>
                           <div className="flex flex-col gap-3 sm:items-end">
                             <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">
@@ -840,7 +840,7 @@ export default function AcademicOverview() {
                                       </span>
                                     </div>
                                     <h2 className="mt-4 text-xl font-semibold leading-snug text-slate-900 dark:text-white max-w-full truncate whitespace-nowrap overflow-hidden">{formatEventTitle(event.title)}</h2>
-                                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-words">{event.description || 'Sin descripción'}</p>
+                                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
                                   </div>
                                   <div className="flex flex-col gap-3 sm:items-end">
                                     <span style={subjectBadgeStyles} className="rounded-full px-3 py-1 text-sm font-semibold max-w-[11rem] truncate whitespace-nowrap overflow-hidden block">

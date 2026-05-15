@@ -117,7 +117,7 @@ export default function ProfilePage() {
   }, [session, streakInfo.today]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 text-slate-900 dark:text-white px-4 py-6 md:px-10 pb-24 sm:pb-0">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-6 md:px-10 pb-24 sm:pb-0">
       <div className="mx-auto max-w-4xl">
         <Navigation />
 
