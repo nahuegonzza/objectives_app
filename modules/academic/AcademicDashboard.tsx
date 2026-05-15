@@ -254,7 +254,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                               {event.type === 'exam' ? 'Examen' : 'Tarea'} • {subject?.name ?? 'Materia'}
                             </p>
                             <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{event.date}</p>
-                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{event.description || 'Sin descripción'}</p>
+                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
                           </div>
                           {event.type === 'task' && (
                             <button
@@ -285,7 +285,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                               {event.type === 'exam' ? 'Examen' : 'Tarea'} • {subject?.name ?? 'Materia'}
                             </p>
                             <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{event.date}</p>
-                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{event.description || 'Sin descripción'}</p>
+                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2 break-all">{event.description || 'Sin descripción'}</p>
                           </div>
                           <div className="ml-3 flex gap-2">
                             {event.type === 'task' && (
