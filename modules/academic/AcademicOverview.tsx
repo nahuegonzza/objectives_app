@@ -646,10 +646,10 @@ export default function AcademicOverview() {
                   <p className="mt-3 text-3xl font-semibold text-violet-900 dark:text-violet-100">{summary.completed}</p>
                   <p className="mt-1 text-sm text-violet-700 dark:text-violet-300">Eventos resueltos</p>
                 </div>
-                <div className="rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-5 dark:from-slate-950/50 dark:to-slate-900/50 dark:border-slate-700">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">Materias</p>
-                  <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">{summary.subjects}</p>
-                  <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Materias únicas</p>
+                <div className="rounded-3xl bg-gradient-to-br from-red-50 to-red-100 border border-red-200 p-5 dark:from-red-950/50 dark:to-red-900/50 dark:border-red-700">
+                  <p className="text-xs uppercase tracking-[0.2em] text-red-600 dark:text-red-400">Pendientes</p>
+                  <p className="mt-3 text-3xl font-semibold text-red-900 dark:text-red-100">{summary.total - summary.completed}</p>
+                  <p className="mt-1 text-sm text-red-700 dark:text-red-300">Eventos sin completar</p>
                 </div>
               </div>
           </div>
