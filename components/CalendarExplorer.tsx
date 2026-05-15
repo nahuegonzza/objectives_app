@@ -571,6 +571,8 @@ export default function CalendarExplorer() {
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400">▾</span>
+                  </div>
                   </label>
                 </>
               )}
@@ -604,6 +606,8 @@ export default function CalendarExplorer() {
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400">▾</span>
+                  </div>
                   </label>
                 </>
               )}
