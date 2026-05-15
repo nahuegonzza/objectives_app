@@ -415,7 +415,6 @@ export default function SettingsPage() {
         <header className="mb-8">
           <div>
             <h1 className="text-4xl font-bold tracking-tight">Configuración</h1>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">Personaliza tu experiencia</p>
           </div>
         </header>
 

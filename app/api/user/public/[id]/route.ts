@@ -152,6 +152,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       select: {
         id: true,
         username: true,
+        email: true,
         firstName: true,
         lastName: true,
         name: true,
@@ -171,12 +172,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
       user: {
         id: targetUser.id,
         username: targetUser.username,
+        email: targetUser.email,
         firstName: targetUser.firstName,
         lastName: targetUser.lastName,
         name: targetUser.name,
         birthDate: targetUser.birthDate ? targetUser.birthDate.toISOString().slice(0, 10) : null,
         createdAt: targetUser.createdAt ? targetUser.createdAt.toISOString() : null,
       },
+
       stats,
       streakInfo,
     });

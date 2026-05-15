@@ -588,8 +588,7 @@ export default function AcademicOverview() {
       <div className="w-full">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Gestión universitaria</p>
-            <h1 className="mt-2 text-4xl font-bold tracking-tight">Visor académico</h1>
+            <h1 className="mt-2 text-4xl font-bold tracking-tight">Gestión universitaria</h1>
           </div>
 
           <div className="flex flex-wrap gap-3">

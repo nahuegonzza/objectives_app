@@ -73,11 +73,6 @@ export const SleepConfig: React.FC<SleepConfigProps> = ({ config, onSave, onClos
             ✕
           </button>
         </div>
-
-        <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
-          Ajusta tus objetivos de sueño.
-        </p>
-
         <div className="space-y-5">
           {/* Horas ideales */}
           <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-4">

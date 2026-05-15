@@ -227,10 +227,6 @@ export function AcademicConfig({
         {/* Tab: Subjects */}
         {activeTab === "subjects" && (
           <div className="space-y-4">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Configura tus materias y asigna los colores que se usarán en las tarjetas.
-            </p>
-
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-slate-900 dark:text-white">
                 Tus Materias
@@ -311,10 +307,6 @@ export function AcademicConfig({
         {/* Tab: Scoring */}
         {activeTab === "scoring" && (
           <div className="space-y-6">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Configura cuántos puntos otorga cada tipo de evento.
-            </p>
-
             <div>
               <h3 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
                 Puntos por Examen

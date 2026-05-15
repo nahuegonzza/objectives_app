@@ -255,7 +255,7 @@ export default function ModulesSettingsPage() {
           <section className="mb-8">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-              Módulos disponibles
+              Módulos inactivos
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               {inactiveModules.map((module) => {

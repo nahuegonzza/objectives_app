@@ -370,11 +370,6 @@ export const MoodConfig: React.FC<MoodConfigProps> = ({ config, onSave, onClose 
             ✕
           </button>
         </div>
-
-        <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
-          Personaliza tus estados de ánimo.
-        </p>
-
         <div className="space-y-3">
           <Reorder.Group
             axis="y"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface FriendProfileModalProps {
   friendId: string;
@@ -12,6 +12,7 @@ interface FriendProfileModalProps {
 interface FriendProfileData {
   id: string;
   username: string;
+  email?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   name?: string | null;
@@ -67,7 +68,7 @@ function formatShortDate(dateLike?: string | Date | null) {
 }
 
 export default function FriendProfileModal({ friendId, onClose, initialDisplayName, initialUsername }: FriendProfileModalProps) {
-  const [friendData, setFriendData] = useState<FriendProfileData | null>(null);
+  const [friendData, setFriendData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -119,13 +120,38 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
   const memberSince = friendData?.createdAt ? new Date(friendData.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No disponible';
   const stats = friendData?.stats ?? { goalsCompleted: 0, totalScore: 0, currentStreak: 0, longestStreak: 0 };
 
+  const headerEmailRef = useRef<HTMLParagraphElement | null>(null);
+  const infoEmailRef = useRef<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    function fitTextToWidth(el?: HTMLElement | null, initial = 14, min = 10) {
+      if (!el) return;
+      el.style.whiteSpace = 'nowrap';
+      let size = initial;
+      el.style.fontSize = `${size}px`;
+      // allow one reflow loop
+      while (el.scrollWidth > el.clientWidth && size > min) {
+        size -= 1;
+        el.style.fontSize = `${size}px`;
+      }
+    }
+
+    const handle = () => {
+      fitTextToWidth(headerEmailRef.current, 14, 10);
+      fitTextToWidth(infoEmailRef.current, 14, 10);
+    };
+
+    handle();
+    window.addEventListener('resize', handle);
+    return () => window.removeEventListener('resize', handle);
+  }, [friendData?.email]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl transition-all">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Perfil de {displayName}</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Vista rápida del perfil de tu amigo, sin búsquedas ni solicitudes.</p>
           </div>
           <button
             type="button"
@@ -152,7 +178,7 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
                   <span className="text-4xl">👤</span>
                 </div>
                 <h3 className="text-3xl font-bold mb-1 text-slate-900 dark:text-white">{displayName}</h3>
-                <p className="text-blue-100 text-sm">@{friendData.username}</p>
+                <p ref={headerEmailRef} title={friendData?.email || friendData?.username} className="text-blue-100 text-sm inline-block max-w-full">{friendData?.email || `@${friendData?.username}`}</p>
                 {age !== null && <p className="text-blue-100 text-xs mt-1">{age} años</p>}
               </div>
             </div>
@@ -184,8 +210,8 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
                   <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center">{displayName}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-800 dark:to-slate-700">
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide text-center">Usuario</p>
-                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center">@{friendData.username}</p>
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide text-center">Email</p>
+                  <p ref={infoEmailRef} title={friendData?.email || ''} className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center inline-block max-w-full whitespace-nowrap">{friendData?.email || 'No disponible'}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide text-center">Nacimiento</p>
