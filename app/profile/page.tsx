@@ -46,7 +46,14 @@ function calculateAge(birthDate?: string | Date | null) {
 
 function formatShortDate(dateLike?: string | Date | null) {
   if (!dateLike) return '';
-  const date = typeof dateLike === 'string' ? new Date(dateLike) : new Date(dateLike);
+  let date: Date;
+  if (typeof dateLike === 'string') {
+    // If it's a bare date like YYYY-MM-DD, append midday to avoid timezone shift
+    const safe = dateLike.length === 10 ? `${dateLike}T12:00:00` : dateLike;
+    date = new Date(safe);
+  } else {
+    date = new Date(dateLike);
+  }
   if (Number.isNaN(date.getTime())) return '';
   const dd = String(date.getDate()).padStart(2, '0');
   const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -325,10 +332,11 @@ function FriendSearchPanel() {
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {results.map((result) => (
             <div key={result.id} className="flex items-center justify-between rounded-xl bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 p-4 border border-slate-200 dark:border-slate-600">
-              <div>
-                <p className="font-semibold text-slate-900 dark:text-white">{result.displayName}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">@{result.username}</p>
               </div>
+            )}
+          </div>
+          {/* keep spacing consistent with other pages: use md:pb-6 instead of a large fixed spacer */}
+          <div className="hidden md:block" aria-hidden="true" style={{ height: 24 }} />
               <button
                 type="button"
                 className="rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:from-emerald-600 hover:to-emerald-700"

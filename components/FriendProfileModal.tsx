@@ -49,7 +49,13 @@ function calculateAge(birthDate?: string | null) {
 
 function formatShortDate(dateLike?: string | Date | null) {
   if (!dateLike) return '';
-  const date = typeof dateLike === 'string' ? new Date(dateLike) : new Date(dateLike);
+  let date: Date;
+  if (typeof dateLike === 'string') {
+    const safe = dateLike.length === 10 ? `${dateLike}T12:00:00` : dateLike;
+    date = new Date(safe);
+  } else {
+    date = new Date(dateLike);
+  }
   if (Number.isNaN(date.getTime())) return '';
   const dd = String(date.getDate()).padStart(2, '0');
   const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
