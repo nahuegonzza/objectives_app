@@ -1,6 +1,7 @@
-'use client';
+ 'use client';
 
 import { useEffect, useState } from 'react';
+import { getAcademicTaskTypes, getAcademicExamTypes, AcademicTypeConfig } from './academicHelpers';
 import { getLocalDateString } from '@lib/dateHelpers';
 import type { AcademicEvent, AcademicSubject, AcademicEventType, AcademicExamType, AcademicTaskPriority, AcademicTaskDuration } from './academicHelpers';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
@@ -63,6 +64,9 @@ export function AcademicEventForm({
   const [completed, setCompleted] = useState(false);
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
+  const [moduleConfig, setModuleConfig] = useState<Record<string, unknown> | undefined>(undefined);
+  const [availableTaskTypes, setAvailableTaskTypes] = useState<AcademicTypeConfig[]>([]);
+  const [availableExamTypes, setAvailableExamTypes] = useState<AcademicTypeConfig[]>([]);
 
   // Función para detectar si hay cambios pendientes
   const hasUnsavedChanges = () => {
@@ -115,6 +119,26 @@ export function AcademicEventForm({
   };
 
   useEffect(() => {
+    // load module config to get dynamic types
+    (async () => {
+      try {
+        const res = await fetch('/api/modules', { credentials: 'include' });
+        if (!res.ok) return;
+        const modules = await res.json();
+        const academicModule = modules.find((m: any) => m.name === 'academic' || m.moduleName === 'academic');
+        if (!academicModule) return;
+        const res2 = await fetch(`/api/modules/${academicModule.id}`, { credentials: 'include' });
+        if (!res2.ok) return;
+        const mod = await res2.json();
+        const config = mod.config as Record<string, unknown> | undefined;
+        setModuleConfig(config);
+        setAvailableTaskTypes(getAcademicTaskTypes(config));
+        setAvailableExamTypes(getAcademicExamTypes(config));
+      } catch (err) {
+        // ignore
+      }
+    })();
+
     if (initialEvent) {
       setEventType(initialEvent.type);
       setExamType(initialEvent.examType || 'parcial');
@@ -254,17 +278,17 @@ export function AcademicEventForm({
                 <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
                   Tipo de examen
                 </label>
-                <select
-                  value={examType}
-                  onChange={(e) => setExamType(e.target.value as AcademicExamType)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                >
-                  <option value="parcial">Parcial</option>
-                  <option value="final">Final</option>
-                  <option value="recuperatorio">Recuperatorio</option>
-                  <option value="exposicion">Exposición</option>
-                  <option value="regular">Regular</option>
-                  <option value="oral">Oral</option>
+                <select value={examType} onChange={(e) => setExamType(e.target.value as AcademicExamType)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900">
+                  {availableExamTypes.length > 0 ? availableExamTypes.map((t) => <option key={t.key} value={t.key}>{t.label}</option>) : (
+                    <>
+                      <option value="parcial">Parcial</option>
+                      <option value="final">Final</option>
+                      <option value="recuperatorio">Recuperatorio</option>
+                      <option value="exposicion">Exposición</option>
+                      <option value="regular">Regular</option>
+                      <option value="oral">Oral</option>
+                    </>
+                  )}
                 </select>
               </div>
             ) : (
@@ -273,18 +297,18 @@ export function AcademicEventForm({
                   <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
                     Tipo de tarea
                   </label>
-                  <select
-                    value={estimatedDuration}
-                    onChange={(e) => setEstimatedDuration(e.target.value as AcademicTaskDuration)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="corta">Corta (15-30 min)</option>
-                    <option value="media">Media (30-60 min)</option>
-                    <option value="extensa">Extensa (1-2 horas)</option>
-                    <option value="lectura">Lectura</option>
-                    <option value="escritura">Escritura</option>
-                    <option value="codigo">Código/Programación</option>
-                    <option value="practica">Práctica/Ejercicios</option>
+                  <select value={estimatedDuration} onChange={(e) => setEstimatedDuration(e.target.value as AcademicTaskDuration)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900">
+                    {availableTaskTypes.length > 0 ? availableTaskTypes.map((t) => <option key={t.key} value={t.key}>{t.label} {t.label !== t.key ? '' : ''}</option>) : (
+                      <>
+                        <option value="corta">Corta (15-30 min)</option>
+                        <option value="media">Media (30-60 min)</option>
+                        <option value="extensa">Extensa (1-2 horas)</option>
+                        <option value="lectura">Lectura</option>
+                        <option value="escritura">Escritura</option>
+                        <option value="codigo">Código/Programación</option>
+                        <option value="practica">Práctica/Ejercicios</option>
+                      </>
+                    )}
                   </select>
                 </div>
                 <div>

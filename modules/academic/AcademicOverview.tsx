@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLocalDateString, parseLocalDate } from '@lib/dateHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
-import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration, AcademicTaskPriority } from './academicHelpers';
+import { parseAcademicData, AcademicEvent, AcademicSubject, AcademicTaskDuration, AcademicTaskPriority, getAcademicTaskTypes, AcademicTypeConfig } from './academicHelpers';
 import { AcademicEventForm } from './AcademicEventForm';
 import ConfirmationModal from '@components/ConfirmationModal';
 import { useAcademicModule } from './useAcademicModule';
@@ -305,13 +305,19 @@ function AcademicFilterModal({
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
               >
                 <option value="all">Todas</option>
-                <option value="corta">Corta</option>
-                <option value="media">Media</option>
-                <option value="extensa">Extensa</option>
-                <option value="lectura">Lectura</option>
-                <option value="escritura">Escritura</option>
-                <option value="codigo">Código</option>
-                <option value="practica">Práctica</option>
+                {availableTaskTypes.length > 0 ? availableTaskTypes.map((t) => (
+                  <option key={t.key} value={t.key}>{t.label}</option>
+                )) : (
+                  <>
+                    <option value="corta">Corta</option>
+                    <option value="media">Media</option>
+                    <option value="extensa">Extensa</option>
+                    <option value="lectura">Lectura</option>
+                    <option value="escritura">Escritura</option>
+                    <option value="codigo">Código</option>
+                    <option value="practica">Práctica</option>
+                  </>
+                )}
               </select>
             </label>
           </div>
@@ -434,6 +440,8 @@ export default function AcademicOverview() {
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<AcademicEvent | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [availableTaskTypes, setAvailableTaskTypes] = useState<AcademicTypeConfig[]>([]);
+  const [academicConfigLoaded, setAcademicConfigLoaded] = useState(false);
 
   const todayString = getLocalDateString();
   const { addEvent, toggleEventCompleted, discardEvent } = useAcademicModule(academicModuleId, 'academic', todayString, {});
@@ -461,6 +469,27 @@ export default function AcademicOverview() {
     if (!academicModuleId) return;
     loadAcademicEntries();
   }, [academicModuleId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/modules', { credentials: 'include' });
+        if (!res.ok) return;
+        const modules = await res.json();
+        const academicModule = modules.find((m: any) => m.name === 'academic' || m.moduleName === 'academic');
+        if (!academicModule) return;
+        const res2 = await fetch(`/api/modules/${academicModule.id}`, { credentials: 'include' });
+        if (!res2.ok) return;
+        const mod = await res2.json();
+        const config = mod.config as Record<string, unknown> | undefined;
+        setAvailableTaskTypes(getAcademicTaskTypes(config));
+      } catch (err) {
+        // ignore
+      } finally {
+        setAcademicConfigLoaded(true);
+      }
+    })();
+  }, []);
 
   const handleOpenNewEvent = () => {
     setEditingEvent(null);

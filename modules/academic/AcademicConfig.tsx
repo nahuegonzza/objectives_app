@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { Reorder, useDragControls } from 'framer-motion';
 import { getLocalDateString } from "@lib/dateHelpers";
 import type { AcademicSubject, AcademicModuleConfig, AcademicTypeConfig } from "./academicHelpers";
 import { getAcademicExamTypes, getAcademicTaskTypes } from "./academicHelpers";
@@ -32,6 +33,8 @@ export function AcademicConfig({
   // Configuración de scoring
   const [examTypes, setExamTypes] = useState<AcademicTypeConfig[]>([]);
   const [taskTypes, setTaskTypes] = useState<AcademicTypeConfig[]>([]);
+  const [draggingExamId, setDraggingExamId] = useState<string | null>(null);
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
 
   // Cargar materias desde moduleEntries si moduleId está disponible
   const todayDate = getLocalDateString();
@@ -145,12 +148,110 @@ export function AcademicConfig({
   };
 
   const handleDeleteExamType = (typeId: string) => {
-    setExamTypes((current) => current.filter((type) => type.id !== typeId));
+    // Safe deletion: update any module entries that reference this examType.key
+    const type = examTypes.find((t) => t.id === typeId);
+    if (!type) return;
+    if (examTypes.length <= 1) return;
+    setError('');
+    (async () => {
+      try {
+        const res = await fetch('/api/moduleEntries?module=academic', { credentials: 'include' });
+        if (res.ok) {
+          const entries = await res.json();
+          const entriesToUpdate = entries.filter((entry: any) => {
+            try {
+              const data = JSON.parse(entry.data);
+              return Array.isArray(data.events) && data.events.some((e: any) => e.type === 'exam' && e.examType === type.key);
+            } catch {
+              return false;
+            }
+          });
+
+          const updatePromises = entriesToUpdate.map((entry: any) => {
+            try {
+              const data = JSON.parse(entry.data);
+              const newData = { ...data, events: data.events.map((e: any) => (e.type === 'exam' && e.examType === type.key ? { ...e, examType: undefined } : e)) };
+              return fetch('/api/moduleEntries', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ moduleId: entry.moduleId, date: entry.date.slice(0, 10), data: newData }),
+              });
+            } catch {
+              return Promise.resolve();
+            }
+          });
+
+          await Promise.all(updatePromises);
+        }
+      } catch (err) {
+        // ignore
+      }
+      setExamTypes((current) => current.filter((t) => t.id !== typeId));
+    })();
   };
 
   const handleDeleteTaskType = (typeId: string) => {
-    setTaskTypes((current) => current.filter((type) => type.id !== typeId));
+    const type = taskTypes.find((t) => t.id === typeId);
+    if (!type) return;
+    if (taskTypes.length <= 1) return;
+    setError('');
+    (async () => {
+      try {
+        const res = await fetch('/api/moduleEntries?module=academic', { credentials: 'include' });
+        if (res.ok) {
+          const entries = await res.json();
+          const entriesToUpdate = entries.filter((entry: any) => {
+            try {
+              const data = JSON.parse(entry.data);
+              return Array.isArray(data.events) && data.events.some((e: any) => e.type === 'task' && e.estimatedDuration === type.key);
+            } catch {
+              return false;
+            }
+          });
+
+          const updatePromises = entriesToUpdate.map((entry: any) => {
+            try {
+              const data = JSON.parse(entry.data);
+              const newData = { ...data, events: data.events.map((e: any) => (e.type === 'task' && e.estimatedDuration === type.key ? { ...e, estimatedDuration: undefined } : e)) };
+              return fetch('/api/moduleEntries', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ moduleId: entry.moduleId, date: entry.date.slice(0, 10), data: newData }),
+              });
+            } catch {
+              return Promise.resolve();
+            }
+          });
+
+          await Promise.all(updatePromises);
+        }
+      } catch (err) {
+        // ignore
+      }
+      setTaskTypes((current) => current.filter((t) => t.id !== typeId));
+    })();
   };
+
+  const reorderById = <T extends { id: string }>(items: T[], nextIds: string[]) =>
+    nextIds.map((id) => items.find((it) => it.id === id)).filter((it): it is T => Boolean(it));
+
+  const handleExamTypesReorder = (nextIds: string[]) => {
+    setExamTypes((current) => reorderById(current, nextIds));
+  };
+
+  const handleTaskTypesReorder = (nextIds: string[]) => {
+    setTaskTypes((current) => reorderById(current, nextIds));
+  };
+
+  const handleDragStartExam = (id: string) => setDraggingExamId(id);
+  const handleDragStartTask = (id: string) => setDraggingTaskId(id);
+
+  const hasEmptyExamType = examTypes.some((t) => !t.label?.toString().trim());
+  const canAddExamType = !hasEmptyExamType;
+  const hasEmptyTaskType = taskTypes.some((t) => !t.label?.toString().trim());
+  const canAddTaskType = !hasEmptyTaskType;
 
   const handleSave = async () => {
     setSaving(true);
@@ -333,65 +434,32 @@ export function AcademicConfig({
                 </button>
               </div>
               <div className="space-y-3">
-                {examTypes.map((type) => (
-                  <div
-                    key={type.id}
-                    className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1.8fr_1fr_1fr_0.75fr] dark:border-slate-700 dark:bg-slate-900"
-                  >
-                    <div>
-                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-                        Nombre del tipo
-                      </label>
-                      <input
-                        value={type.label}
-                        onChange={(e) =>
-                          handleExamTypeChange(type.id, 'label', e.target.value)
-                        }
-                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-                        Puntos
-                      </label>
-                      <input
-                        type="number"
-                        value={type.points}
-                        onChange={(e) =>
-                          handleExamTypeChange(
-                            type.id,
-                            'points',
-                            Number(e.target.value)
-                          )
-                        }
-                        min="0"
-                        step="0.5"
-                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-                        Color
-                      </label>
-                      <div className="mt-1">
-                        <UnifiedColorPicker
-                          value={type.color}
-                          onChange={(color) =>
-                            handleExamTypeChange(type.id, 'color', color)
-                          }
-                        />
+                <Reorder.Group axis="y" values={examTypes.map((t) => t.id)} onReorder={handleExamTypesReorder} className="space-y-3">
+                  {examTypes.map((type) => (
+                    <Reorder.Item key={type.id} value={type.id} dragListener={false} className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1.8fr_1fr_1fr_0.75fr] dark:border-slate-700 dark:bg-slate-900">
+                      <div>
+                        <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Nombre del tipo</label>
+                        <input value={type.label} onChange={(e) => handleExamTypeChange(type.id, 'label', e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900" />
                       </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteExamType(type.id)}
-                      className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-700/40 dark:bg-rose-950/50 dark:text-rose-300"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Puntos</label>
+                        <input type="number" value={type.points} onChange={(e) => handleExamTypeChange(type.id, 'points', Number(e.target.value))} min="0" step="0.5" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900" />
+                      </div>
+                      <div>
+                        <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Color</label>
+                        <div className="mt-1">
+                          <UnifiedColorPicker value={type.color} onChange={(color) => handleExamTypeChange(type.id, 'color', color)} />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => handleDeleteExamType(type.id)} className="inline-flex h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-700/40 dark:bg-rose-950/50 dark:text-rose-300">Eliminar</button>
+                        <button type="button" onPointerDown={(e) => { e.preventDefault(); handleDragStartExam(type.id); }} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900">≡</button>
+                      </div>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
               </div>
+              {!canAddExamType && <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">Completa el tipo pendiente antes de crear uno nuevo.</p>}
             </div>
 
             <div className="space-y-4">
@@ -413,65 +481,32 @@ export function AcademicConfig({
                 </button>
               </div>
               <div className="space-y-3">
-                {taskTypes.map((type) => (
-                  <div
-                    key={type.id}
-                    className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1.8fr_1fr_1fr_0.75fr] dark:border-slate-700 dark:bg-slate-900"
-                  >
-                    <div>
-                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-                        Nombre del tipo
-                      </label>
-                      <input
-                        value={type.label}
-                        onChange={(e) =>
-                          handleTaskTypeChange(type.id, 'label', e.target.value)
-                        }
-                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-                        Puntos
-                      </label>
-                      <input
-                        type="number"
-                        value={type.points}
-                        onChange={(e) =>
-                          handleTaskTypeChange(
-                            type.id,
-                            'points',
-                            Number(e.target.value)
-                          )
-                        }
-                        min="0"
-                        step="0.5"
-                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-                        Color
-                      </label>
-                      <div className="mt-1">
-                        <UnifiedColorPicker
-                          value={type.color}
-                          onChange={(color) =>
-                            handleTaskTypeChange(type.id, 'color', color)
-                          }
-                        />
+                <Reorder.Group axis="y" values={taskTypes.map((t) => t.id)} onReorder={handleTaskTypesReorder} className="space-y-3">
+                  {taskTypes.map((type) => (
+                    <Reorder.Item key={type.id} value={type.id} dragListener={false} className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1.8fr_1fr_1fr_0.75fr] dark:border-slate-700 dark:bg-slate-900">
+                      <div>
+                        <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Nombre del tipo</label>
+                        <input value={type.label} onChange={(e) => handleTaskTypeChange(type.id, 'label', e.target.value)} className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900" />
                       </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTaskType(type.id)}
-                      className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-700/40 dark:bg-rose-950/50 dark:text-rose-300"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Puntos</label>
+                        <input type="number" value={type.points} onChange={(e) => handleTaskTypeChange(type.id, 'points', Number(e.target.value))} min="0" step="0.5" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900" />
+                      </div>
+                      <div>
+                        <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">Color</label>
+                        <div className="mt-1">
+                          <UnifiedColorPicker value={type.color} onChange={(color) => handleTaskTypeChange(type.id, 'color', color)} />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => handleDeleteTaskType(type.id)} className="inline-flex h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-700/40 dark:bg-rose-950/50 dark:text-rose-300">Eliminar</button>
+                        <button type="button" onPointerDown={(e) => { e.preventDefault(); handleDragStartTask(type.id); }} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-slate-100 text-[#059669] transition hover:border-[#059669] hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-900">≡</button>
+                      </div>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
               </div>
+              {!canAddTaskType && <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">Completa el tipo pendiente antes de crear uno nuevo.</p>}
             </div>
           </div>
         )}
