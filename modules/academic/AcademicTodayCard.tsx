@@ -1,7 +1,7 @@
 'use client';
 
 import type { AcademicEvent, AcademicSubject } from './academicHelpers';
-import { getAcademicExamTypeLabel } from './academicHelpers';
+import { getAcademicExamTypeLabelByType } from './academicHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
 
 const normalizeHex = (hex: string) => {
@@ -103,7 +103,7 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
   );
 
   const badgeText = event.type === 'exam'
-    ? getAcademicExamTypeLabel(event.examType)
+    ? getAcademicExamTypeLabelByType(event.examType)
     : `${event.priority ? `Prioridad ${event.priority}` : 'Tarea'}`;
 
   const examColors = {

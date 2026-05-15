@@ -148,7 +148,7 @@ export function parseAcademicData(data: string | null | undefined): AcademicData
   }
 }
 
-export function getAcademicExamTypeLabel(type: AcademicExamType | undefined): string {
+export function getAcademicExamTypeLabelByType(type: AcademicExamType | undefined): string {
   switch (type) {
     case 'final':
       return 'Final';
@@ -168,7 +168,7 @@ export function getAcademicExamTypeLabel(type: AcademicExamType | undefined): st
 
 export function getAcademicEventLabel(event: AcademicEvent): string {
   if (event.type === 'exam') {
-    return `${getAcademicExamTypeLabel(event.examType)} de ${event.title}`;
+    return `${getAcademicExamTypeLabelByType(event.examType)} de ${event.title}`;
   }
 
   return `Entrega de ${event.title}`;
