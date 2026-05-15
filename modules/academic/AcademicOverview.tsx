@@ -298,7 +298,7 @@ function AcademicFilterModal({
               </select>
             </label>
             <label className="space-y-1 min-w-0">
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Duración</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Tipo de tarea</span>
               <select
                 value={durationFilter}
                 onChange={(e) => onChange('durationFilter', e.target.value)}

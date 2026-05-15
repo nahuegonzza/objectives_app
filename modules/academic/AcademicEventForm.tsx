@@ -271,21 +271,7 @@ export function AcademicEventForm({
               <>
                 <div>
                   <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Prioridad
-                  </label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value as AcademicTaskPriority)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  >
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Duración estimada
+                    Tipo de tarea
                   </label>
                   <select
                     value={estimatedDuration}
@@ -299,6 +285,20 @@ export function AcademicEventForm({
                     <option value="escritura">Escritura</option>
                     <option value="codigo">Código/Programación</option>
                     <option value="practica">Práctica/Ejercicios</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Prioridad
+                  </label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value as AcademicTaskPriority)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  >
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
                   </select>
                 </div>
               </>

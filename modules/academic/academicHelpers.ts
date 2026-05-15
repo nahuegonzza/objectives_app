@@ -5,6 +5,95 @@ export type AcademicExamType = 'parcial' | 'final' | 'recuperatorio' | 'exposici
 export type AcademicTaskPriority = 'alta' | 'media' | 'baja';
 export type AcademicTaskDuration = 'corta' | 'media' | 'extensa' | 'lectura' | 'escritura' | 'codigo' | 'practica';
 
+export const DEFAULT_ACADEMIC_EXAM_TYPES: AcademicTypeConfig[] = [
+  { id: 'exam-parcial', key: 'parcial', label: 'Parcial', points: 3, color: '#0ea5e9' },
+  { id: 'exam-final', key: 'final', label: 'Final', points: 4, color: '#22c55e' },
+  { id: 'exam-recuperatorio', key: 'recuperatorio', label: 'Recuperatorio', points: 2, color: '#8b5cf6' },
+  { id: 'exam-exposicion', key: 'exposicion', label: 'Exposición', points: 3, color: '#f97316' },
+  { id: 'exam-regular', key: 'regular', label: 'Regular', points: 2, color: '#6366f1' },
+  { id: 'exam-oral', key: 'oral', label: 'Oral', points: 3, color: '#d946ef' },
+];
+
+export const DEFAULT_ACADEMIC_TASK_TYPES: AcademicTypeConfig[] = [
+  { id: 'task-corta', key: 'corta', label: 'Corta', points: 2, color: '#facc15' },
+  { id: 'task-media', key: 'media', label: 'Media', points: 1.5, color: '#14b8a6' },
+  { id: 'task-extensa', key: 'extensa', label: 'Extensa', points: 1, color: '#7c3aed' },
+  { id: 'task-lectura', key: 'lectura', label: 'Lectura', points: 1.5, color: '#f97316' },
+  { id: 'task-escritura', key: 'escritura', label: 'Escritura', points: 1.5, color: '#2563eb' },
+  { id: 'task-codigo', key: 'codigo', label: 'Código', points: 2, color: '#0ea5e9' },
+  { id: 'task-practica', key: 'practica', label: 'Práctica', points: 2, color: '#22c55e' },
+];
+
+const isTypeConfigArray = (value: unknown): value is AcademicTypeConfig[] =>
+  Array.isArray(value) && value.every(
+    (item) =>
+      typeof item === 'object' &&
+      item !== null &&
+      typeof (item as any).id === 'string' &&
+      typeof (item as any).key === 'string' &&
+      typeof (item as any).label === 'string' &&
+      typeof (item as any).points === 'number' &&
+      typeof (item as any).color === 'string'
+  );
+
+export function getAcademicExamTypes(config?: Record<string, unknown>): AcademicTypeConfig[] {
+  const configExamTypes = (config?.examTypes as unknown);
+  if (isTypeConfigArray(configExamTypes) && configExamTypes.length > 0) {
+    return configExamTypes;
+  }
+
+  const legacyPoints = config?.examPoints as Record<string, number> | undefined;
+  return DEFAULT_ACADEMIC_EXAM_TYPES.map((item) => ({
+    ...item,
+    points: legacyPoints?.[item.key] ?? item.points,
+  }));
+}
+
+export function getAcademicTaskTypes(config?: Record<string, unknown>): AcademicTypeConfig[] {
+  const configTaskTypes = (config?.taskTypes as unknown);
+  if (isTypeConfigArray(configTaskTypes) && configTaskTypes.length > 0) {
+    return configTaskTypes;
+  }
+
+  const legacyPoints = config?.taskPoints as Record<string, number> | undefined;
+  return DEFAULT_ACADEMIC_TASK_TYPES.map((item) => ({
+    ...item,
+    points: legacyPoints?.[item.key] ?? item.points,
+  }));
+}
+
+export function getAcademicExamTypeConfig(config: Record<string, unknown> | undefined, key: string | undefined): AcademicTypeConfig {
+  return getAcademicExamTypes(config).find((item) => item.key === key) ?? DEFAULT_ACADEMIC_EXAM_TYPES[0];
+}
+
+export function getAcademicTaskTypeConfig(config: Record<string, unknown> | undefined, key: string | undefined): AcademicTypeConfig {
+  return getAcademicTaskTypes(config).find((item) => item.key === key) ?? DEFAULT_ACADEMIC_TASK_TYPES[1];
+}
+
+export function getAcademicExamTypeLabel(config: Record<string, unknown> | undefined, key: string | undefined): string {
+  return getAcademicExamTypeConfig(config, key).label;
+}
+
+export function getAcademicTaskTypeLabel(config: Record<string, unknown> | undefined, key: string | undefined): string {
+  return getAcademicTaskTypeConfig(config, key).label;
+}
+
+export interface AcademicTypeConfig {
+  id: string;
+  key: string;
+  label: string;
+  points: number;
+  color: string;
+}
+
+export interface AcademicModuleConfig {
+  examTypes?: AcademicTypeConfig[];
+  taskTypes?: AcademicTypeConfig[];
+  examPoints?: Record<string, number>;
+  taskPoints?: Record<string, number>;
+  [key: string]: unknown;
+}
+
 export interface AcademicSubject {
   id: string;
   name: string;

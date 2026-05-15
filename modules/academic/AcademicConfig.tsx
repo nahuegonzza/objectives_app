@@ -2,16 +2,17 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { getLocalDateString } from "@lib/dateHelpers";
-import type { AcademicSubject } from "./academicHelpers";
+import type { AcademicSubject, AcademicModuleConfig, AcademicTypeConfig } from "./academicHelpers";
+import { getAcademicExamTypes, getAcademicTaskTypes } from "./academicHelpers";
 import { useAcademicModule } from "./useAcademicModule";
 import UnifiedColorPicker from '@components/UnifiedColorPicker';
 import UnsavedChangesModal from '@components/UnsavedChangesModal';
 
 interface AcademicConfigProps {
-  config?: Record<string, unknown>;
+  config?: AcademicModuleConfig;
   moduleId?: string;
   moduleName?: string;
-  onSave?: (newConfig: Record<string, unknown>) => Promise<boolean>;
+  onSave?: (newConfig: AcademicModuleConfig) => Promise<boolean>;
   onClose?: () => void;
 }
 
@@ -29,33 +30,8 @@ export function AcademicConfig({
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   
   // Configuración de scoring
-  const [examPointsPartial, setExamPointsPartial] = useState(
-    ((config?.examPoints as any)?.parcial ?? 2).toString()
-  );
-  const [examPointsFinal, setExamPointsFinal] = useState(
-    ((config?.examPoints as any)?.final ?? 4).toString()
-  );
-  const [examPointsRecuperatorio, setExamPointsRecuperatorio] = useState(
-    ((config?.examPoints as any)?.recuperatorio ?? 3).toString()
-  );
-  const [examPointsExposicion, setExamPointsExposicion] = useState(
-    ((config?.examPoints as any)?.exposicion ?? 2).toString()
-  );
-  const [examPointsRegular, setExamPointsRegular] = useState(
-    ((config?.examPoints as any)?.regular ?? 1).toString()
-  );
-  const [examPointsOral, setExamPointsOral] = useState(
-    ((config?.examPoints as any)?.oral ?? 1.5).toString()
-  );
-  const [taskPointsAlta, setTaskPointsAlta] = useState(
-    ((config?.taskPoints as any)?.alta ?? 2).toString()
-  );
-  const [taskPointsMedia, setTaskPointsMedia] = useState(
-    ((config?.taskPoints as any)?.media ?? 1.5).toString()
-  );
-  const [taskPointsBaja, setTaskPointsBaja] = useState(
-    ((config?.taskPoints as any)?.baja ?? 1).toString()
-  );
+  const [examTypes, setExamTypes] = useState<AcademicTypeConfig[]>([]);
+  const [taskTypes, setTaskTypes] = useState<AcademicTypeConfig[]>([]);
 
   // Cargar materias desde moduleEntries si moduleId está disponible
   const todayDate = getLocalDateString();
@@ -71,40 +47,24 @@ export function AcademicConfig({
     [academicModule.subjects, subjects]
   );
 
-  const initialScoring = useMemo(
-    () => ({
-      examPointsPartial: ((config?.examPoints as any)?.parcial ?? 5).toString(),
-      examPointsFinal: ((config?.examPoints as any)?.final ?? 8).toString(),
-      examPointsRecuperatorio: ((config?.examPoints as any)?.recuperatorio ?? 6).toString(),
-      examPointsExposicion: ((config?.examPoints as any)?.exposicion ?? 6).toString(),
-      examPointsRegular: ((config?.examPoints as any)?.regular ?? 4).toString(),
-      examPointsOral: ((config?.examPoints as any)?.oral ?? 5).toString(),
-      taskPointsAlta: ((config?.taskPoints as any)?.alta ?? 4).toString(),
-      taskPointsMedia: ((config?.taskPoints as any)?.media ?? 2).toString(),
-      taskPointsBaja: ((config?.taskPoints as any)?.baja ?? 1).toString(),
-    }),
-    [config]
-  );
+  const initialExamTypes = useMemo(() => getAcademicExamTypes(config), [config]);
+  const initialTaskTypes = useMemo(() => getAcademicTaskTypes(config), [config]);
 
   const isDirty =
     JSON.stringify(subjects) !== JSON.stringify(initialSubjects) ||
-    JSON.stringify({
-      examPointsPartial,
-      examPointsFinal,
-      examPointsRecuperatorio,
-      examPointsExposicion,
-      examPointsRegular,
-      examPointsOral,
-      taskPointsAlta,
-      taskPointsMedia,
-      taskPointsBaja,
-    }) !== JSON.stringify(initialScoring);
+    JSON.stringify(examTypes) !== JSON.stringify(initialExamTypes) ||
+    JSON.stringify(taskTypes) !== JSON.stringify(initialTaskTypes);
 
   useEffect(() => {
     if (academicModule.subjects && academicModule.subjects.length > 0) {
       setSubjects(academicModule.subjects);
     }
   }, [academicModule.subjects]);
+
+  useEffect(() => {
+    setExamTypes(initialExamTypes);
+    setTaskTypes(initialTaskTypes);
+  }, [initialExamTypes, initialTaskTypes]);
 
   const handleFieldChange = (
     id: string,
@@ -134,25 +94,72 @@ export function AcademicConfig({
     );
   };
 
+  const handleExamTypeChange = (
+    id: string,
+    field: keyof AcademicTypeConfig,
+    value: string | number
+  ) => {
+    setExamTypes((current) =>
+      current.map((type) =>
+        type.id === id ? { ...type, [field]: value } : type
+      )
+    );
+  };
+
+  const handleTaskTypeChange = (
+    id: string,
+    field: keyof AcademicTypeConfig,
+    value: string | number
+  ) => {
+    setTaskTypes((current) =>
+      current.map((type) =>
+        type.id === id ? { ...type, [field]: value } : type
+      )
+    );
+  };
+
+  const handleAddExamType = () => {
+    setExamTypes((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        key: `examen_${Date.now()}`,
+        label: 'Nuevo tipo',
+        points: 2,
+        color: '#0ea5e9',
+      },
+    ]);
+  };
+
+  const handleAddTaskType = () => {
+    setTaskTypes((current) => [
+      ...current,
+      {
+        id: crypto.randomUUID(),
+        key: `tarea_${Date.now()}`,
+        label: 'Nuevo tipo',
+        points: 1,
+        color: '#0ea5e9',
+      },
+    ]);
+  };
+
+  const handleDeleteExamType = (typeId: string) => {
+    setExamTypes((current) => current.filter((type) => type.id !== typeId));
+  };
+
+  const handleDeleteTaskType = (typeId: string) => {
+    setTaskTypes((current) => current.filter((type) => type.id !== typeId));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      const newConfig = {
-        ...config,
-        subjects,
-        examPoints: {
-          parcial: Number(examPointsPartial),
-          final: Number(examPointsFinal),
-          recuperatorio: Number(examPointsRecuperatorio),
-          exposicion: Number(examPointsExposicion),
-          regular: Number(examPointsRegular),
-          oral: Number(examPointsOral),
-        },
-        taskPoints: {
-          alta: Number(taskPointsAlta),
-          media: Number(taskPointsMedia),
-          baja: Number(taskPointsBaja),
-        },
+      const { examPoints, taskPoints, ...legacyConfig } = config || {};
+      const newConfig: AcademicModuleConfig = {
+        ...legacyConfig,
+        examTypes,
+        taskTypes,
       };
 
       // Primero guardar las materias si hay módulo ID
@@ -307,138 +314,163 @@ export function AcademicConfig({
         {/* Tab: Scoring */}
         {activeTab === "scoring" && (
           <div className="space-y-6">
-            <div>
-              <h3 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
-                Puntos por Examen
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-3">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Parcial
-                  </label>
-                  <input
-                    type="number"
-                    value={examPointsPartial}
-                    onChange={(e) => setExamPointsPartial(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                    Tipos de Examen
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Añade, edita y elimina los tipos de examen que se usarán en el módulo.
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Final
-                  </label>
-                  <input
-                    type="number"
-                    value={examPointsFinal}
-                    onChange={(e) => setExamPointsFinal(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Recuperatorio
-                  </label>
-                  <input
-                    type="number"
-                    value={examPointsRecuperatorio}
-                    onChange={(e) => setExamPointsRecuperatorio(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={handleAddExamType}
+                  className="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                >
+                  + Nuevo tipo de examen
+                </button>
               </div>
-              <div className="grid gap-4 sm:grid-cols-3 mt-4">
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Exposición
-                  </label>
-                  <input
-                    type="number"
-                    value={examPointsExposicion}
-                    onChange={(e) => setExamPointsExposicion(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Regular
-                  </label>
-                  <input
-                    type="number"
-                    value={examPointsRegular}
-                    onChange={(e) => setExamPointsRegular(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Oral
-                  </label>
-                  <input
-                    type="number"
-                    value={examPointsOral}
-                    onChange={(e) => setExamPointsOral(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
+              <div className="space-y-3">
+                {examTypes.map((type) => (
+                  <div
+                    key={type.id}
+                    className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1.8fr_1fr_1fr_0.75fr] dark:border-slate-700 dark:bg-slate-900"
+                  >
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Nombre del tipo
+                      </label>
+                      <input
+                        value={type.label}
+                        onChange={(e) =>
+                          handleExamTypeChange(type.id, 'label', e.target.value)
+                        }
+                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Puntos
+                      </label>
+                      <input
+                        type="number"
+                        value={type.points}
+                        onChange={(e) =>
+                          handleExamTypeChange(
+                            type.id,
+                            'points',
+                            Number(e.target.value)
+                          )
+                        }
+                        min="0"
+                        step="0.5"
+                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Color
+                      </label>
+                      <div className="mt-1">
+                        <UnifiedColorPicker
+                          value={type.color}
+                          onChange={(color) =>
+                            handleExamTypeChange(type.id, 'color', color)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteExamType(type.id)}
+                      className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-700/40 dark:bg-rose-950/50 dark:text-rose-300"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div>
-              <h3 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
-                Puntos por Tarea (por prioridad)
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-3">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Alta Prioridad
-                  </label>
-                  <input
-                    type="number"
-                    value={taskPointsAlta}
-                    onChange={(e) => setTaskPointsAlta(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                    Tipos de Tarea
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Configura aquí los tipos de tarea que usarás en el planificador.
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Media Prioridad
-                  </label>
-                  <input
-                    type="number"
-                    value={taskPointsMedia}
-                    onChange={(e) => setTaskPointsMedia(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                    Baja Prioridad
-                  </label>
-                  <input
-                    type="number"
-                    value={taskPointsBaja}
-                    onChange={(e) => setTaskPointsBaja(e.target.value)}
-                    min="0"
-                    max="20"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={handleAddTaskType}
+                  className="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                >
+                  + Nuevo tipo de tarea
+                </button>
+              </div>
+              <div className="space-y-3">
+                {taskTypes.map((type) => (
+                  <div
+                    key={type.id}
+                    className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1.8fr_1fr_1fr_0.75fr] dark:border-slate-700 dark:bg-slate-900"
+                  >
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Nombre del tipo
+                      </label>
+                      <input
+                        value={type.label}
+                        onChange={(e) =>
+                          handleTaskTypeChange(type.id, 'label', e.target.value)
+                        }
+                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Puntos
+                      </label>
+                      <input
+                        type="number"
+                        value={type.points}
+                        onChange={(e) =>
+                          handleTaskTypeChange(
+                            type.id,
+                            'points',
+                            Number(e.target.value)
+                          )
+                        }
+                        min="0"
+                        step="0.5"
+                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Color
+                      </label>
+                      <div className="mt-1">
+                        <UnifiedColorPicker
+                          value={type.color}
+                          onChange={(color) =>
+                            handleTaskTypeChange(type.id, 'color', color)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTaskType(type.id)}
+                      className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-700/40 dark:bg-rose-950/50 dark:text-rose-300"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
