@@ -97,7 +97,7 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
 
   const displayName = getDisplayName(friendData, initialDisplayName, initialUsername);
   const age = calculateAge(friendData?.birthDate ?? null);
-  const memberSince = friendData?.createdAt ? new Date(friendData.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short' }) : 'No disponible';
+  const memberSince = friendData?.createdAt ? new Date(friendData.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No disponible';
   const stats = friendData?.stats ?? { goalsCompleted: 0, totalScore: 0, currentStreak: 0, longestStreak: 0 };
 
   return (
@@ -162,19 +162,19 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wide">Nombre</p>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{displayName}</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">{displayName}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide">Usuario</p>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">@{friendData.username}</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">@{friendData.username}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide">Nacimiento</p>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{friendData.birthDate ? new Date(friendData.birthDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No disponible'}</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">{friendData.birthDate ? new Date(friendData.birthDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No disponible'}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-orange-600 dark:text-orange-300 uppercase tracking-wide">Miembro desde</p>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">{memberSince}</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white mt-1 text-center">{memberSince}</p>
                 </div>
               </div>
             </div>
