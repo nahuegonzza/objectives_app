@@ -62,6 +62,7 @@ export function AcademicEventForm({
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(getLocalDateString());
   const [completed, setCompleted] = useState(false);
+  const [grade, setGrade] = useState<number | undefined>(undefined);
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
   const [moduleConfig, setModuleConfig] = useState<Record<string, unknown> | undefined>(undefined);
@@ -83,7 +84,8 @@ export function AcademicEventForm({
         title !== initialEvent.title ||
         description !== initialEvent.description ||
         date !== initialEvent.date.slice(0, 10) ||
-        completed !== initialEvent.completed
+        completed !== initialEvent.completed ||
+        grade !== initialEvent.grade
       );
     } else {
       // Modo creación: comparar con valores por defecto
@@ -96,7 +98,8 @@ export function AcademicEventForm({
         title !== '' ||
         description !== '' ||
         date !== getLocalDateString() ||
-        completed !== false
+        completed !== false ||
+        grade !== undefined
       );
     }
   };
@@ -149,6 +152,7 @@ export function AcademicEventForm({
       setDescription(initialEvent.description);
       setDate(initialEvent.date.slice(0, 10));
       setCompleted(initialEvent.completed);
+      setGrade(initialEvent.grade);
     } else {
       setEventType('task');
       setExamType('parcial');
@@ -159,6 +163,7 @@ export function AcademicEventForm({
       setDescription('');
       setDate(getLocalDateString());
       setCompleted(false);
+      setGrade(undefined);
     }
     setShowValidationModal(false);
     setShowUnsavedChangesModal(false);
@@ -178,7 +183,7 @@ export function AcademicEventForm({
       date: date,
       completed: completed,
       type: eventType,
-      ...(eventType === 'exam' ? { examType } : { priority, estimatedDuration }),
+      ...(eventType === 'exam' ? { examType, grade } : { priority, estimatedDuration }),
     };
 
     await onSave(event);
@@ -274,23 +279,40 @@ export function AcademicEventForm({
 
             {/* Tipo de examen o prioridad de tarea */}
             {eventType === 'exam' ? (
-              <div>
-                <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
-                  Tipo de examen
-                </label>
-                <select value={examType} onChange={(e) => setExamType(e.target.value as AcademicExamType)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900">
-                  {availableExamTypes.length > 0 ? availableExamTypes.map((t) => <option key={t.key} value={t.key}>{t.label}</option>) : (
-                    <>
-                      <option value="parcial">Parcial</option>
-                      <option value="final">Final</option>
-                      <option value="recuperatorio">Recuperatorio</option>
-                      <option value="exposicion">Exposición</option>
+              <>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Tipo de examen
+                  </label>
+                  <select value={examType} onChange={(e) => setExamType(e.target.value as AcademicExamType)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900">
+                    {availableExamTypes.length > 0 ? availableExamTypes.map((t) => <option key={t.key} value={t.key}>{t.label}</option>) : (
+                      <>
+                        <option value="parcial">Parcial</option>
+                        <option value="final">Final</option>
+                        <option value="recuperatorio">Recuperatorio</option>
+                        <option value="exposicion">Exposición</option>
                       <option value="regular">Regular</option>
                       <option value="oral">Oral</option>
                     </>
                   )}
                 </select>
-              </div>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500 mb-2">
+                    Nota del examen (opcional)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={grade !== undefined ? grade : ''}
+                    onChange={(e) => setGrade(e.target.value ? parseFloat(e.target.value) : undefined)}
+                    placeholder="Ej. 8.5"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                  />
+                </div>
+              </>
             ) : (
               <>
                 <div>

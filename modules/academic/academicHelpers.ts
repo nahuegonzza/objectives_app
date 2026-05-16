@@ -99,6 +99,8 @@ export interface AcademicSubject {
   name: string;
   color: string;
   semester: string;
+  approveNote?: number; // Nota mínima para aprobar (ej: 4)
+  promoteNote?: number; // Nota mínima para promocionar (ej: 7)
 }
 
 export interface AcademicEvent {
@@ -112,6 +114,7 @@ export interface AcademicEvent {
   examType?: AcademicExamType;
   priority?: AcademicTaskPriority;
   estimatedDuration?: AcademicTaskDuration;
+  grade?: number; // Nota del examen (solo para exámenes)
 }
 
 export interface AcademicData {
@@ -179,6 +182,46 @@ export function getAcademicEventColor(subject: AcademicSubject | undefined, even
 
   return event.type === 'exam' ? '#f97316' : '#22c55e';
 }
+
+/**
+ * Calcula los puntos a otorgar para un evento basado en la nota del examen
+ * - Si nota < nota para aprobar: 0 puntos
+ * - Si nota >= nota para aprobar y < nota para promocionar: mitad de puntos
+ * - Si nota >= nota para promocionar: puntos completos
+ */
+export function calculateEventPoints(
+  event: AcademicEvent,
+  typeConfig: AcademicTypeConfig,
+  subject?: AcademicSubject
+): number {
+  // Si es una tarea (no examen), devolver los puntos completos
+  if (event.type === 'task') {
+    return typeConfig.points;
+  }
+
+  // Si es examen pero no tiene nota, no dar puntos
+  if (event.type === 'exam' && typeof event.grade !== 'number') {
+    return 0;
+  }
+
+  const grade = event.grade as number;
+  const approveNote = subject?.approveNote ?? 4;
+  const promoteNote = subject?.promoteNote ?? 7;
+
+  // Si la nota es inferior a la de aprobación
+  if (grade < approveNote) {
+    return 0;
+  }
+
+  // Si la nota es entre aprobación y promoción
+  if (grade < promoteNote) {
+    return typeConfig.points / 2;
+  }
+
+  // Si la nota es de promoción o superior
+  return typeConfig.points;
+}
+
 
 export function getAcademicEventsForCalendar(entries: ModuleEntry[]): AcademicCalendarEvent[] {
   return entries.flatMap((entry) => {

@@ -207,6 +207,32 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
         </p>
       </div>
 
+      {/* Nota del examen */}
+      {event.type === 'exam' && (
+        <div className="mt-4 space-y-2">
+          {event.grade !== undefined && (
+            <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3 dark:bg-slate-800/50">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">Nota</span>
+              <span className="text-lg font-bold text-slate-900 dark:text-white">{event.grade.toFixed(1)}</span>
+            </div>
+          )}
+          {subject && (subject.approveNote !== undefined || subject.promoteNote !== undefined) && (
+            <div className="flex gap-2 text-xs">
+              {subject.approveNote !== undefined && (
+                <div className="flex-1 rounded-lg bg-blue-50 p-2 text-center dark:bg-blue-950/30">
+                  <p className="font-semibold text-blue-600 dark:text-blue-400">Aprobación: {subject.approveNote}</p>
+                </div>
+              )}
+              {subject.promoteNote !== undefined && (
+                <div className="flex-1 rounded-lg bg-emerald-50 p-2 text-center dark:bg-emerald-950/30">
+                  <p className="font-semibold text-emerald-600 dark:text-emerald-400">Promoción: {subject.promoteNote}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Footer: Acciones de edición */}
       {(onEdit || onDelete) && (
         <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-900">

@@ -159,7 +159,7 @@ export function AcademicConfig({
   const handleFieldChange = (
     id: string,
     field: keyof AcademicSubject,
-    value: string
+    value: string | number
   ) => {
     setSubjects((current) =>
       current.map((subject) =>
@@ -174,6 +174,8 @@ export function AcademicConfig({
       name: "",
       color: "#2563eb",
       semester: "1",
+      approveNote: 4,
+      promoteNote: 7,
     };
     setSubjects((current) => [...current, nextSubject]);
   };
@@ -524,7 +526,7 @@ export function AcademicConfig({
                 {subjects.map((subject) => (
                   <div
                     key={subject.id}
-                    className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1fr_0.5fr_0.5fr_auto] dark:border-slate-700 dark:bg-slate-900"
+                    className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1fr_0.5fr_0.5fr_0.5fr_0.5fr_auto] dark:border-slate-700 dark:bg-slate-900"
                   >
                     <div>
                       <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
@@ -552,6 +554,40 @@ export function AcademicConfig({
                         }
                         className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
                         placeholder="Ej. 1º"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Nota Aprobación
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.5"
+                        value={subject.approveNote ?? 4}
+                        onChange={(e) =>
+                          handleFieldChange(subject.id, "approveNote", parseFloat(e.target.value))
+                        }
+                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                        placeholder="Ej. 4"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                        Nota Promoción
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.5"
+                        value={subject.promoteNote ?? 7}
+                        onChange={(e) =>
+                          handleFieldChange(subject.id, "promoteNote", parseFloat(e.target.value))
+                        }
+                        className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-emerald-400 dark:focus:ring-emerald-900"
+                        placeholder="Ej. 7"
                       />
                     </div>
                     <div>
