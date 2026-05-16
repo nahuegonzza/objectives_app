@@ -209,7 +209,7 @@ export default function FriendProfileModal({ friendId, onClose, initialDisplayNa
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-300 uppercase tracking-wide text-center">Email</p>
-                  <p ref={infoEmailRef} title={friendData?.email || ''} className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center inline-block max-w-full whitespace-nowrap">{friendData?.email || 'No disponible'}</p>
+                  <p ref={infoEmailRef} title={friendData?.email || ''} className="text-base font-bold text-slate-900 dark:text-white mt-1 text-center w-full max-w-full whitespace-nowrap">{friendData?.email || 'No disponible'}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-slate-800 dark:to-slate-700">
                   <p className="text-xs font-semibold text-purple-600 dark:text-purple-300 uppercase tracking-wide text-center">Nacimiento</p>
