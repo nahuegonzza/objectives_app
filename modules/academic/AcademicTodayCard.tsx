@@ -206,7 +206,9 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
                   const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
                   const parsed = Number(raw);
                   if (!Number.isNaN(parsed)) {
-                    const updated = { ...event, grade: parsed, completed: true } as AcademicEvent;
+                    const clamped = Math.min(10, Math.max(0, parsed));
+                    setGradeInput(String(clamped));
+                    const updated = { ...event, grade: clamped, completed: true } as AcademicEvent;
                     await onUpdateEvent(updated);
                   } else {
                     // reset to previous value
@@ -218,7 +220,9 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
                     const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
                     const parsed = Number(raw);
                     if (!Number.isNaN(parsed)) {
-                      const updated = { ...event, grade: parsed, completed: true } as AcademicEvent;
+                      const clamped = Math.min(10, Math.max(0, parsed));
+                      setGradeInput(String(clamped));
+                      const updated = { ...event, grade: clamped, completed: true } as AcademicEvent;
                       await onUpdateEvent(updated);
                     }
                     (e.target as HTMLInputElement).blur();

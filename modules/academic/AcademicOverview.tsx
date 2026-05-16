@@ -848,19 +848,51 @@ export default function AcademicOverview() {
                               {event.subject?.name || 'Sin materia'}
                             </span>
                             <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleToggleReady(event)}
-                                className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
-                                aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
-                              >
-                                <Image
-                                  src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
-                                  alt={event.completed ? 'Deshacer' : 'Listo'}
-                                  width={18}
-                                  height={18}
+                              {event.type === 'exam' ? (
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  min={0}
+                                  max={10}
+                                  defaultValue={event.grade !== undefined ? String(event.grade) : ''}
+                                  onBlur={async (e) => {
+                                    const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                    const parsed = Number(raw);
+                                    if (!Number.isNaN(parsed)) {
+                                      const clamped = Math.min(10, Math.max(0, parsed));
+                                      const updated = { ...event, grade: clamped, completed: true } as any;
+                                      await handleSaveEvent(updated as any);
+                                    }
+                                  }}
+                                  onKeyDown={async (e) => {
+                                    if (e.key === 'Enter') {
+                                      const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                      const parsed = Number(raw);
+                                      if (!Number.isNaN(parsed)) {
+                                        const clamped = Math.min(10, Math.max(0, parsed));
+                                        const updated = { ...event, grade: clamped, completed: true } as any;
+                                        await handleSaveEvent(updated as any);
+                                      }
+                                      (e.target as HTMLInputElement).blur();
+                                    }
+                                  }}
+                                  className="w-20 px-2 py-1 text-center text-sm rounded border border-slate-300 bg-white dark:bg-slate-800"
                                 />
-                              </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleReady(event)}
+                                  className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                                  aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
+                                >
+                                  <Image
+                                    src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
+                                    alt={event.completed ? 'Deshacer' : 'Listo'}
+                                    width={18}
+                                    height={18}
+                                  />
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={() => handleEditEvent(event)}
@@ -930,19 +962,52 @@ export default function AcademicOverview() {
                                       {event.subject?.name || 'Sin materia'}
                                     </span>
                                     <div className="flex gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleToggleReady(event)}
-                                        className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
-                                        aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
-                                      >
-                                        <Image
-                                          src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
-                                          alt={event.completed ? 'Deshacer' : 'Listo'}
-                                          width={18}
-                                          height={18}
+                                      {event.type === 'exam' ? (
+                                        <input
+                                          type="number"
+                                          step="0.1"
+                                          min={0}
+                                          max={10}
+                                          defaultValue={event.grade !== undefined ? String(event.grade) : ''}
+                                          onBlur={async (e) => {
+                                            const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                            const parsed = Number(raw);
+                                            if (!Number.isNaN(parsed)) {
+                                              const clamped = Math.min(10, Math.max(0, parsed));
+                                              const updated = { ...event, grade: clamped, completed: true } as any;
+                                              await handleSaveEvent(updated as any);
+                                            }
+                                          }}
+                                          onKeyDown={async (e) => {
+                                            if (e.key === 'Enter') {
+                                              const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                              const parsed = Number(raw);
+                                              if (!Number.isNaN(parsed)) {
+                                                const clamped = Math.min(10, Math.max(0, parsed));
+                                                const updated = { ...event, grade: clamped, completed: true } as any;
+                                                await handleSaveEvent(updated as any);
+                                              }
+                                              (e.target as HTMLInputElement).blur();
+                                            }
+                                          }}
+                                          className="w-20 px-2 py-1 text-center text-sm rounded border border-slate-300 bg-white dark:bg-slate-800"
                                         />
-                                      </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleToggleReady(event)}
+                                          className="rounded-lg bg-emerald-100 p-2 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800"
+                                          aria-label={event.completed ? 'Deshacer' : 'Marcar como listo'}
+                                        >
+                                          <Image
+                                            src={event.completed ? '/icons/ui/cancel_icon.png' : '/icons/ui/check_icon.png'}
+                                            alt={event.completed ? 'Deshacer' : 'Listo'}
+                                            width={18}
+                                            height={18}
+                                          />
+                                        </button>
+                                      )}
+
                                       <button
                                         type="button"
                                         onClick={() => handleEditEvent(event)}
