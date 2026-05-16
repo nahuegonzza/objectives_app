@@ -208,6 +208,7 @@ export function AcademicDashboard({ config, module, onUpdate, isEditing = false,
                     event={event}
                     subject={subject}
                     onToggleComplete={handleToggleCompleted}
+                    onUpdateEvent={handleSaveEvent}
                     onEdit={handleEditEvent}
                     onDelete={handleDeleteEvent}
                     isEditing={isEditing}

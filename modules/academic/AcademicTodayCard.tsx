@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { AcademicEvent, AcademicSubject } from './academicHelpers';
 import { getAcademicExamTypeLabelByType } from './academicHelpers';
 import { getColorOption } from '@lib/goalIconsColors';
@@ -82,12 +83,18 @@ interface AcademicTodayCardProps {
   event: AcademicEvent;
   subject: AcademicSubject | undefined;
   onToggleComplete: (event: AcademicEvent) => Promise<void>;
+  onUpdateEvent?: (event: AcademicEvent) => Promise<void>;
   onEdit?: (event: AcademicEvent) => void;
   onDelete?: (event: AcademicEvent) => void;
   isEditing?: boolean;
 }
 
-export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, onDelete, isEditing = false }: AcademicTodayCardProps) {
+export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEvent, onEdit, onDelete, isEditing = false }: AcademicTodayCardProps) {
+  const [gradeInput, setGradeInput] = useState<string>(event.grade !== undefined ? String(event.grade) : '');
+
+  useEffect(() => {
+    setGradeInput(event.grade !== undefined ? String(event.grade) : '');
+  }, [event.grade]);
   const icon = event.type === 'exam' ? (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M6 4h12v16H6z" />
@@ -183,20 +190,58 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onEdit, on
           </div>
         </div>
 
-        {/* Toggle de completado */}
+        {/* Toggle de completado o input de nota para exámenes */}
         <div className="flex flex-col items-end gap-1">
-          <button
-            type="button"
-            onClick={() => isEditing && onToggleComplete(event)}
-            disabled={!isEditing}
-            className={`relative h-6 w-11 rounded-full transition-colors ${
-              event.completed
-                ? 'bg-emerald-500'
-                : 'bg-slate-200 dark:bg-slate-800'
-            } ${!isEditing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          >
-            <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${event.completed ? 'translate-x-5' : 'translate-x-0'}`} />
-          </button>
+          {event.type === 'exam' ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="10"
+                value={gradeInput}
+                onChange={(e) => setGradeInput(e.target.value)}
+                onBlur={async (e) => {
+                  if (!isEditing || !onUpdateEvent) return;
+                  const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                  const parsed = Number(raw);
+                  if (!Number.isNaN(parsed)) {
+                    const updated = { ...event, grade: parsed, completed: true } as AcademicEvent;
+                    await onUpdateEvent(updated);
+                  } else {
+                    // reset to previous value
+                    setGradeInput(event.grade !== undefined ? String(event.grade) : '');
+                  }
+                }}
+                onKeyDown={async (e) => {
+                  if (e.key === 'Enter' && isEditing && onUpdateEvent) {
+                    const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                    const parsed = Number(raw);
+                    if (!Number.isNaN(parsed)) {
+                      const updated = { ...event, grade: parsed, completed: true } as AcademicEvent;
+                      await onUpdateEvent(updated);
+                    }
+                    (e.target as HTMLInputElement).blur();
+                  }
+                }}
+                disabled={!isEditing}
+                className={`w-20 px-2 py-1 text-center text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 ${!isEditing ? 'opacity-50 cursor-not-allowed' : ''}`}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => isEditing && onToggleComplete(event)}
+              disabled={!isEditing}
+              className={`relative h-6 w-11 rounded-full transition-colors ${
+                event.completed
+                  ? 'bg-emerald-500'
+                  : 'bg-slate-200 dark:bg-slate-800'
+              } ${!isEditing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${event.completed ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+          )}
         </div>
       </div>
 
