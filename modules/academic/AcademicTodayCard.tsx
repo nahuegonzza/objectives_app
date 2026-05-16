@@ -204,6 +204,13 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
                 onBlur={async (e) => {
                   if (!isEditing || !onUpdateEvent) return;
                   const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                  if (raw === '') {
+                    // Empty input: clear the grade and mark as pending
+                    setGradeInput('');
+                    const updated = { ...event, grade: undefined, completed: false } as AcademicEvent;
+                    await onUpdateEvent(updated);
+                    return;
+                  }
                   const parsed = Number(raw);
                   if (!Number.isNaN(parsed)) {
                     const clamped = Math.min(10, Math.max(0, parsed));
@@ -218,6 +225,14 @@ export function AcademicTodayCard({ event, subject, onToggleComplete, onUpdateEv
                 onKeyDown={async (e) => {
                   if (e.key === 'Enter' && isEditing && onUpdateEvent) {
                     const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                    if (raw === '') {
+                      // Empty input: clear the grade and mark as pending
+                      setGradeInput('');
+                      const updated = { ...event, grade: undefined, completed: false } as AcademicEvent;
+                      await onUpdateEvent(updated);
+                      (e.target as HTMLInputElement).blur();
+                      return;
+                    }
                     const parsed = Number(raw);
                     if (!Number.isNaN(parsed)) {
                       const clamped = Math.min(10, Math.max(0, parsed));

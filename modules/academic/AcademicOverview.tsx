@@ -857,6 +857,11 @@ export default function AcademicOverview() {
                                   defaultValue={event.grade !== undefined ? String(event.grade) : ''}
                                   onBlur={async (e) => {
                                     const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                    if (raw === '') {
+                                      const updated = { ...event, grade: undefined, completed: false } as any;
+                                      await handleSaveEvent(updated as any);
+                                      return;
+                                    }
                                     const parsed = Number(raw);
                                     if (!Number.isNaN(parsed)) {
                                       const clamped = Math.min(10, Math.max(0, parsed));
@@ -867,6 +872,12 @@ export default function AcademicOverview() {
                                   onKeyDown={async (e) => {
                                     if (e.key === 'Enter') {
                                       const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                      if (raw === '') {
+                                        const updated = { ...event, grade: undefined, completed: false } as any;
+                                        await handleSaveEvent(updated as any);
+                                        (e.target as HTMLInputElement).blur();
+                                        return;
+                                      }
                                       const parsed = Number(raw);
                                       if (!Number.isNaN(parsed)) {
                                         const clamped = Math.min(10, Math.max(0, parsed));
@@ -971,6 +982,11 @@ export default function AcademicOverview() {
                                           defaultValue={event.grade !== undefined ? String(event.grade) : ''}
                                           onBlur={async (e) => {
                                             const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                            if (raw === '') {
+                                              const updated = { ...event, grade: undefined, completed: false } as any;
+                                              await handleSaveEvent(updated as any);
+                                              return;
+                                            }
                                             const parsed = Number(raw);
                                             if (!Number.isNaN(parsed)) {
                                               const clamped = Math.min(10, Math.max(0, parsed));
@@ -981,6 +997,12 @@ export default function AcademicOverview() {
                                           onKeyDown={async (e) => {
                                             if (e.key === 'Enter') {
                                               const raw = String((e.target as HTMLInputElement).value).trim().replace(',', '.');
+                                              if (raw === '') {
+                                                const updated = { ...event, grade: undefined, completed: false } as any;
+                                                await handleSaveEvent(updated as any);
+                                                (e.target as HTMLInputElement).blur();
+                                                return;
+                                              }
                                               const parsed = Number(raw);
                                               if (!Number.isNaN(parsed)) {
                                                 const clamped = Math.min(10, Math.max(0, parsed));
